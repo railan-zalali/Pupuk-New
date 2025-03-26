@@ -138,23 +138,34 @@ class CustomerController extends Controller
             ->with('success', 'Customer deleted successfully');
     }
 
-    // API untuk select2
     public function search(Request $request)
     {
-        $term = $request->get('term');
+        $search = $request->input('search');
 
-        $customers = Customer::where('nama', 'like', "%{$term}%")
-            ->orWhere('nik', 'like', "%{$term}%")
-            ->limit(10)
-            ->get()
-            ->map(function ($customer) {
-                return [
-                    'id' => $customer->id,
-                    'text' => "$customer->nama - $customer->nik"
-                ];
-            });
+        $customers = Customer::query()
+            ->withCount('sales')
+            ->withSum('sales', 'total_amount')
+            ->with(['desa:id,nama', 'kecamatan:id,nama'])
+            ->when($search, function ($query) use ($search) {
+                $query->where(function ($q) use ($search) {
+                    $q->where('nik', 'like', "%{$search}%")
+                        ->orWhere('nama', 'like', "%{$search}%")
+                        ->orWhere('alamat', 'like', "%{$search}%")
+                        ->orWhereHas('desa', function ($q) use ($search) {
+                            $q->where('nama', 'like', "%{$search}%");
+                        })
+                        ->orWhereHas('kecamatan', function ($q) use ($search) {
+                            $q->where('nama', 'like', "%{$search}%");
+                        });
+                });
+            })
+            ->latest()
+            ->get();
 
-        return response()->json(['results' => $customers]);
+        // Pastikan mengembalikan array
+        return response()->json([
+            'data' => $customers->toArray()
+        ]);
     }
     public function import(Request $request)
     {

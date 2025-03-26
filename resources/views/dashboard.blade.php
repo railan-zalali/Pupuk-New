@@ -5,13 +5,15 @@
             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ __('Dashboard') }}</h2>
 
             <!-- Optional action buttons -->
-            <div class="flex items-center gap-3">
-                <button class="btn-secondary">
-                    <i class="ti ti-filter mr-1"></i> Filter
-                </button>
-                <button class="btn-primary">
-                    <i class="ti ti-plus mr-1"></i> Add New
-                </button>
+            <div class="mt-4 sm:mt-0 flex space-x-2">
+                <a href="{{ route('products.create') }}"
+                    class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    Tambah
+                </a>
             </div>
         </div>
 
@@ -48,7 +50,6 @@
                     </div>
                 </div>
             </div>
-
             <!-- Monthly Sales Card -->
             <div
                 class="overflow-hidden rounded-lg bg-gradient-to-br from-green-50 to-white dark:from-green-900 dark:to-gray-800 shadow-sm border border-green-100 dark:border-green-800 hover:shadow-md transition-all duration-300">
@@ -57,13 +58,15 @@
                         <div class="flex-shrink-0 p-3 bg-green-100 dark:bg-green-800 rounded-full">
                             <svg class="h-6 w-6 text-green-600 dark:text-green-300" fill="none" stroke="currentColor"
                                 viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d=" M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0
+                                                012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0
+                                                012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                             </svg>
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Penjualan
+                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">
+                                    Penjualan
                                     Bulanan</dt>
                                 <dd class="text-xl font-semibold text-gray-900 dark:text-gray-100">Rp
                                     {{ number_format($totalSalesThisMonth, 0, ',', '.') }}</dd>
@@ -73,7 +76,8 @@
                                             d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
                                             clip-rule="evenodd" />
                                     </svg>
-                                    <span>{{ number_format($salesChangeThisMonth, 2) }}% dari bulan lalu</span>
+                                    <span>{{ number_format($salesChangeThisMonth, 2) }}% dari bulan
+                                        lalu</span>
                                 </dd>
                             </dl>
                         </div>
@@ -95,7 +99,8 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Total Produk
+                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Total
+                                    Produk
                                 </dt>
                                 <dd class="text-xl font-semibold text-gray-900 dark:text-gray-100">
                                     {{ number_format($totalProducts) }}
@@ -136,7 +141,8 @@
                         </div>
                         <div class="ml-5 w-0 flex-1">
                             <dl>
-                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Kredit Bulanan
+                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Kredit
+                                    Bulanan
                                 </dt>
                                 <dd class="text-xl font-semibold text-gray-900 dark:text-gray-100">Rp
                                     {{ number_format($totalCreditAmount, 0, ',', '.') }}</dd>
@@ -152,14 +158,83 @@
                         <a href="{{ route('sales.credit') }}"
                             class="text-sm text-orange-600 dark:text-orange-300 hover:text-orange-800 dark:hover:text-orange-500 flex items-center justify-between">
                             <span>Lihat semua kredit</span>
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M9 5l7 7-7 7" />
                             </svg>
                         </a>
                     </div>
                 @endif
+            </div>
+            <!-- Daily Outgoing Stock Card -->
+            <div
+                class="overflow-hidden rounded-lg bg-gradient-to-br from-red-50 to-white dark:from-red-900 dark:to-gray-800 shadow-sm border border-red-100 dark:border-red-800 hover:shadow-md transition-all duration-300">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 p-3 bg-red-100 dark:bg-red-800 rounded-full">
+                            <svg class="h-6 w-6 text-red-600 dark:text-red-300" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 12H9m6 0a6 6 0 11-12 0 6 6 0 0112 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Stok Keluar
+                                    Harian</dt>
+                                <dd class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                                    {{ number_format($dailyOutgoingStock, 0, ',', '.') }} unit
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-red-50 dark:bg-red-900 px-5 py-2">
+                    <a href="{{ route('stock.details') }}"
+                        class="text-sm text-red-600 dark:text-red-300 hover:text-red-800 dark:hover:text-red-500 flex items-center justify-between">
+                        <span>Lihat selengkapnya</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Daily Incoming Stock Card -->
+            <div
+                class="overflow-hidden rounded-lg bg-gradient-to-br from-green-50 to-white dark:from-green-900 dark:to-gray-800 shadow-sm border border-green-100 dark:border-green-800 hover:shadow-md transition-all duration-300">
+                <div class="p-5">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 p-3 bg-green-100 dark:bg-green-800 rounded-full">
+                            <svg class="h-6 w-6 text-green-600 dark:text-green-300" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                        <div class="ml-5 w-0 flex-1">
+                            <dl>
+                                <dt class="truncate text-sm font-medium text-gray-500 dark:text-gray-300">Stok Masuk
+                                    Harian</dt>
+                                <dd class="text-xl font-semibold text-gray-900 dark:text-gray-100">
+                                    {{ number_format($dailyIncomingStock, 0, ',', '.') }} unit
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-green-50 dark:bg-green-900 px-5 py-2">
+                    <a href="{{ route('stock.details') }}"
+                        class="text-sm text-green-600 dark:text-green-300 hover:text-green-800 dark:hover:text-green-500 flex items-center justify-between">
+                        <span>Lihat selengkapnya</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </a>
+                </div>
             </div>
         </div>
 
@@ -218,6 +293,31 @@
                     <div class="mt-2">
                         <div class="h-80">
                             <canvas id="topProductsChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </div>
+        <!-- Sales Trend Chart -->
+        <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">
+            <div
+                class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-100 dark:border-gray-700">
+                <div class="p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-gray-100 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                            </svg>
+                            Tren Penjualan
+                        </h3>
+                    </div>
+                    <div class="mt-2">
+                        <div class="h-80">
+                            <canvas id="salesTrendChart"></canvas>
                         </div>
                     </div>
                 </div>
@@ -335,7 +435,8 @@
                                                         stroke-width="2"
                                                         d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                                 </svg>
-                                                <p class="text-gray-500 dark:text-gray-400 font-medium">Semua produk
+                                                <p class="text-gray-500 dark:text-gray-400 font-medium">Semua
+                                                    produk
                                                     memiliki stok
                                                     yang cukup</p>
                                             </td>
@@ -462,108 +563,153 @@
                 </div>
             </div>
         </div>
+    </div>
+    @push('scripts')
+        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+        <script>
+            // Format Rupiah
+            function formatRupiah(number) {
+                return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
+            }
 
-
-        @push('scripts')
-            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-            <script>
-                // Format Rupiah
-                function formatRupiah(number) {
-                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(number);
+            // Daily Sales Chart
+            const dailySalesChart = new Chart(
+                document.getElementById('dailySalesChart'), {
+                    type: 'line',
+                    data: {
+                        labels: @json($dailySales->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('d/m'))),
+                        datasets: [{
+                            label: 'Penjualan Harian',
+                            data: @json($dailySales->pluck('total')),
+                            borderColor: 'rgb(59, 130, 246)',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return formatRupiah(context.raw);
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatRupiah(value);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
+            );
 
-                // Daily Sales Chart
-                const dailySalesChart = new Chart(
-                    document.getElementById('dailySalesChart'), {
-                        type: 'line',
-                        data: {
-                            labels: @json($dailySales->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('d/m'))),
-                            datasets: [{
-                                label: 'Penjualan Harian',
-                                data: @json($dailySales->pluck('total')),
-                                borderColor: 'rgb(59, 130, 246)',
-                                backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4
-                            }]
+            // Top Products Chart
+            const topProductsChart = new Chart(
+                document.getElementById('topProductsChart'), {
+                    type: 'bar',
+                    data: {
+                        labels: @json($topProducts->pluck('name')),
+                        datasets: [{
+                            label: 'Unit Terjual',
+                            data: @json($topProducts->pluck('total_sold')),
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.8)',
+                                'rgba(16, 185, 129, 0.8)',
+                                'rgba(245, 158, 11, 0.8)',
+                                'rgba(239, 68, 68, 0.8)',
+                                'rgba(139, 92, 246, 0.8)'
+                            ],
+                            borderColor: [
+                                'rgb(59, 130, 246)',
+                                'rgb(16, 185, 129)',
+                                'rgb(245, 158, 11)',
+                                'rgb(239, 68, 68)',
+                                'rgb(139, 92, 246)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            }
                         },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top'
-                                },
-                                tooltip: {
-                                    callbacks: {
-                                        label: function(context) {
-                                            return formatRupiah(context.raw);
-                                        }
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    stepSize: 1
+                                }
+                            }
+                        }
+                    }
+                }
+            );
+
+            // Sales Trend Chart
+            const salesTrendChart = new Chart(
+                document.getElementById('salesTrendChart'), {
+                    type: 'line',
+                    data: {
+                        labels: @json($salesTrend->pluck('date')->map(fn($date) => \Carbon\Carbon::parse($date)->format('d/m'))),
+                        datasets: [{
+                            label: 'Tren Penjualan',
+                            data: @json($salesTrend->pluck('total')),
+                            borderColor: 'rgb(75, 192, 192)',
+                            backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top'
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return formatRupiah(context.raw);
                                     }
                                 }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        callback: function(value) {
-                                            return formatRupiah(value);
-                                        }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    callback: function(value) {
+                                        return formatRupiah(value);
                                     }
                                 }
                             }
                         }
                     }
-                );
-
-                // Top Products Chart
-                const topProductsChart = new Chart(
-                    document.getElementById('topProductsChart'), {
-                        type: 'bar',
-                        data: {
-                            labels: @json($topProducts->pluck('name')),
-                            datasets: [{
-                                label: 'Unit Terjual',
-                                data: @json($topProducts->pluck('total_sold')),
-                                backgroundColor: [
-                                    'rgba(59, 130, 246, 0.8)',
-                                    'rgba(16, 185, 129, 0.8)',
-                                    'rgba(245, 158, 11, 0.8)',
-                                    'rgba(239, 68, 68, 0.8)',
-                                    'rgba(139, 92, 246, 0.8)'
-                                ],
-                                borderColor: [
-                                    'rgb(59, 130, 246)',
-                                    'rgb(16, 185, 129)',
-                                    'rgb(245, 158, 11)',
-                                    'rgb(239, 68, 68)',
-                                    'rgb(139, 92, 246)'
-                                ],
-                                borderWidth: 1
-                            }]
-                        },
-                        options: {
-                            responsive: true,
-                            maintainAspectRatio: false,
-                            plugins: {
-                                legend: {
-                                    display: true,
-                                    position: 'top'
-                                }
-                            },
-                            scales: {
-                                y: {
-                                    beginAtZero: true,
-                                    ticks: {
-                                        stepSize: 1
-                                    }
-                                }
-                            }
-                        }
-                    }
-                );
-            </script>
-        @endpush
+                }
+            );
+        </script>
+    @endpush
 </x-app-layout>

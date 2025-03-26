@@ -80,6 +80,8 @@ Route::middleware('auth')->group(function () {
     // Dashboard
     Route::get('/', [DashboardController::class, 'index']);
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+    Route::get('/stock-details', [DashboardController::class, 'dailyStockDetails'])->name('stock.details');
+    Route::get('/weekly-stock-details', [DashboardController::class, 'weeklyStockDetails'])->name('weekly.stock.details');
 
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

@@ -37,7 +37,7 @@
             --color-sidebar-text: #64748b;
             --color-sidebar-active-text: #4f46e5;
 
-            --transition-normal: all 0.3s ease;
+            /* --transition-normal: all 0.3s ease; */
         }
 
         .dark {
@@ -57,7 +57,7 @@
         .sidebar {
             width: 280px;
             background-color: var(--color-sidebar-bg);
-            transition: var(--transition-normal);
+
             z-index: 50;
         }
 
@@ -66,7 +66,7 @@
         }
 
         .main-content {
-            transition: var(--transition-normal);
+
             /* margin-left: 280px; */
             width: calc(100% - 280px);
         }
@@ -113,7 +113,7 @@
             color: var(--color-sidebar-text);
             border-radius: 0.5rem;
             margin: 0.25rem 0.75rem;
-            transition: var(--transition-normal);
+
         }
 
         .nav-item:hover {
@@ -141,7 +141,7 @@
             background-color: white;
             border-radius: 1rem;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
-            transition: var(--transition-normal);
+
         }
 
         .dark .content-card {
@@ -153,7 +153,7 @@
             cursor: pointer;
             padding: 0.5rem;
             border-radius: 0.5rem;
-            transition: var(--transition-normal);
+
         }
 
         .toggle-theme:hover {
@@ -189,7 +189,7 @@
             display: flex;
             align-items: center;
             justify-content: space-between;
-            transition: var(--transition-normal);
+
         }
 
         .dark .app-header {

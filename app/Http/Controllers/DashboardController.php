@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Sale;
+use App\Models\StockMovement;
 use App\Services\ActivityLogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -81,6 +82,17 @@ class DashboardController extends Controller
         }
         $data['dailySales'] = $dates;
 
+        $data['salesTrend'] = collect(range(0, 11))->map(function ($i) {
+            $date = Carbon::today()->subMonths($i);
+            return [
+                'date' => $date->format('Y-m'),
+                'total' => Sale::whereMonth('created_at', $date->month)
+                    ->whereYear('created_at', $date->year)
+                    ->sum('total_amount')
+            ];
+        });
+
+
         // Data untuk produk terlaris
         $productsWithSales = Product::with(['saleDetails.sale' => function ($query) {
             $query->whereNull('deleted_at');
@@ -99,6 +111,58 @@ class DashboardController extends Controller
 
         $data['topProducts'] = $productsWithSales;
 
+        // Data untuk stok keluar harian
+        $data['dailyOutgoingStock'] = StockMovement::where('type', 'out')
+            ->whereDate('created_at', Carbon::today())
+            ->sum('quantity');
+
+        // Data untuk stok masuk harian
+        $data['dailyIncomingStock'] = StockMovement::where('type', 'in')
+            ->whereDate('created_at', Carbon::today())
+            ->sum('quantity');
+
         return view('dashboard', $data);
+    }
+    public function dailyStockDetails()
+    {
+        $outgoingStockDetails = StockMovement::where('type', 'out')
+            ->whereDate('created_at', Carbon::today())
+            ->with('product')
+            ->get();
+
+        $incomingStockDetails = StockMovement::where('type', 'in')
+            ->whereDate('created_at', Carbon::today())
+            ->with('product')
+            ->get();
+
+        return view('stock-details', [
+            'outgoingStockDetails' => $outgoingStockDetails,
+            'incomingStockDetails' => $incomingStockDetails,
+        ]);
+    }
+    public function weeklyStockDetails()
+    {
+        $dates = collect();
+        for ($i = 6; $i >= 0; $i--) {
+            $date = Carbon::today()->subDays($i);
+            $outgoingStock = StockMovement::where('type', 'out')
+                ->whereDate('created_at', $date)
+                ->with('product')
+                ->get();
+            $incomingStock = StockMovement::where('type', 'in')
+                ->whereDate('created_at', $date)
+                ->with('product')
+                ->get();
+
+            $dates->push([
+                'date' => $date,
+                'outgoing_stock' => $outgoingStock,
+                'incoming_stock' => $incomingStock,
+            ]);
+        }
+
+        return view('weekly-stock-details', [
+            'stockDetails' => $dates,
+        ]);
     }
 }

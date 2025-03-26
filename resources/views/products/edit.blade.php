@@ -1,124 +1,76 @@
 <x-app-layout>
-    <x-slot name="header">
+    <div class="space-y-6">
+        <!-- Page Heading -->
         <div class="flex items-center justify-between">
-            <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                {{ __('Edit Product') }}
-            </h2>
-            <nav class="flex" aria-label="Breadcrumb">
-                <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                    <li class="inline-flex items-center">
-                        <a href="{{ route('dashboard') }}" class="text-gray-700 hover:text-blue-600">
-                            Dashboard
-                        </a>
-                    </li>
-                    <li>
-                        <div class="flex items-center">
-                            <span class="mx-2 text-gray-400">/</span>
-                            <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-blue-600">
-                                Products
-                            </a>
-                        </div>
-                    </li>
-                    <li aria-current="page">
-                        <div class="flex items-center">
-                            <span class="mx-2 text-gray-400">/</span>
-                            <span class="text-gray-500">Edit</span>
-                        </div>
-                    </li>
-                </ol>
-            </nav>
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ __('Edit Produk') }}</h2>
+
+            <div class="mt-4 sm:mt-0 flex space-x-2">
+                <a href="{{ route('products.index') }}"
+                    class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Kembali
+                </a>
+            </div>
         </div>
-    </x-slot>
 
-    <div class="py-12">
-        <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <!-- Status Messages -->
-            @if (session('success'))
-                <div id="success-alert"
-                    class="mb-4 bg-green-100 border-l-4 border-green-500 text-green-700 p-4 rounded shadow-md"
-                    role="alert">
-                    <div class="flex items-center">
-                        <div class="py-1">
-                            <svg class="h-6 w-6 text-green-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <p>{{ session('success') }}</p>
-                    </div>
-                </div>
-            @endif
-
-            @if ($errors->any())
-                <div id="error-alert"
-                    class="mb-4 bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded shadow-md">
-                    <div class="flex items-center mb-2">
-                        <svg class="h-6 w-6 text-red-500 mr-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
                         </svg>
-                        <p class="font-medium">Please correct the following errors:</p>
                     </div>
-                    <ul class="list-disc ml-10 space-y-1">
-                        @foreach ($errors->all() as $error)
-                            <li>{{ $error }}</li>
-                        @endforeach
-                    </ul>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terdapat beberapa kesalahan:</h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
                 </div>
-            @endif
+            </div>
+        @endif
 
-            <div class="flex flex-col md:flex-row gap-6">
-                <!-- Left column (form) -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg flex-1">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <form id="product-form" method="POST" action="{{ route('products.update', $product) }}"
-                            enctype="multipart/form-data">
-                            @csrf
-                            @method('PUT')
+        <!-- Form Content -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column (Main Form) -->
+            <div class="lg:col-span-2">
+                <div
+                    class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
+                    <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data"
+                        class="p-6 space-y-6">
+                        @csrf
+                        @method('PUT')
 
-                            <!-- Basic Info -->
-                            <div class="mb-6">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Basic Information</h3>
+                        <!-- Basic Information -->
+                        <div
+                            class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
+                            <h3
+                                class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                Informasi Dasar
+                            </h3>
 
-                                <!-- Product Code -->
-                                <div class="mb-4">
-                                    <x-input-label for="code" value="Product Code" />
-                                    <div class="mt-1 flex rounded-md shadow-sm">
-                                        <span
-                                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                            Code
-                                        </span>
-                                        <input type="text" name="code" id="code"
-                                            value="{{ old('code', $product->code) }}"
-                                            class="focus:ring-indigo-500 focus:border-indigo-500 flex-1 block w-full rounded-none rounded-r-md sm:text-sm border-gray-300"
-                                            readonly>
-                                    </div>
-                                    @error('code')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
-                                <!-- Product Name -->
-                                <div class="mb-4">
-                                    <x-input-label for="name" value="Product Name" />
-                                    <input type="text" name="name" id="name"
-                                        value="{{ old('name', $product->name) }}"
-                                        class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                        required>
-                                    @error('name')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
-                                </div>
-
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                                 <!-- Category -->
-                                <div class="mb-4">
-                                    <x-input-label for="category_id" value="Category" />
-                                    <select id="category_id" name="category_id"
-                                        class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-white rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                        required>
-                                        <option value="">Select a category</option>
+                                <div>
+                                    <label for="category_id"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Kategori
+                                    </label>
+                                    <select id="category_id" name="category_id" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500">
+                                        <option value="">Pilih Kategori</option>
                                         @foreach ($categories as $category)
                                             <option value="{{ $category->id }}"
                                                 {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
@@ -126,216 +78,186 @@
                                             </option>
                                         @endforeach
                                     </select>
-                                    @error('category_id')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                </div>
+
+                                <!-- Product Code -->
+                                <div>
+                                    <label for="code"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Kode Produk
+                                    </label>
+                                    <div class="mt-1 flex rounded-md shadow-sm">
+                                        <span
+                                            class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">
+                                            Kode
+                                        </span>
+                                        <input type="text" id="code" name="code"
+                                            value="{{ old('code', $product->code) }}" readonly
+                                            class="flex-1 rounded-none rounded-r-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                                    </div>
+                                </div>
+
+                                <!-- Name -->
+                                <div>
+                                    <label for="name"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Nama Produk
+                                    </label>
+                                    <input type="text" id="name" name="name"
+                                        value="{{ old('name', $product->name) }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500">
                                 </div>
 
                                 <!-- Description -->
                                 <div>
-                                    <x-input-label for="description" value="Description" />
+                                    <label for="description"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Deskripsi
+                                    </label>
                                     <textarea id="description" name="description" rows="3"
-                                        class="mt-1 shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md">{{ old('description', $product->description) }}</textarea>
-                                    @error('description')
-                                        <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                    @enderror
+                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500">{{ old('description', $product->description) }}</textarea>
                                 </div>
-                            </div>
-
-                            <!-- Pricing & Stock -->
-                            <div class="mb-6">
-                                <h3 class="text-lg font-medium text-gray-900 mb-4 pb-2 border-b">Pricing & Stock</h3>
-
-                                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
-                                    <!-- Purchase Price -->
-                                    <div>
-                                        <x-input-label for="purchase_price" value="Purchase Price (Rp)" />
-                                        <div class="mt-1 relative rounded-md shadow-sm">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <span class="text-gray-500 sm:text-sm">Rp</span>
-                                            </div>
-                                            <input type="number" name="purchase_price" id="purchase_price"
-                                                value="{{ old('purchase_price', $product->purchase_price) }}"
-                                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-12 sm:text-sm border-gray-300 rounded-md"
-                                                min="0" required>
-                                        </div>
-                                        @error('purchase_price')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Selling Price -->
-                                    <div>
-                                        <x-input-label for="selling_price" value="Selling Price (Rp)" />
-                                        <div class="mt-1 relative rounded-md shadow-sm">
-                                            <div
-                                                class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                                <span class="text-gray-500 sm:text-sm">Rp</span>
-                                            </div>
-                                            <input type="number" name="selling_price" id="selling_price"
-                                                value="{{ old('selling_price', $product->selling_price) }}"
-                                                class="focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-12 sm:text-sm border-gray-300 rounded-md"
-                                                min="0" required>
-                                        </div>
-                                        @error('selling_price')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-
-                                    <!-- Current Stock (read-only) -->
-                                    <div>
-                                        <x-input-label for="current_stock" value="Current Stock" />
-                                        <input type="number" id="current_stock" value="{{ $product->stock }}"
-                                            class="mt-1 block w-full py-2 px-3 border border-gray-300 bg-gray-100 rounded-md shadow-sm sm:text-sm"
-                                            readonly>
-                                        <p class="mt-1 text-xs text-gray-500">Stock can be adjusted on the product
-                                            detail page</p>
-                                    </div>
-
-                                    <!-- Minimum Stock -->
-                                    <div>
-                                        <x-input-label for="min_stock" value="Minimum Stock Level" />
-                                        <input type="number" name="min_stock" id="min_stock"
-                                            value="{{ old('min_stock', $product->min_stock) }}"
-                                            class="mt-1 focus:ring-indigo-500 focus:border-indigo-500 block w-full shadow-sm sm:text-sm border-gray-300 rounded-md"
-                                            min="0" required>
-                                        @error('min_stock')
-                                            <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                </div>
-                            </div>
-
-                            <!-- Product image - hidden, actual UI is in the right column -->
-                            <input type="file" name="image" id="image" class="hidden" accept="image/*">
-
-                            <!-- Form buttons -->
-                            <div class="flex justify-end space-x-3 mt-8">
-                                <a href="{{ route('products.index') }}"
-                                    class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Cancel
-                                </a>
-                                <button type="submit"
-                                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Update Product
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-
-                <!-- Right column (image and preview) -->
-                <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg w-full md:w-80">
-                    <div class="p-6 bg-white border-b border-gray-200">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Product Image</h3>
-
-                        <!-- Current image or placeholder -->
-                        <div class="mb-6 bg-gray-100 rounded-lg overflow-hidden">
-                            <div id="current-image-container" class="w-full h-64 flex items-center justify-center">
-                                @if ($product->image_path)
-                                    <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}"
-                                        class="max-h-full max-w-full object-contain" id="current-product-image">
-                                @else
-                                    <div class="text-center p-4">
-                                        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none"
-                                            stroke="currentColor" viewBox="0 0 24 24"
-                                            xmlns="http://www.w3.org/2000/svg">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
-                                            </path>
-                                        </svg>
-                                        <p class="mt-2 text-sm text-gray-500">No image</p>
-                                    </div>
-                                @endif
-                            </div>
-
-                            <!-- Image preview (hidden initially) -->
-                            <div id="preview-container" class="hidden w-full h-64 flex items-center justify-center">
-                                <img src="#" alt="Preview" class="max-h-full max-w-full object-contain"
-                                    id="image-preview">
                             </div>
                         </div>
 
-                        <!-- Image controls -->
-                        <div class="flex flex-col space-y-3">
-                            <button type="button" id="select-image-btn"
-                                class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <svg class="mr-2 -ml-1 h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                </svg>
-                                Select Image
+                        <!-- Pricing & Stock Section -->
+                        <div
+                            class="rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 p-6">
+                            <h3
+                                class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700">
+                                Harga & Stok
+                            </h3>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <!-- Purchase Price -->
+                                <div>
+                                    <label for="purchase_price"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Harga Beli
+                                    </label>
+                                    <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
+                                        </div>
+                                        <input type="number" id="purchase_price" name="purchase_price"
+                                            value="{{ old('purchase_price', $product->purchase_price) }}" required
+                                            class="block w-full pl-12 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500">
+                                    </div>
+                                </div>
+
+                                <!-- Selling Price -->
+                                <div>
+                                    <label for="selling_price"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Harga Jual
+                                    </label>
+                                    <div class="mt-1 relative rounded-md shadow-sm">
+                                        <div
+                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
+                                        </div>
+                                        <input type="number" id="selling_price" name="selling_price"
+                                            value="{{ old('selling_price', $product->selling_price) }}" required
+                                            class="block w-full pl-12 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500">
+                                    </div>
+                                </div>
+
+                                <!-- Current Stock -->
+                                <div>
+                                    <label for="current_stock"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Stok Saat Ini
+                                    </label>
+                                    <input type="number" id="current_stock" value="{{ $product->stock }}" readonly
+                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 bg-gray-50 dark:bg-gray-600">
+                                    <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Stok dapat disesuaikan di
+                                        halaman detail produk</p>
+                                </div>
+
+                                <!-- Minimum Stock -->
+                                <div>
+                                    <label for="min_stock"
+                                        class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        Stok Minimum
+                                    </label>
+                                    <input type="number" id="min_stock" name="min_stock"
+                                        value="{{ old('min_stock', $product->min_stock) }}" required
+                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-blue-500 dark:focus:border-blue-500 focus:ring-blue-500 dark:focus:ring-blue-500">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Form Actions -->
+                        <div class="flex justify-end space-x-3">
+                            <button type="button" onclick="window.history.back()"
+                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                                Batal
                             </button>
+                            <button type="submit"
+                                class="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600 border border-transparent rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400">
+                                Simpan
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
 
+            <!-- Right Column (Image & Preview) -->
+            <div class="space-y-6">
+                <!-- Image Upload Section -->
+                <div
+                    class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4">Gambar Produk</h3>
+
+                    <!-- Current image preview -->
+                    <div class="mb-4">
+                        <div id="current-image-container"
+                            class="aspect-w-1 aspect-h-1 rounded-lg bg-gray-100 dark:bg-gray-700 overflow-hidden">
                             @if ($product->image_path)
-                                <div id="image-exists-actions" class="flex justify-between">
-                                    <a href="{{ Storage::url($product->image_path) }}" target="_blank"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        <svg class="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                        </svg>
-                                        View
-                                    </a>
-
-                                    <button type="button" id="delete-image-btn"
-                                        class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500">
-                                        <svg class="mr-2 h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                        </svg>
-                                        Delete
-                                    </button>
+                                <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}"
+                                    class="object-cover w-full h-full">
+                            @else
+                                <div class="flex items-center justify-center h-full">
+                                    <svg class="h-12 w-12 text-gray-400 dark:text-gray-600" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                    </svg>
                                 </div>
                             @endif
-
-                            <div id="preview-actions" class="hidden space-x-2">
-                                <button type="button" id="cancel-preview-btn"
-                                    class="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                    Cancel
-                                </button>
-                            </div>
                         </div>
-
-                        <!-- Delete image form (hidden) -->
-                        <form id="delete-image-form" action="{{ route('products.deleteImage', $product) }}"
-                            method="POST" class="hidden">
-                            @csrf
-                        </form>
                     </div>
 
-                    <!-- Product Info Preview -->
-                    <div class="p-6 bg-white">
-                        <h3 class="text-lg font-medium text-gray-900 mb-4">Product Preview</h3>
-                        <div class="space-y-4 text-sm">
-                            <div>
-                                <span class="block text-gray-500 font-medium">Name</span>
-                                <span id="preview-name" class="block">{{ $product->name }}</span>
-                            </div>
-                            <div>
-                                <span class="block text-gray-500 font-medium">Category</span>
-                                <span id="preview-category" class="block">{{ $product->category->name }}</span>
-                            </div>
-                            <div>
-                                <span class="block text-gray-500 font-medium">Selling Price</span>
-                                <span id="preview-price" class="block">Rp
-                                    {{ number_format($product->selling_price, 0, ',', '.') }}</span>
-                            </div>
-                            <div>
-                                <span class="block text-gray-500 font-medium">Stock Status</span>
-                                <span id="preview-stock"
-                                    class="inline-flex items-center px-2.5 py-0.5 rounded-md text-sm font-medium 
-                                    {{ $product->stock > $product->min_stock ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                                    {{ $product->stock > $product->min_stock ? 'In Stock' : 'Low Stock' }}
-                                </span>
-                            </div>
-                        </div>
+                    <!-- Image actions -->
+                    <div class="space-y-3">
+                        <input type="file" id="image" name="image" class="hidden" accept="image/*">
+                        <button type="button" onclick="document.getElementById('image').click()"
+                            class="w-full inline-flex justify-center items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 dark:focus:ring-offset-gray-800">
+                            <svg class="h-5 w-5 mr-2 text-gray-400 dark:text-gray-500" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                            </svg>
+                            Pilih Gambar
+                        </button>
+
+                        @if ($product->image_path)
+                            <form action="{{ route('products.deleteImage', $product) }}" method="POST"
+                                class="mt-3">
+                                @csrf
+                                <button type="submit"
+                                    onclick="return confirm('Apakah Anda yakin ingin menghapus gambar ini?')"
+                                    class="w-full inline-flex justify-center items-center px-4 py-2 border border-red-300 dark:border-red-600 rounded-md shadow-sm text-sm font-medium text-red-700 dark:text-red-300 bg-white dark:bg-gray-700 hover:bg-red-50 dark:hover:bg-red-900/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800">
+                                    <svg class="h-5 w-5 mr-2 text-red-500 dark:text-red-400" fill="none"
+                                        stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                    Hapus Gambar
+                                </button>
+                            </form>
+                        @endif
                     </div>
                 </div>
             </div>

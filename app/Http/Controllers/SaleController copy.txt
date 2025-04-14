@@ -59,6 +59,8 @@ class SaleController extends Controller
                 'paid_amount' => 'required|numeric|min:0',
                 'discount' => 'nullable|numeric|min:0',
                 'payment_method' => 'required|in:cash,transfer,credit',
+                'vehicle_type' => 'nullable|string',
+                'vehicle_number' => 'nullable|string',
                 'notes' => 'nullable|string',
                 'save_as_draft' => 'nullable'
             ]);
@@ -167,6 +169,8 @@ class SaleController extends Controller
                 'down_payment' => $downPayment,
                 'change_amount' => $changeAmount,
                 'payment_method' => $request->payment_method,
+                'vehicle_type' => $request->vehicle_type,
+                'vehicle_number' => $request->vehicle_number,
                 'payment_status' => $paymentStatus,
                 'status' => $status,
                 'remaining_amount' => $remainingAmount,
@@ -274,6 +278,8 @@ class SaleController extends Controller
                 'paid_amount' => 'required|numeric|min:0',
                 'discount' => 'nullable|numeric|min:0',
                 'payment_method' => 'required|in:cash,transfer,credit',
+                'vehicle_type' => 'nullable|string',
+                'vehicle_number' => 'nullable|string',
                 'notes' => 'nullable|string',
                 'complete_transaction' => 'nullable'
             ]);
@@ -368,6 +374,8 @@ class SaleController extends Controller
                 'down_payment' => $downPayment,
                 'change_amount' => $changeAmount,
                 'payment_method' => $request->payment_method,
+                'vehicle_type' => $request->vehicle_type,
+                'vehicle_number' => $request->vehicle_number,
                 'payment_status' => $paymentStatus,
                 'status' => $status,
                 'remaining_amount' => $remainingAmount,

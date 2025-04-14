@@ -54,7 +54,8 @@
                     </svg>
                     Informasi Penjualan
                 </h3>
-                <input type="hidden" name="new_customer_name" id="new_customer_name">
+                {{-- <input type="hidden" name="new_customer_name" id="new_customer_name"> --}}
+                <input type="hidden" name="customer_name" id="new_customer_name">
                 <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div>
                         <x-input-label for="invoice_number" value="Nomor Faktur" />
@@ -69,14 +70,17 @@
                     </div>
 
                     <div>
-                        <x-input-label for="customer_select" value="Pelanggan" />
+                        <x-input-label for="customer_select" value="Nama Pelanggan" />
                         <select id="customer_select" name="customer_id"
-                            class="select2 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
-                            <option value="">-- Pilih Pelanggan --</option>
+                            class="select2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">-- Pilih Pelanggan atau Ketik Nama Baru --</option>
                             @foreach ($customers as $customer)
-                                <option value="{{ $customer->id }}">{{ $customer->nama }}</option>
+                                <option value="{{ $customer->id }}">{{ $customer->nama }}
+                                </option>
                             @endforeach
                         </select>
+                        <div class="mt-1 text-xs text-gray-500">Pilih pelanggan yang ada atau ketik nama
+                            baru</div>
                     </div>
 
                     <div>
@@ -536,8 +540,6 @@
                     dropdownParent: $('#saleItems').closest('.overflow-x-auto'),
                     templateResult: formatProductOption,
                     templateSelection: formatProductSelection
-                }).on('change', function() {
-                    updatePrice(this);
                 });
             }
 
@@ -557,21 +559,21 @@
                         <div class="font-medium dark:text-gray-200">${product.text}</div>
                         ${product.element ? 
                             `<div class="text-sm text-gray-500 dark:text-gray-400">
-                                                <span class="inline-flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                </svg>
-                                                Stok: ${$(product.element).data('stock')}
-                                                </span>
-                                                <span class="inline-flex items-center ml-3">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
-                                                </span>
-                                                </div>` 
+                                                                                                                                                                                                                                                                                <span class="inline-flex items-center">
+                                                                                                                                                                                                                                                                                <svg class="w-80 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                                                                                                                                                                                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                Stok: ${$(product.element).data('stock')}
+                                                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                                                <span class="inline-flex items-center ml-3">
+                                                                                                                                                                                                                                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                                                                                                                                                                                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                                                                                                                                                                                                                </svg>
+                                                                                                                                                                                                                                                                                Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
+                                                                                                                                                                                                                                                                                </span>
+                                                                                                                                                                                                                                                                                </div>` 
                             : ''
                         }
                     </div>
@@ -579,31 +581,31 @@
             `);
             }
 
-
             function formatProductOption(product) {
                 if (!product.id) return product.text;
-
                 return $(`
-        <div class="flex items-center py-2">
+        <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
             <div class="flex-1">
-                <div class="font-medium text-gray-900 dark:text-gray-200">${product.text}</div>
+                <div class="font-medium text-gray-900 dark:text-gray-100">
+                    ${product.text}
+                </div>
                 ${product.element ? 
-                    `<div class="flex items-center mt-1 space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                                                                                                                                        <span class="inline-flex items-center">
-                                                                                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                                                                                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                                                                                                                        </svg>
-                                                                                                                                                        Stok: ${$(product.element).data('stock')}
-                                                                                                                                                        </span>
-                                                                                                                                                        <span class="inline-flex items-center">
-                                                                                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                                                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                                                                                        </svg>
-                                                                                                                                                        Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
-                                                                                                                                                        </span>
-                                                                                                                                                        </div>` 
+                    `<div class="grid grid-cols-2 gap-2 mt-1 text-sm">
+                                                                <div class="flex items-center text-emerald-600 dark:text-emerald-400">
+                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                    </svg>
+                                                                    <span>Stok: ${$(product.element).data('stock')}</span>
+                                                                </div>
+                                                                <div class="flex items-center text-blue-600 dark:text-blue-400">
+                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                    </svg>
+                                                                    <span>Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}</span>
+                                                                </div>
+                                                            </div>` 
                     : ''
                 }
             </div>
@@ -614,7 +616,15 @@
             function formatProductSelection(product) {
                 if (!product.id) return product.text;
                 return $(`
-        <div class="font-medium text-gray-900 dark:text-gray-200">${product.text}</div>
+        <div class="flex items-center">
+            <div class="font-medium text-gray-900 dark:text-gray-100">${product.text}</div>
+            ${product.element ? 
+                `<div class="ml-2 text-sm text-gray-500 dark:text-gray-400">
+                                                            (Stok: ${$(product.element).data('stock')})
+                                                        </div>` 
+                : ''
+            }
+        </div>
     `);
             }
 
@@ -775,8 +785,15 @@
             // Inisialisasi Select2
             $('#customer_select').select2({
                 theme: 'tailwind',
-                tags: true,
+                tags: true, // Mengizinkan pembuatan tag baru
+                placeholder: 'Pilih atau ketik nama pelanggan baru',
+                allowClear: true,
                 createTag: function(params) {
+                    // Jika input kosong, jangan buat tag
+                    if ($.trim(params.term) === '') {
+                        return null;
+                    }
+
                     return {
                         id: 'new:' + params.term,
                         text: params.term,
@@ -784,16 +801,50 @@
                     }
                 },
                 templateResult: function(data) {
-                    var $result = $("<span></span>");
+                    if (data.loading) return data.text;
+
+                    var $container = $("<div class='select2-result-customer'></div>");
 
                     if (data.newTag) {
-                        $result.text(data.text + " (Tambahkan Customer Baru)");
-                        $result.addClass("text-blue-600");
+                        // Format untuk customer baru
+                        $container.append(
+                            $("<div class='text-blue-600'><i class='fas fa-plus-circle mr-1'></i> Tambah pelanggan baru: " +
+                                data.text + "</div>")
+                        );
                     } else {
-                        $result.text(data.text);
+                        // Format untuk customer yang sudah ada
+                        $container.append(
+                            $("<div>" + data.text + "</div>")
+                        );
                     }
 
-                    return $result;
+                    return $container;
+                },
+                templateSelection: function(data) {
+                    if (data.newTag) {
+                        return "Pelanggan Baru: " + data.text;
+                    }
+                    return data.text;
+                }
+            });
+
+            // Event handler saat nilai select berubah
+            $('#customer_select').on('change', function(e) {
+                var selectedValue = $(this).val();
+
+                if (selectedValue && selectedValue.startsWith('new:')) {
+                    // Ekstrak nama pelanggan baru
+                    var newCustomerName = selectedValue.substring(4);
+
+                    // Set nilai di hidden input
+                    $('#new_customer_name').val(newCustomerName);
+
+                    // Opsional: tambahkan visual feedback
+                    $(this).next('.select2-container').find('.select2-selection').addClass('border-blue-500');
+                } else {
+                    // Reset hidden input jika memilih customer yang sudah ada
+                    $('#new_customer_name').val('');
+                    $(this).next('.select2-container').find('.select2-selection').removeClass('border-blue-500');
                 }
             });
 

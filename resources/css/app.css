@@ -93,7 +93,6 @@
     @apply px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 dark:text-gray-300 dark:bg-gray-700;
 }
 
-/* Add this to your app.css or create a new styles section */
 .sidebar {
     @apply w-64 bg-white dark:bg-gray-800 transition-all duration-300 ease-in-out fixed lg:static z-50;
 }

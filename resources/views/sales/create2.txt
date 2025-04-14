@@ -432,17 +432,17 @@
             }
 
             function calculateChange() {
-                const finalText = document.getElementById('finalAmount').textContent; // Use finalAmount
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '')) || 0;
+                const totalText = document.getElementById('totalAmount').textContent;
+                const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '')) || 0;
                 const paid = parseFloat(document.getElementById('paid_amount').value) || 0;
-                const change = paid - finalTotal;
+                const change = paid - total;
                 document.getElementById('changeAmount').textContent = formatRupiah(Math.max(0, change));
 
-                // Validasi jumlah yang dibayar minimum
+                // Validasi jumlah yang dibayar minimum HANYA untuk pembayaran tunai/transfer
                 const submitButton = document.querySelector('button[type="submit"]');
                 const paymentMethod = document.getElementById('payment_method').value;
 
-                if (paymentMethod !== 'credit' && paid < finalTotal) {
+                if (paymentMethod !== 'credit' && paid < total) {
                     // Nonaktifkan tombol submit hanya untuk transaksi non-kredit
                     submitButton.disabled = true;
                     submitButton.classList.add('opacity-50', 'cursor-not-allowed');
@@ -451,18 +451,6 @@
                     submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
             }
-
-            function addInputValidations() {
-                // Prevent negative values in all number inputs
-                document.querySelectorAll('input[type="number"]').forEach(input => {
-                    input.addEventListener('input', function() {
-                        if (parseFloat(this.value) < 0) {
-                            this.value = 0;
-                        }
-                    });
-                });
-            }
-            document.addEventListener('DOMContentLoaded', addInputValidations);
 
             function calculateRemainingAmount() {
                 const totalText = document.getElementById('finalAmount')
@@ -534,8 +522,6 @@
                     placeholder: 'Pilih Produk',
                     width: '100%',
                     dropdownParent: $('#saleItems').closest('.overflow-x-auto'),
-                    templateResult: formatProductOption,
-                    templateSelection: formatProductSelection
                 }).on('change', function() {
                     updatePrice(this);
                 });
@@ -557,21 +543,21 @@
                         <div class="font-medium dark:text-gray-200">${product.text}</div>
                         ${product.element ? 
                             `<div class="text-sm text-gray-500 dark:text-gray-400">
-                                                <span class="inline-flex items-center">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                </svg>
-                                                Stok: ${$(product.element).data('stock')}
-                                                </span>
-                                                <span class="inline-flex items-center ml-3">
-                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                </svg>
-                                                Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
-                                                </span>
-                                                </div>` 
+                                                                                        <span class="inline-flex items-center">
+                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                                        </svg>
+                                                                                        Stok: ${$(product.element).data('stock')}
+                                                                                        </span>
+                                                                                        <span class="inline-flex items-center ml-3">
+                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                        </svg>
+                                                                                        Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
+                                                                                        </span>
+                                                                                        </div>` 
                             : ''
                         }
                     </div>
@@ -589,21 +575,21 @@
                 <div class="font-medium text-gray-900 dark:text-gray-200">${product.text}</div>
                 ${product.element ? 
                     `<div class="flex items-center mt-1 space-x-4 text-sm text-gray-500 dark:text-gray-400">
-                                                                                                                                                        <span class="inline-flex items-center">
-                                                                                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                                                                                                        d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                                                                                                                        </svg>
-                                                                                                                                                        Stok: ${$(product.element).data('stock')}
-                                                                                                                                                        </span>
-                                                                                                                                                        <span class="inline-flex items-center">
-                                                                                                                                                        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                                                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                                                                                        </svg>
-                                                                                                                                                        Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
-                                                                                                                                                        </span>
-                                                                                                                                                        </div>` 
+                                                                                <span class="inline-flex items-center">
+                                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                                                                </svg>
+                                                                                Stok: ${$(product.element).data('stock')}
+                                                                                </span>
+                                                                                <span class="inline-flex items-center">
+                                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                </svg>
+                                                                                Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
+                                                                                </span>
+                                                                                </div>` 
                     : ''
                 }
             </div>
@@ -665,15 +651,8 @@
                     return false;
                 }
 
-                // Call the stock validation function
-                if (!validateProductStock()) {
-                    e.preventDefault();
-                    return false;
-                }
-
                 const paymentMethod = document.getElementById('payment_method').value;
-                const totalText = document.getElementById('finalAmount')
-                    .textContent; // Use finalAmount instead of totalAmount
+                const totalText = document.getElementById('totalAmount').textContent;
                 const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '')) || 0;
                 const paid = parseFloat(document.getElementById('paid_amount').value) || 0;
 
@@ -823,33 +802,12 @@
                     initializeSelect2ForRow($(this).closest('tr'));
                 });
 
-                // Add first row on page load if needed
+                // Add first row on page load
                 if ($('#saleItems tr').length === 0) {
                     addItem();
                 }
-
-                // Initialize payment sections based on initial payment method
-                updatePaymentSections();
+                // addItem();
             });
-
-            function checkSelect2Loading() {
-                if (typeof $.fn.select2 === 'undefined') {
-                    console.error('Select2 not loaded - using native select elements');
-                    document.querySelectorAll('.product-select, #customer_select').forEach(select => {
-                        select.style.display = 'block';
-                        select.classList.add('w-full', 'rounded-md', 'border-gray-300', 'dark:border-gray-600',
-                            'dark:bg-gray-700', 'dark:text-gray-300');
-
-                        // Add direct event listeners for native selects
-                        if (select.classList.contains('product-select')) {
-                            select.addEventListener('change', function() {
-                                updatePrice(this);
-                            });
-                        }
-                    });
-                }
-            }
-            setTimeout(checkSelect2Loading, 1000);
 
             setTimeout(() => {
                 if (typeof $.fn.select2 === 'undefined') {

@@ -18,7 +18,280 @@
         </div>
 
         <!-- Summary Cards -->
-        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+            <!-- Daily Sales Card -->
+            <div
+                class="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-lg">
+                <div class="px-6 pt-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Penjualan Harian</h3>
+                            <div class="mt-2 flex items-baseline">
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    Rp {{ number_format($totalSalesToday, 0, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+                            <svg class="h-6 w-6 text-blue-500 dark:text-blue-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="relative h-1 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                            <div class="absolute h-full bg-blue-500 rounded-full"
+                                style="width: {{ min(max($salesChangeToday, 0), 100) }}%"></div>
+                        </div>
+                        <div class="mt-2 flex items-center text-xs text-green-600 dark:text-green-400">
+                            <svg class="w-3 h-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ number_format($salesChangeToday, 2) }}% dari kemarin</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 mt-4">
+                    <a href="#"
+                        class="text-sm font-medium text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300">
+                        Lihat detail
+                    </a>
+                </div>
+            </div>
+
+            <!-- Monthly Sales Card -->
+            <div
+                class="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-lg">
+                <div class="px-6 pt-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Penjualan Bulanan</h3>
+                            <div class="mt-2 flex items-baseline">
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    Rp {{ number_format($totalSalesThisMonth, 0, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <svg class="h-6 w-6 text-green-500 dark:text-green-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="relative h-1 w-full bg-gray-100 dark:bg-gray-800 rounded-full overflow-hidden">
+                            <div class="absolute h-full bg-green-500 rounded-full"
+                                style="width: {{ min(max($salesChangeThisMonth, 0), 100) }}%"></div>
+                        </div>
+                        <div class="mt-2 flex items-center text-xs text-green-600 dark:text-green-400">
+                            <svg class="w-3 h-3 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M12 7a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0V8.414l-4.293 4.293a1 1 0 01-1.414 0L8 10.414l-4.293 4.293a1 1 0 01-1.414-1.414l5-5a1 1 0 011.414 0L11 10.586 14.586 7H12z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ number_format($salesChangeThisMonth, 2) }}% dari bulan lalu</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 mt-4">
+                    <a href="#"
+                        class="text-sm font-medium text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                        Lihat detail
+                    </a>
+                </div>
+            </div>
+
+            <!-- Products Card -->
+            <div
+                class="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-lg">
+                <div class="px-6 pt-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Produk</h3>
+                            <div class="mt-2 flex items-baseline">
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    {{ number_format($totalProducts) }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-indigo-50 dark:bg-indigo-900/20 rounded-lg">
+                            <svg class="h-6 w-6 text-indigo-500 dark:text-indigo-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-2">
+                        <div
+                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ $lowStockProducts }} produk stok menipis</span>
+                        </div>
+                    </div>
+                </div>
+                @if ($lowStockProducts > 0)
+                    <div class="px-6 py-4 mt-4 border-t border-gray-100 dark:border-gray-800">
+                        <a href="{{ route('products.index') }}"
+                            class="flex items-center justify-between text-sm font-medium text-indigo-600 hover:text-indigo-800 dark:text-indigo-400 dark:hover:text-indigo-300">
+                            <span>Lihat semua peringatan</span>
+                            <svg class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Credit Card -->
+            <div
+                class="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-lg">
+                <div class="px-6 pt-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Kredit Bulanan</h3>
+                            <div class="mt-2 flex items-baseline">
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    Rp {{ number_format($totalCreditAmount, 0, ',', '.') }}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg">
+                            <svg class="h-6 w-6 text-orange-500 dark:text-orange-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex items-center gap-2">
+                        <div
+                            class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300">
+                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                            <span>{{ $totalUpcomingCredits }} transaksi akan jatuh tempo</span>
+                        </div>
+                    </div>
+                </div>
+                @if ($totalUpcomingCredits > 0)
+                    <div class="px-6 py-4 mt-4 border-t border-gray-100 dark:border-gray-800">
+                        <a href="{{ route('sales.credit') }}"
+                            class="flex items-center justify-between text-sm font-medium text-orange-600 hover:text-orange-800 dark:text-orange-400 dark:hover:text-orange-300">
+                            <span>Lihat semua kredit</span>
+                            <svg class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                            </svg>
+                        </a>
+                    </div>
+                @endif
+            </div>
+
+            <!-- Daily Outgoing Stock Card -->
+            <div
+                class="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-lg">
+                <div class="px-6 pt-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Stok Keluar Harian</h3>
+                            <div class="mt-2 flex items-baseline">
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    {{ number_format($dailyOutgoingStock, 0, ',', '.') }} unit
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-red-50 dark:bg-red-900/20 rounded-lg">
+                            <svg class="h-6 w-6 text-red-500 dark:text-red-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M20 12H4M12 4v16" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="h-10 w-full bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden">
+                            <div class="h-full bg-red-100 dark:bg-red-900/30 relative" style="width: 70%">
+                                <div class="absolute inset-0 flex items-center px-3">
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full">
+                                        <div class="bg-red-500 h-1 rounded-full" style="width: 70%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 mt-4 border-t border-gray-100 dark:border-gray-800">
+                    <a href="{{ route('stock.details') }}"
+                        class="flex items-center justify-between text-sm font-medium text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
+                        <span>Lihat selengkapnya</span>
+                        <svg class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <!-- Daily Incoming Stock Card -->
+            <div
+                class="overflow-hidden rounded-2xl bg-white dark:bg-gray-900 shadow-md border border-gray-100 dark:border-gray-800 transition-all duration-300 hover:shadow-lg">
+                <div class="px-6 pt-6">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Stok Masuk Harian</h3>
+                            <div class="mt-2 flex items-baseline">
+                                <p class="text-2xl font-bold text-gray-900 dark:text-white">
+                                    {{ number_format($dailyIncomingStock, 0, ',', '.') }} unit
+                                </p>
+                            </div>
+                        </div>
+                        <div class="p-2 bg-green-50 dark:bg-green-900/20 rounded-lg">
+                            <svg class="h-6 w-6 text-green-500 dark:text-green-400" fill="none"
+                                stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M12 4v16m8-8H4" />
+                            </svg>
+                        </div>
+                    </div>
+                    <div class="mt-4">
+                        <div class="h-10 w-full bg-gray-50 dark:bg-gray-800 rounded-lg overflow-hidden">
+                            <div class="h-full bg-green-100 dark:bg-green-900/30 relative" style="width: 65%">
+                                <div class="absolute inset-0 flex items-center px-3">
+                                    <div class="w-full bg-gray-200 dark:bg-gray-700 h-1 rounded-full">
+                                        <div class="bg-green-500 h-1 rounded-full" style="width: 65%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="px-6 py-4 mt-4 border-t border-gray-100 dark:border-gray-800">
+                    <a href="{{ route('stock.details') }}"
+                        class="flex items-center justify-between text-sm font-medium text-green-600 hover:text-green-800 dark:text-green-400 dark:hover:text-green-300">
+                        <span>Lihat selengkapnya</span>
+                        <svg class="h-4 w-4 ml-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                        </svg>
+                    </a>
+                </div>
+            </div>
+        </div>
+        {{-- <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <!-- Daily Sales Card -->
             <div
                 class="overflow-hidden rounded-lg bg-gradient-to-br from-blue-50 to-white dark:from-blue-900 dark:to-gray-800 shadow-sm border border-blue-100 dark:border-blue-800 hover:shadow-md transition-all duration-300">
@@ -236,7 +509,7 @@
                     </a>
                 </div>
             </div>
-        </div>
+        </div> --}}
 
         <!-- Charts Section -->
         <div class="mt-8 grid grid-cols-1 gap-6 lg:grid-cols-2">

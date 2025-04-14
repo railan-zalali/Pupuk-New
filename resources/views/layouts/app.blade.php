@@ -12,8 +12,7 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css" rel="stylesheet">
@@ -21,187 +20,34 @@
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+
     <style>
-        :root {
-            --color-primary: #6366f1;
-            --color-primary-hover: #4f46e5;
-            --color-secondary: #0ea5e9;
-            --color-success: #10b981;
-            --color-warning: #f59e0b;
-            --color-danger: #ef4444;
-            --color-info: #3b82f6;
-
-            --color-sidebar-bg: #f8fafc;
-            --color-sidebar-active: rgba(99, 102, 241, 0.1);
-            --color-sidebar-hover: rgba(99, 102, 241, 0.05);
-            --color-sidebar-text: #64748b;
-            --color-sidebar-active-text: #4f46e5;
-
-            /* --transition-normal: all 0.3s ease; */
-        }
-
-        .dark {
-            --color-primary: #818cf8;
-            --color-primary-hover: #6366f1;
-            --color-sidebar-bg: #1e293b;
-            --color-sidebar-active: rgba(129, 140, 248, 0.2);
-            --color-sidebar-hover: rgba(129, 140, 248, 0.1);
-            --color-sidebar-text: #94a3b8;
-            --color-sidebar-active-text: #818cf8;
-        }
-
         body {
-            font-family: 'Poppins', sans-serif;
-        }
-
-        .sidebar {
-            width: 280px;
-            background-color: var(--color-sidebar-bg);
-
-            z-index: 50;
-        }
-
-        .sidebar.collapsed {
-            width: 80px;
-        }
-
-        .main-content {
-
-            /* margin-left: 280px; */
-            width: calc(100% - 280px);
-        }
-
-        .main-content.expanded {
-            margin-left: 80px;
-            width: calc(100% - 80px);
-        }
-
-        @media (max-width: 1024px) {
-            .sidebar {
-                left: -280px;
-                position: fixed;
-                height: 100vh;
-            }
-
-            .sidebar.open {
-                left: 0;
-            }
-
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-        }
-
-        .nav-group {
-            margin-bottom: 1rem;
-        }
-
-        .nav-title {
-            font-size: 0.75rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            padding: 0.75rem 1.5rem 0.5rem;
-            color: var(--color-sidebar-text);
-        }
-
-        .nav-item {
-            display: flex;
-            align-items: center;
-            padding: 0.75rem 1.5rem;
-            color: var(--color-sidebar-text);
-            border-radius: 0.5rem;
-            margin: 0.25rem 0.75rem;
-
-        }
-
-        .nav-item:hover {
-            background-color: var(--color-sidebar-hover);
-            color: var(--color-sidebar-active-text);
-        }
-
-        .nav-item.active {
-            background-color: var(--color-sidebar-active);
-            color: var(--color-sidebar-active-text);
-            font-weight: 500;
-        }
-
-        .nav-icon {
-            margin-right: 0.75rem;
-            font-size: 1.25rem;
-            width: 1.25rem;
-            height: 1.25rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .content-card {
-            background-color: white;
-            border-radius: 1rem;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.1);
-
-        }
-
-        .dark .content-card {
-            background-color: #1e293b;
-            color: #e2e8f0;
-        }
-
-        .toggle-theme {
-            cursor: pointer;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-
-        }
-
-        .toggle-theme:hover {
-            background-color: rgba(99, 102, 241, 0.1);
-        }
-
-        .dark .toggle-theme:hover {
-            background-color: rgba(129, 140, 248, 0.2);
-        }
-
-        .badge {
-            padding: 0.2rem 0.6rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-        }
-
-        .badge-primary {
-            background-color: rgba(99, 102, 241, 0.1);
-            color: var(--color-primary);
-        }
-
-        .dark .badge-primary {
-            background-color: rgba(129, 140, 248, 0.2);
-            color: var(--color-primary);
+            font-family: 'Inter', sans-serif;
         }
 
         .app-header {
-            height: 70px;
-            background-color: white;
-            border-bottom: 1px solid #e2e8f0;
-            padding: 0 1.5rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-
+            @apply bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3;
         }
 
-        .dark .app-header {
-            background-color: #0f172a;
-            border-color: #334155;
+        .content-card {
+            @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
         }
 
-        .page-header {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 1.5rem;
+        .btn-primary {
+            @apply inline-flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-lg transition-colors;
+        }
+
+        .btn-secondary {
+            @apply inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors;
+        }
+
+        .nav-link {
+            @apply flex items-center gap-2 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors;
+        }
+
+        .nav-link.active {
+            @apply bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400;
         }
     </style>
 </head>
@@ -214,74 +60,87 @@
         <!-- Main Content -->
         <div class="flex-1 flex flex-col h-screen overflow-y-auto"
             :class="sidebarOpen ? 'main-content' : 'main-content expanded'">
+
             <!-- Header -->
-            <header class="app-header sticky top-0 z-30">
-                <div class="flex items-center gap-4">
-                    <!-- Toggle Sidebar Button -->
-                    <button @click="sidebarOpen = !sidebarOpen" class="focus:outline-none">
-                        <i class="ti ti-menu-2 text-xl text-gray-500 dark:text-gray-400"></i>
-                    </button>
-
-                    <!-- Page title (optional) -->
-                    <span class="text-lg font-medium hidden md:block">{{ config('app.name', 'Laravel') }}</span>
-                </div>
-
-                <div class="flex items-center gap-4">
-                    <!-- Dark mode toggle -->
-                    <button @click="darkMode = !darkMode" class="toggle-theme">
-                        <i x-show="!darkMode" class="ti ti-sun text-amber-500"></i>
-                        <i x-show="darkMode" class="ti ti-moon text-blue-400"></i>
-                    </button>
-
-                    <!-- Notifications -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="p-1 relative">
-                            <i class="ti ti-bell text-xl text-gray-500 dark:text-gray-400"></i>
-                            <span class="absolute top-0 right-0 h-2 w-2 rounded-full bg-red-500"></span>
+            <header class="app-header">
+                <div class="max-w-7xl mx-auto flex items-center justify-between">
+                    <div class="flex items-center gap-4">
+                        <!-- Toggle Sidebar Button -->
+                        <button @click="sidebarOpen = !sidebarOpen"
+                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i class="ti ti-menu-2 text-xl text-gray-500 dark:text-gray-400"></i>
                         </button>
 
-                        <!-- Notifications dropdown -->
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50"
-                            x-cloak>
-                            <div class="px-4 py-2 font-medium border-b border-gray-100 dark:border-gray-700">
-                                Notifikasi
-                            </div>
-                            <div class="p-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                                Tidak ada notifikasi baru
-                            </div>
-                        </div>
+                        <!-- Page title -->
+                        <span class="text-lg font-semibold hidden md:block">{{ config('app.name', 'Laravel') }}</span>
                     </div>
 
-                    <!-- User profile -->
-                    <div class="relative" x-data="{ open: false }">
-                        <button @click="open = !open" class="flex items-center gap-2 focus:outline-none">
-                            <div class="w-9 h-9 rounded-full bg-indigo-500 flex items-center justify-center text-white">
-                                {{ substr(Auth::user()->name, 0, 1) }}
-                            </div>
-                            <span class="hidden md:block">{{ Auth::user()->name }}</span>
-                            <i class="ti ti-chevron-down text-gray-500 dark:text-gray-400"></i>
+                    <div class="flex items-center gap-6">
+                        <!-- Dark mode toggle -->
+                        <button @click="darkMode = !darkMode"
+                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                            <i x-show="!darkMode" class="ti ti-sun text-xl text-amber-500"></i>
+                            <i x-show="darkMode" class="ti ti-moon text-xl text-blue-400"></i>
                         </button>
 
-                        <!-- Profile dropdown -->
-                        <div x-show="open" @click.away="open = false"
-                            class="absolute right-0 mt-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-lg py-2 z-50"
-                            x-cloak>
-                            <a href="{{ route('profile.edit') }}"
-                                class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="ti ti-user mr-2"></i> {{ __('Profile') }}
-                            </a>
-                            <a href="#" class="block px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700">
-                                <i class="ti ti-settings mr-2"></i> {{ __('Settings') }}
-                            </a>
-                            <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
-                            <form method="POST" action="{{ route('logout') }}">
-                                @csrf
-                                <button type="submit"
-                                    class="w-full text-left px-4 py-2 text-sm hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500">
-                                    <i class="ti ti-logout mr-2"></i> {{ __('Log Out') }}
-                                </button>
-                            </form>
+                        <!-- Notifications -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open"
+                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative">
+                                <i class="ti ti-bell text-xl text-gray-500 dark:text-gray-400"></i>
+                                <span
+                                    class="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
+                            </button>
+
+                            <!-- Notifications dropdown -->
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
+                                x-cloak x-transition>
+                                <div class="px-4 py-2.5 font-semibold border-b border-gray-100 dark:border-gray-700">
+                                    Notifikasi
+                                </div>
+                                <div class="p-4 text-sm text-center text-gray-500 dark:text-gray-400">
+                                    Tidak ada notifikasi baru
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- User profile -->
+                        <div class="relative" x-data="{ open: false }">
+                            <button @click="open = !open"
+                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                <div
+                                    class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium">
+                                    {{ substr(Auth::user()->name, 0, 1) }}
+                                </div>
+                                <span class="hidden md:block font-medium">{{ Auth::user()->name }}</span>
+                                <i class="ti ti-chevron-down text-gray-500 dark:text-gray-400"></i>
+                            </button>
+
+                            <!-- Profile dropdown -->
+                            <div x-show="open" @click.away="open = false"
+                                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
+                                x-cloak x-transition>
+                                <a href="{{ route('profile.edit') }}"
+                                    class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    <i class="ti ti-user text-gray-500 dark:text-gray-400"></i>
+                                    <span>{{ __('Profile') }}</span>
+                                </a>
+                                <a href="#"
+                                    class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    <i class="ti ti-settings text-gray-500 dark:text-gray-400"></i>
+                                    <span>{{ __('Settings') }}</span>
+                                </a>
+                                <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
+                                <form method="POST" action="{{ route('logout') }}">
+                                    @csrf
+                                    <button type="submit"
+                                        class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors">
+                                        <i class="ti ti-logout"></i>
+                                        <span>{{ __('Log Out') }}</span>
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -289,23 +148,25 @@
 
             <!-- Page Content -->
             <main class="flex-grow p-6">
-                <!-- Page header (optional) -->
+                <!-- Page header -->
                 @isset($header)
-                    <div class="page-header">
-                        <h1 class="text-2xl font-bold">{{ $header }}</h1>
+                    <div class="max-w-7xl mx-auto mb-6">
+                        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $header }}</h1>
                     </div>
                 @endisset
 
                 <!-- Content area -->
-                <div class="content-card p-6">
-                    {{ $slot }}
+                <div class="max-w-7xl mx-auto">
+                    <div class="content-card p-6">
+                        {{ $slot }}
+                    </div>
                 </div>
             </main>
         </div>
     </div>
 
     <script>
-        // Check for system color scheme preference on first load
+        // Check for system color scheme preference
         if (!localStorage.getItem('darkMode')) {
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             localStorage.setItem('darkMode', prefersDark);

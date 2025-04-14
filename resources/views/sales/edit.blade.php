@@ -1,4 +1,4 @@
-<x-app-layout>
+{{-- <x-app-layout>
     <x-slot name="header">
         <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
             <div>
@@ -555,6 +555,510 @@
             document.addEventListener('DOMContentLoaded', function() {
                 loadSaleDetails();
             });
+        </script>
+    @endpush
+</x-app-layout> --}}
+<x-app-layout>
+    <div class="space-y-6">
+        <!-- Page Header -->
+        <div class="flex items-center justify-between">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    {{ __('Edit Draft Transaksi') }}
+                </h2>
+                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Edit draft transaksi penjualan
+                    #{{ $sale->invoice_number }}</p>
+            </div>
+        </div>
+
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Ada kesalahan dalam pengisian
+                            form</h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <form action="{{ route('sales.update', $sale) }}" method="POST" id="saleForm">
+            @csrf
+            @method('PUT')
+
+            <!-- Section: Informasi Penjualan -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <h3
+                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Informasi Penjualan
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <!-- Nomor Faktur -->
+                    <div>
+                        <x-input-label for="invoice_number" value="Nomor Faktur" />
+                        <x-text-input id="invoice_number" name="invoice_number" type="text"
+                            class="mt-1 block w-full bg-gray-50 dark:bg-gray-700" :value="$sale->invoice_number" readonly />
+                    </div>
+
+                    <!-- Tanggal -->
+                    <div>
+                        <x-input-label for="date" value="Tanggal" />
+                        <x-text-input id="date" name="date" type="date"
+                            class="mt-1 block w-full bg-gray-50 dark:bg-gray-700" :value="old('date', date('Y-m-d', strtotime($sale->date)))" readonly />
+                    </div>
+
+                    <!-- Pelanggan -->
+                    <div>
+                        <x-input-label for="customer_select" value="Nama Pelanggan" />
+                        <select id="customer_select" name="customer_id"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                            <option value="">-- Pilih Pelanggan atau Ketik Nama Baru --</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}"
+                                    {{ $sale->customer_id == $customer->id ? 'selected' : '' }}>
+                                    {{ $customer->nama }} - {{ $customer->nik }}
+                                </option>
+                            @endforeach
+                        </select>
+                        <input type="hidden" name="customer_name" id="new_customer_name">
+                        <div class="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                            Pilih pelanggan yang ada atau ketik nama baru
+                        </div>
+                    </div>
+
+                    <!-- Metode Pembayaran -->
+                    <div>
+                        <x-input-label for="payment_method" value="Metode Pembayaran" />
+                        <select id="payment_method" name="payment_method"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                            required>
+                            <option value="cash" {{ $sale->payment_method === 'cash' ? 'selected' : '' }}>
+                                Tunai
+                            </option>
+                            <option value="transfer" {{ $sale->payment_method === 'transfer' ? 'selected' : '' }}>
+                                Transfer
+                            </option>
+                            <option value="credit" {{ $sale->payment_method === 'credit' ? 'selected' : '' }}>
+                                Kredit
+                            </option>
+                        </select>
+                        <x-input-error :messages="$errors->get('payment_method')" class="mt-2" />
+                    </div>
+
+                    <!-- Tanggal Jatuh Tempo (untuk kredit) -->
+                    <div id="due_date_container" class="{{ $sale->payment_method !== 'credit' ? 'hidden' : '' }}">
+                        <x-input-label for="due_date" value="Tanggal Jatuh Tempo" />
+                        <x-text-input id="due_date" name="due_date" type="date" class="mt-1 block w-full"
+                            :value="old(
+                                'due_date',
+                                $sale->due_date ? date('Y-m-d', strtotime($sale->due_date)) : '',
+                            )" :required="$sale->payment_method === 'credit'" />
+                        <x-input-error :messages="$errors->get('due_date')" class="mt-2" />
+                    </div>
+
+                    <!-- Catatan -->
+                    <div class="md:col-span-4">
+                        <x-input-label for="notes" value="Catatan" />
+                        <textarea id="notes" name="notes" rows="3"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                            placeholder="Tambahkan catatan jika diperlukan">{{ $sale->notes }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Item Penjualan (update with the same styling as create) -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        Item Penjualan
+                    </h3>
+                    <button type="button" onclick="addItem()"
+                        class="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        Tambah Item
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-800">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Produk</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Stok</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Jumlah</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Harga</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Subtotal</th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                    Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="saleItems"
+                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                            <!-- Items will be loaded dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section: Perhitungan (update with the same styling as create) -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center mb-6">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Perhitungan
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <!-- Total dan Diskon -->
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total:</span>
+                            <span id="totalAmount" class="text-lg font-bold text-gray-900 dark:text-gray-100">Rp
+                                0</span>
+                        </div>
+
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Diskon:</span>
+                            <div class="w-1/2">
+                                <input type="number" name="discount" id="discount"
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                                    value="{{ $sale->discount }}" min="0" onchange="calculateFinalTotal()">
+                            </div>
+                        </div>
+
+                        <div
+                            class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                            <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Setelah
+                                Diskon:</span>
+                            <span id="finalAmount" class="text-lg font-bold text-indigo-600 dark:text-indigo-400">Rp
+                                0</span>
+                        </div>
+                    </div>
+
+                    <!-- Pembayaran -->
+                    <div class="space-y-4">
+                        <!-- Metode Pembayaran -->
+                        <div id="payment_method_container">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Metode
+                                Pembayaran</label>
+                            <div class="grid grid-cols-3 gap-3">
+                                <label
+                                    class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="payment_method" value="cash"
+                                        {{ $sale->payment_method === 'cash' ? 'checked' : '' }} class="sr-only">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">Tunai</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="payment_method" value="transfer"
+                                        {{ $sale->payment_method === 'transfer' ? 'checked' : '' }} class="sr-only">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">Transfer</span>
+                                </label>
+                                <label
+                                    class="flex items-center p-3 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    <input type="radio" name="payment_method" value="credit"
+                                        {{ $sale->payment_method === 'credit' ? 'checked' : '' }} class="sr-only">
+                                    <span class="ml-2 text-sm text-gray-900 dark:text-gray-100">Kredit</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Pembayaran Tunai/Transfer -->
+                        <div id="paid_amount_container" class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah
+                                Dibayar</label>
+                            <div class="flex space-x-2">
+                                <input type="number" name="paid_amount" id="paid_amount"
+                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                                    value="{{ $sale->paid_amount }}" min="0" onchange="calculateChange()">
+                                <button type="button" onclick="setExactAmount()"
+                                    class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                    Uang Pas
+                                </button>
+                            </div>
+                            <div class="flex justify-between items-center mt-2">
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Kembalian:</span>
+                                <span id="changeAmount"
+                                    class="text-lg font-bold text-green-600 dark:text-green-400">Rp 0</span>
+                            </div>
+                        </div>
+
+                        <!-- Pembayaran Kredit -->
+                        <div id="credit_payment_container" class="space-y-4" style="display: none;">
+                            <div class="space-y-2">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Uang Muka
+                                    (DP)</label>
+                                <div class="flex space-x-2">
+                                    <input type="number" name="down_payment" id="down_payment"
+                                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                                        value="{{ $sale->down_payment }}" min="0"
+                                        onchange="calculateRemainingAmount()">
+                                    <button type="button" onclick="setDownPayment(50)"
+                                        class="px-3 py-2 text-sm text-white bg-blue-600 hover:bg-blue-700 rounded-md">
+                                        50%
+                                    </button>
+                                    <button type="button" onclick="setDownPayment(75)"
+                                        class="px-3 py-2 text-sm text-white bg-green-600 hover:bg-green-700 rounded-md">
+                                        75%
+                                    </button>
+                                </div>
+                            </div>
+                            <div
+                                class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-700">
+                                <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Sisa Hutang:</span>
+                                <span id="remainingAmount" class="text-lg font-bold text-red-600 dark:text-red-400">Rp
+                                    0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="window.history.back()"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Batal
+                </button>
+                <button type="submit" name="save_as_draft" value="1"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Perbarui Draft
+                </button>
+                <button type="submit" name="complete_transaction" value="1"
+                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 border border-transparent rounded-md shadow-sm">
+                    Selesaikan Transaksi
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @push('scripts')
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+        <script>
+            // Store sale details from the sale that's being edited
+            const saleDetails = @json($sale->saleDetails);
+
+            function createItemRow(detail = null) {
+                return `
+            <tr>
+                <td class="px-6 py-4">
+                    <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="">Pilih Produk</option>
+                        @foreach ($products as $product)
+                            <option value="{{ $product->id }}" 
+                                data-price="{{ $product->selling_price }}" 
+                                data-stock="{{ $product->stock }}"
+                                ${detail && detail.product_id == {{ $product->id }} ? 'selected' : ''}>
+                                {{ $product->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="px-6 py-4 available-stock text-gray-900 dark:text-gray-300">
+                    ${detail ? detail.product.stock : 0}
+                </td>
+                <td class="px-6 py-4">
+                    <input type="number" name="quantity[]" required 
+                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
+                        value="${detail ? detail.quantity : 1}" min="1" 
+                        onchange="calculateSubtotal(this)">
+                </td>
+                <td class="px-6 py-4">
+                    <input type="number" name="selling_price[]" required 
+                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
+                        value="${detail ? detail.selling_price : 0}" min="0" 
+                        onchange="calculateSubtotal(this)">
+                </td>
+                <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">
+                    ${detail ? formatRupiah(detail.subtotal) : 'Rp 0'}
+                </td>
+                <td class="px-6 py-4">
+                    <button type="button" onclick="removeItem(this)" 
+                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
+            }
+
+            // All calculation functions remain the same as in create.blade.php
+            function updatePrice(select) {
+                const tr = select.closest('tr');
+                const priceInput = tr.querySelector('input[name="selling_price[]"]');
+                const stockDisplay = tr.querySelector('.available-stock');
+                const quantityInput = tr.querySelector('input[name="quantity[]"]');
+                const selectedOption = select.options[select.selectedIndex];
+
+                if (selectedOption.value) {
+                    const price = selectedOption.dataset.price;
+                    const stock = selectedOption.dataset.stock;
+                    priceInput.value = price || 0;
+                    stockDisplay.textContent = stock;
+                    quantityInput.max = stock;
+                } else {
+                    priceInput.value = 0;
+                    stockDisplay.textContent = 0;
+                    quantityInput.max = 0;
+                }
+
+                calculateSubtotal(priceInput);
+            }
+
+            function calculateSubtotal(input) {
+                const tr = input.closest('tr');
+                const quantity = tr.querySelector('input[name="quantity[]"]').value || 0;
+                const price = tr.querySelector('input[name="selling_price[]"]').value || 0;
+                const subtotal = quantity * price;
+                tr.querySelector('.subtotal').textContent = formatRupiah(subtotal);
+                calculateTotal();
+            }
+
+            // Add all other calculation functions from create.blade.php...
+
+            function addItem() {
+                const tbody = document.getElementById('saleItems');
+                const newRow = $(createItemRow());
+                $(tbody).append(newRow);
+
+                newRow.find('.product-select').on('change', function() {
+                    updatePrice(this);
+                });
+                initializeSelect2ForRow(newRow);
+            }
+
+            function loadSaleDetails() {
+                const tbody = document.getElementById('saleItems');
+                tbody.innerHTML = ''; // Clear existing rows
+
+                if (saleDetails && saleDetails.length) {
+                    saleDetails.forEach(detail => {
+                        tbody.insertAdjacentHTML('beforeend', createItemRow(detail));
+                    });
+                } else {
+                    addItem(); // Add one empty row if no details
+                }
+
+                // Initialize Select2 for all product selects
+                $('.product-select').each(function() {
+                    initializeSelect2ForRow($(this).closest('tr'));
+                });
+
+                // Calculate initial totals
+                calculateTotal();
+
+                // Update payment method display
+                document.getElementById('payment_method').dispatchEvent(new Event('change'));
+            }
+
+            // Initialize on page load
+            document.addEventListener('DOMContentLoaded', function() {
+                loadSaleDetails();
+
+                // Initialize Select2 for customer select
+                $('#customer_select').select2({
+                    theme: 'tailwind',
+                    placeholder: 'Pilih Pelanggan',
+                    allowClear: true
+                });
+
+                // Initialize payment method handling
+                document.getElementById('payment_method').addEventListener('change', function() {
+                    const dpContainer = document.getElementById('dp_container');
+                    const cashSection = document.getElementById('cash-payment-section');
+
+                    if (this.value === 'credit') {
+                        dpContainer.classList.remove('hidden');
+                        cashSection.classList.add('hidden');
+                        calculateRemainingAmount();
+                    } else {
+                        dpContainer.classList.add('hidden');
+                        cashSection.classList.remove('hidden');
+                        calculateChange();
+                    }
+                });
+            });
+
+            // Add form validation
+            document.getElementById('saleForm').addEventListener('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                    return false;
+                }
+            });
+
+            function validateForm() {
+                const paymentMethod = document.getElementById('payment_method').value;
+
+                if (paymentMethod === 'credit' && !document.getElementById('customer_select').value) {
+                    alert('Untuk pembayaran kredit, pilih pelanggan terlebih dahulu');
+                    return false;
+                }
+
+                if (!validateProductStock()) {
+                    return false;
+                }
+
+                return true;
+            }
+
+            function formatRupiah(number) {
+                return 'Rp ' + Math.round(number).toLocaleString('id-ID');
+            }
         </script>
     @endpush
 </x-app-layout>

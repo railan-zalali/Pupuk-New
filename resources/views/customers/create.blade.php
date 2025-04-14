@@ -27,7 +27,7 @@
                         <div class="mt-1 flex items-center">
                             <label for="excel_file" class="relative cursor-pointer">
                                 <div
-                                    class="flex items-center space-x-2 px-3 py-2 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-900 transition-colors duration-200">
+                                    class="flex items-center space-x-2 px-3 py-2 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-800/50">
                                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
                                         viewBox="0 0 24 24" stroke="currentColor">
                                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -65,13 +65,12 @@
                     <div class="flex-shrink-0">
                         <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
                             <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.293-4.293a1 1 0 011.414-1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293z"
                                 clip-rule="evenodd" />
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terdapat beberapa kesalahan:
-                        </h3>
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terdapat beberapa kesalahan:</h3>
                         <div class="mt-2 text-sm text-red-700 dark:text-red-300">
                             <ul class="list-disc pl-5 space-y-1">
                                 @foreach ($errors->all() as $error)
@@ -87,165 +86,150 @@
         <!-- Form Content -->
         <div
             class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-            <form action="{{ route('customers.store') }}" method="POST" class="p-6 space-y-6">
-                @csrf
+            <div class="p-6 space-y-6">
+                <form action="{{ route('customers.store') }}" method="POST" class="space-y-6">
+                    @csrf
 
-                <!-- Informasi Dasar -->
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                        <x-input-label for="nik" :value="__('NIK')"
-                            class="font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1m-4 0a2 2 0 104 0m-5 8a2 2 0 100-4 2 2 0 000 4zm0 0c1.306 0 2.417.835 2.83 2M9 14a3.001 3.001 0 00-2.83 2M15 11h3m-3 4h2" />
-                                </svg>
+                    <!-- Personal Info Section -->
+                    <div
+                        class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                            Informasi Pribadi
+                        </h3>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <x-input-label for="nik" :value="__('NIK')" />
+                                <x-text-input id="nik" name="nik" type="number" class="mt-1 block w-full"
+                                    :value="old('nik')" required />
+                                <x-input-error :messages="$errors->get('nik')" class="mt-2" />
                             </div>
-                            <x-text-input id="nik" name="nik" type="number"
-                                class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300"
-                                :value="old('nik')" placeholder="Masukkan NIK" required />
+
+                            <div>
+                                <x-input-label for="nama" :value="__('Nama')" />
+                                <x-text-input id="nama" name="nama" type="text" class="mt-1 block w-full"
+                                    :value="old('nama')" required />
+                                <x-input-error :messages="$errors->get('nama')" class="mt-2" />
+                            </div>
                         </div>
-                        <x-input-error :messages="$errors->get('nik')" class="mt-2" />
                     </div>
 
-                    <div>
-                        <x-input-label for="nama" :value="__('Nama')"
-                            class="font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <x-text-input id="nama" name="nama" type="text"
-                                class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300"
-                                :value="old('nama')" placeholder="Masukkan nama lengkap" required />
-                        </div>
-                        <x-input-error :messages="$errors->get('nama')" class="mt-2" />
-                    </div>
-                </div>
+                    <!-- Address Section -->
+                    <div
+                        class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                            </svg>
+                            Informasi Alamat
+                        </h3>
 
-                <!-- Informasi Wilayah -->
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                    <div>
-                        <x-input-label for="provinsi" :value="__('Provinsi')"
-                            class="font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />
-                                </svg>
+                        <div class="space-y-4">
+                            <div class="md:col-span-2">
+                                <x-input-label for="alamat" :value="__('Alamat Lengkap')" />
+                                <textarea id="alamat" name="alamat" rows="3"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-300">{{ old('alamat') }}</textarea>
+                                <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
                             </div>
-                            <select id="provinsi" name="provinsi_id"
-                                class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300 select2"
-                                required>
-                                <option value="">Pilih Provinsi</option>
-                            </select>
-                            <input type="hidden" name="provinsi_nama" id="provinsi_nama">
-                        </div>
-                        <x-input-error :messages="$errors->get('provinsi_id')" class="mt-2" />
-                    </div>
 
-                    <div>
-                        <x-input-label for="kabupaten" :value="__('Kabupaten')"
-                            class="font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                                </svg>
-                            </div>
-                            <select id="kabupaten" name="kabupaten_id"
-                                class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300 select2"
-                                required disabled>
-                                <option value="">Pilih Kabupaten</option>
-                            </select>
-                            <input type="hidden" name="kabupaten_nama" id="kabupaten_nama">
-                        </div>
-                        <x-input-error :messages="$errors->get('kabupaten_id')" class="mt-2" />
-                    </div>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <!-- Provinsi -->
+                                <div
+                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <x-input-label for="provinsi" :value="__('Provinsi')" />
+                                    <select id="provinsi" name="provinsi_id"
+                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                                        required>
+                                        <option value="">Pilih Provinsi</option>
+                                    </select>
+                                    <input type="hidden" name="provinsi_nama" id="provinsi_nama">
+                                    <x-input-error :messages="$errors->get('provinsi_id')" class="mt-2" />
+                                </div>
 
-                    <div>
-                        <x-input-label for="kecamatan" :value="__('Kecamatan')"
-                            class="font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
+                                <!-- Kabupaten -->
+                                <div
+                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <x-input-label for="kabupaten" :value="__('Kabupaten')" />
+                                    <select id="kabupaten" name="kabupaten_id"
+                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                                        required disabled>
+                                        <option value="">Pilih Kabupaten</option>
+                                    </select>
+                                    <input type="hidden" name="kabupaten_nama" id="kabupaten_nama">
+                                    <x-input-error :messages="$errors->get('kabupaten_id')" class="mt-2" />
+                                </div>
+
+                                <!-- Kecamatan -->
+                                <div
+                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <x-input-label for="kecamatan" :value="__('Kecamatan')" />
+                                    <select id="kecamatan" name="kecamatan_id"
+                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                                        required disabled>
+                                        <option value="">Pilih Kecamatan</option>
+                                    </select>
+                                    <input type="hidden" name="kecamatan_nama" id="kecamatan_nama">
+                                    <x-input-error :messages="$errors->get('kecamatan_id')" class="mt-2" />
+                                </div>
+
+                                <!-- Desa -->
+                                <div
+                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
+                                    <x-input-label for="desa" :value="__('Desa')" />
+                                    <select id="desa" name="desa_id"
+                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
+                                        required disabled>
+                                        <option value="">Pilih Desa</option>
+                                    </select>
+                                    <input type="hidden" name="desa_nama" id="desa_nama">
+                                    <x-input-error :messages="$errors->get('desa_id')" class="mt-2" />
+                                </div>
                             </div>
-                            <select id="kecamatan" name="kecamatan_id"
-                                class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300 select2"
-                                required disabled>
-                                <option value="">Pilih Kecamatan</option>
-                            </select>
-                            <input type="hidden" name="kecamatan_nama" id="kecamatan_nama">
                         </div>
-                        <x-input-error :messages="$errors->get('kecamatan_id')" class="mt-2" />
                     </div>
 
-                    <div>
-                        <x-input-label for="desa" :value="__('Desa')"
-                            class="font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 relative rounded-md shadow-sm">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
-                                </svg>
-                            </div>
-                            <select id="desa" name="desa_id"
-                                class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300 select2"
-                                required disabled>
-                                <option value="">Pilih Desa</option>
-                            </select>
-                            <input type="hidden" name="desa_nama" id="desa_nama">
-                        </div>
-                        <x-input-error :messages="$errors->get('desa_id')" class="mt-2" />
-                    </div>
-                </div>
-
-                <!-- Form Actions -->
-                <div class="flex justify-end space-x-3">
-                    <button type="button" onclick="window.history.back()"
-                        class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none"
+                    <!-- Form Actions -->
+                    <div class="flex justify-end space-x-3">
+                        <button type="button" onclick="window.history.back()"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                             </svg>
                             Batal
-                        </div>
-                    </button>
-                    <button type="submit"
-                        class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 border border-transparent rounded-md shadow-sm hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        <div class="flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none"
+                        </button>
+
+                        <button type="submit"
+                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
                             </svg>
                             Simpan Pelanggan
-                        </div>
-                    </button>
-                </div>
-            </form>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
     </div>
+
+    @push('styles')
+        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    @endpush
+
     @push('scripts')
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
@@ -275,8 +259,6 @@
                     provinces.forEach(function(province) {
                         $('#provinsi').append(new Option(province.name, province.id));
                     });
-                }).fail(function(jqXHR, textStatus, errorThrown) {
-                    console.error("Gagal memuat data provinsi:", textStatus, errorThrown);
                 });
 
                 // Event Provinsi Change
@@ -291,7 +273,7 @@
                     }
                 });
 
-                // Event Kabupaten Change
+                // Event Kabupaten Change 
                 $('#kabupaten').on('change', function() {
                     $('#kecamatan').empty().append(new Option('Pilih Kecamatan', '')).prop('disabled', true);
                     $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);

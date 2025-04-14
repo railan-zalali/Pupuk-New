@@ -133,6 +133,7 @@ Route::middleware('auth')->group(function () {
 
         Route::get('sales/credit', [SaleController::class, 'creditSales'])->name('sales.credit');
         Route::get('sales/drafts', [SaleController::class, 'drafts'])->name('sales.drafts');
+        Route::put('/sales/{sale}/complete-draft', [SaleController::class, 'completeDraft'])->name('sales.complete_draft');
 
 
         Route::get('sales/{sale}/complete-draft', [SaleController::class, 'completeDraft'])->name('sales.complete-draft');

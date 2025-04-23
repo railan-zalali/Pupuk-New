@@ -12,15 +12,16 @@ class Product extends Model
     use SoftDeletes, HasFactory;
 
     protected $fillable = [
+        'category_id',
         'name',
         'code',
         'description',
         'image_path',
-        'category_id',
         'purchase_price',
         'selling_price',
         'stock',
-        'min_stock'
+        'min_stock',
+        'supplier_id',
     ];
 
     public function category()
@@ -41,5 +42,15 @@ class Product extends Model
     public function stockMovements()
     {
         return $this->hasMany(StockMovement::class);
+    }
+    public function suppliers()
+    {
+        return $this->belongsToMany(Supplier::class, 'product_supplier')
+            ->withPivot('purchase_price')
+            ->withTimestamps();
+    }
+    public function supplier()
+    {
+        return $this->belongsTo(Supplier::class);
     }
 }

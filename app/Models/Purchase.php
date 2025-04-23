@@ -8,7 +8,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Purchase extends Model
 {
-    use SoftDeletes, HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'invoice_number',
@@ -16,11 +16,13 @@ class Purchase extends Model
         'user_id',
         'date',
         'total_amount',
+        'status',
         'notes'
     ];
 
     protected $casts = [
-        'date' => 'date'
+        'date' => 'datetime',
+        'total_amount' => 'decimal:2'
     ];
 
     public function supplier()
@@ -36,5 +38,48 @@ class Purchase extends Model
     public function purchaseDetails()
     {
         return $this->hasMany(PurchaseDetail::class);
+    }
+
+    public function receipts()
+    {
+        return $this->hasMany(PurchaseReceipt::class);
+    }
+
+    // Helper methods to check status
+    public function isPending()
+    {
+        return $this->status === 'pending';
+    }
+
+    public function isPartiallyReceived()
+    {
+        return $this->status === 'partially_received';
+    }
+
+    public function isReceived()
+    {
+        return $this->status === 'received';
+    }
+
+    // Get total received quantity
+    public function getTotalReceivedQuantity()
+    {
+        return $this->purchaseDetails->sum('received_quantity');
+    }
+
+    // Get total ordered quantity
+    public function getTotalOrderedQuantity()
+    {
+        return $this->purchaseDetails->sum('quantity');
+    }
+
+    // Get receipt progress percentage
+    public function getReceiptProgressPercentage()
+    {
+        $totalOrdered = $this->getTotalOrderedQuantity();
+        if ($totalOrdered == 0) return 0;
+
+        $totalReceived = $this->getTotalReceivedQuantity();
+        return round(($totalReceived / $totalOrdered) * 100);
     }
 }

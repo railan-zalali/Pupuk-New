@@ -183,137 +183,137 @@
     </div>
 
     @push('scripts')
-    <script>
-        function createItemRow() {
-            return `
-            <tr>
-                <td class="px-6 py-4">
-                    <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" onchange="updatePrice(this)">
-                        <option value="">Pilih Produk</option>
-                    </select>
-                </td>
-                <td class="px-6 py-4">
-                    <input type="number" name="quantity[]" required
-                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
-                        value="1" min="1" onchange="calculateSubtotal(this)">
-                </td>
-                <td class="px-6 py-4">
-                    <input type="number" name="purchase_price[]" required
-                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
-                        value="0" min="0" onchange="calculateSubtotal(this)">
-                </td>
-                <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">Rp 0</td>
-                <td class="px-6 py-4">
-                    <button type="button" onclick="removeItem(this)"
-                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        Hapus
-                    </button>
-                </td>
-            </tr>
+        <script>
+            function createItemRow() {
+                return `
+                <tr>
+                    <td class="px-6 py-4">
+                        <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" onchange="updatePrice(this)">
+                            <option value="">Pilih Produk</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="number" name="quantity[]" required
+                            class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
+                            value="1" min="1" onchange="calculateSubtotal(this)">
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="number" name="purchase_price[]" required
+                            class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
+                            value="0" min="0" onchange="calculateSubtotal(this)">
+                    </td>
+                    <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">Rp 0</td>
+                    <td class="px-6 py-4">
+                        <button type="button" onclick="removeItem(this)"
+                            class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                            Hapus
+                        </button>
+                    </td>
+                </tr>
             `;
-        }
+            }
 
-        function updatePrice(select) {
-            const tr = select.closest('tr');
-            const priceInput = tr.querySelector('input[name="purchase_price[]"]');
-            const selectedOption = select.options[select.selectedIndex];
-            const price = selectedOption.dataset.price;
-            priceInput.value = price || 0;
-            calculateSubtotal(priceInput);
-        }
+            function updatePrice(select) {
+                const tr = select.closest('tr');
+                const priceInput = tr.querySelector('input[name="purchase_price[]"]');
+                const selectedOption = select.options[select.selectedIndex];
+                const price = selectedOption.dataset.price;
+                priceInput.value = price || 0;
+                calculateSubtotal(priceInput);
+            }
 
-        function calculateSubtotal(input) {
-            const tr = input.closest('tr');
-            const quantity = Math.max(1, Math.round(tr.querySelector('input[name="quantity[]"]').value || 0));
-            const price = Math.max(0, Math.round(tr.querySelector('input[name="purchase_price[]"]').value || 0));
-            const subtotal = quantity * price;
-            tr.querySelector('.subtotal').textContent = formatRupiah(subtotal);
-            calculateTotal();
-        }
-
-        function calculateTotal() {
-            const subtotals = document.querySelectorAll('.subtotal');
-            let total = 0;
-            subtotals.forEach(subtotal => {
-                const value = subtotal.textContent.replace('Rp ', '').replace(/\./g, '');
-                total += parseFloat(value) || 0;
-            });
-            document.getElementById('totalAmount').textContent = formatRupiah(total);
-        }
-
-        function formatRupiah(number) {
-            return 'Rp ' + Math.round(number).toLocaleString('id-ID');
-        }
-
-        function addItem() {
-            const tbody = document.getElementById('purchaseItems');
-            tbody.insertAdjacentHTML('beforeend', createItemRow());
-            const newRow = tbody.lastElementChild;
-            updateProductOptions(newRow.querySelector('select[name="product_id[]"]'));
-        }
-
-        function removeItem(button) {
-            const tbody = document.getElementById('purchaseItems');
-            if (tbody.children.length > 1) {
-                button.closest('tr').remove();
+            function calculateSubtotal(input) {
+                const tr = input.closest('tr');
+                const quantity = Math.max(1, Math.round(tr.querySelector('input[name="quantity[]"]').value || 0));
+                const price = Math.max(0, Math.round(tr.querySelector('input[name="purchase_price[]"]').value || 0));
+                const subtotal = quantity * price;
+                tr.querySelector('.subtotal').textContent = formatRupiah(subtotal);
                 calculateTotal();
-            } else {
-                alert('Minimal satu item harus ada');
             }
-        }
 
-        function updateProductOptions(selectElement = null) {
-            const supplierId = document.getElementById('supplier_id').value;
-
-            if (!supplierId) {
-                document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
-                    select.innerHTML = '<option value="">Pilih Produk</option>';
+            function calculateTotal() {
+                const subtotals = document.querySelectorAll('.subtotal');
+                let total = 0;
+                subtotals.forEach(subtotal => {
+                    const value = subtotal.textContent.replace('Rp ', '').replace(/\./g, '');
+                    total += parseFloat(value) || 0;
                 });
-                return;
+                document.getElementById('totalAmount').textContent = formatRupiah(total);
             }
 
-            fetch(`/purchases/products-by-supplier/${supplierId}`)
-                .then(response => response.json())
-                .then(products => {
-                    let optionsHtml = '<option value="">Pilih Produk</option>';
-                    products.forEach(product => {
-                        const supplierInfo = product.suppliers.find(s => s.id == supplierId);
-                        const price = supplierInfo ? supplierInfo.pivot.purchase_price : product.purchase_price;
-                        optionsHtml +=
-                            `<option value="${product.id}" data-price="${price}">${product.name}</option>`;
-                    });
+            function formatRupiah(number) {
+                return 'Rp ' + Math.round(number).toLocaleString('id-ID');
+            }
 
-                    if (selectElement) {
-                        selectElement.innerHTML = optionsHtml;
-                    } else {
-                        document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
-                            select.innerHTML = optionsHtml;
-                        });
-                    }
-                })
-                .catch(error => console.error('Error fetching products:', error));
-        }
+            function addItem() {
+                const tbody = document.getElementById('purchaseItems');
+                tbody.insertAdjacentHTML('beforeend', createItemRow());
+                const newRow = tbody.lastElementChild;
+                updateProductOptions(newRow.querySelector('select[name="product_id[]"]'));
+            }
 
-        // Event Listeners
-        document.addEventListener('DOMContentLoaded', function() {
-            const supplierSelect = document.getElementById('supplier_id');
-            supplierSelect.addEventListener('change', function() {
-                updateProductOptions();
-            });
-
-            // Add first item on page load
-            addItem();
-        });
-
-        // Prevent negative values in all number inputs
-        document.addEventListener('input', function(e) {
-            if (e.target.type === 'number') {
-                if (parseFloat(e.target.value) < 0 || isNaN(e.target.value)) {
-                    e.target.value = 0;
+            function removeItem(button) {
+                const tbody = document.getElementById('purchaseItems');
+                if (tbody.children.length > 1) {
+                    button.closest('tr').remove();
+                    calculateTotal();
+                } else {
+                    alert('Minimal satu item harus ada');
                 }
             }
-        });
-    </script>
+
+            function updateProductOptions(selectElement = null) {
+                const supplierId = document.getElementById('supplier_id').value;
+
+                if (!supplierId) {
+                    document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
+                        select.innerHTML = '<option value="">Pilih Produk</option>';
+                    });
+                    return;
+                }
+
+                fetch(`/purchases/products-by-supplier/${supplierId}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        let optionsHtml = '<option value="">Pilih Produk</option>';
+                        products.forEach(product => {
+                            const supplierInfo = product.suppliers[0];
+                            const price = supplierInfo ? supplierInfo.pivot.purchase_price : 0;
+                            optionsHtml +=
+                                `<option value="${product.id}" data-price="${price}">${product.name}</option>`;
+                        });
+
+                        if (selectElement) {
+                            selectElement.innerHTML = optionsHtml;
+                        } else {
+                            document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
+                                select.innerHTML = optionsHtml;
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
+            }
+
+            // Event Listeners
+            document.addEventListener('DOMContentLoaded', function() {
+                const supplierSelect = document.getElementById('supplier_id');
+                supplierSelect.addEventListener('change', function() {
+                    updateProductOptions();
+                });
+
+                // Add first item on page load
+                addItem();
+            });
+
+            // Prevent negative values in all number inputs
+            document.addEventListener('input', function(e) {
+                if (e.target.type === 'number') {
+                    if (parseFloat(e.target.value) < 0 || isNaN(e.target.value)) {
+                        e.target.value = 0;
+                    }
+                }
+            });
+        </script>
     @endpush
 
 </x-app-layout>

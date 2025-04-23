@@ -1,0 +1,341 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Product;
+use App\Models\Purchase;
+use App\Models\PurchaseDetail;
+use App\Models\PurchaseReceipt;
+use App\Models\StockMovement;
+use App\Models\Supplier;
+use Carbon\Carbon;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
+
+class PurchaseController extends Controller
+{
+    /**
+     * Display a listing of purchases.
+     */
+    public function index()
+    {
+        // Eager load relationships to avoid N+1 queries
+        $purchases = Purchase::with(['supplier', 'user'])
+            ->orderBy('date', 'desc')
+            ->paginate(15);
+
+        return view('purchases.index', compact('purchases'));
+    }
+
+    /**
+     * Show the form for creating a new purchase.
+     */
+    public function create()
+    {
+        $suppliers = Supplier::orderBy('name')->get();
+        $products = Product::with('category')->orderBy('name')->get();
+
+        return view('purchases.create', compact('suppliers', 'products'));
+    }
+
+    /**
+     * Store a newly created purchase in storage.
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'supplier_id' => 'required|exists:suppliers,id',
+            'date' => 'required|date',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.price' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            // Begin transaction
+            \DB::beginTransaction();
+
+            // Calculate total amount
+            $totalAmount = 0;
+            foreach ($request->products as $product) {
+                $totalAmount += $product['quantity'] * $product['price'];
+            }
+
+            // Create purchase
+            $purchase = Purchase::create([
+                'invoice_number' => $this->generateInvoiceNumber(),
+                'supplier_id' => $request->supplier_id,
+                'user_id' => Auth::id(),
+                'date' => Carbon::parse($request->date),
+                'total_amount' => $totalAmount,
+                'status' => 'pending',
+                'notes' => $request->notes,
+            ]);
+
+            // Create purchase details
+            foreach ($request->products as $item) {
+                PurchaseDetail::create([
+                    'purchase_id' => $purchase->id,
+                    'product_id' => $item['id'],
+                    'quantity' => $item['quantity'],
+                    'received_quantity' => 0,
+                    'purchase_price' => $item['price'],
+                    'subtotal' => $item['quantity'] * $item['price'],
+                ]);
+            }
+
+            \DB::commit();
+            return redirect()->route('purchases.show', $purchase)
+                ->with('success', 'Pembelian berhasil dibuat.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            Log::error('Purchase creation failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    /**
+     * Display the specified purchase.
+     */
+    public function show(Purchase $purchase)
+    {
+        // Eager load relationships to avoid N+1 queries
+        $purchase->load(['supplier', 'user', 'purchaseDetails.product', 'receipts.receiptDetails']);
+
+        return view('purchases.show', compact('purchase'));
+    }
+
+    /**
+     * Show the form for editing the specified purchase.
+     */
+    public function edit(Purchase $purchase)
+    {
+        if ($purchase->status !== 'pending') {
+            return redirect()->route('purchases.show', $purchase)
+                ->with('error', 'Pembelian yang sudah diproses tidak dapat diedit.');
+        }
+
+        $purchase->load('purchaseDetails.product');
+        $suppliers = Supplier::orderBy('name')->get();
+        $products = Product::with('category')->orderBy('name')->get();
+
+        return view('purchases.edit', compact('purchase', 'suppliers', 'products'));
+    }
+
+    /**
+     * Update the specified purchase in storage.
+     */
+    public function update(Request $request, Purchase $purchase)
+    {
+        if ($purchase->status !== 'pending') {
+            return redirect()->route('purchases.show', $purchase)
+                ->with('error', 'Pembelian yang sudah diproses tidak dapat diubah.');
+        }
+
+        $request->validate([
+            'supplier_id' => 'required|exists:suppliers,id',
+            'date' => 'required|date',
+            'products' => 'required|array|min:1',
+            'products.*.id' => 'required|exists:products,id',
+            'products.*.quantity' => 'required|integer|min:1',
+            'products.*.price' => 'required|numeric|min:0',
+        ]);
+
+        try {
+            // Begin transaction
+            \DB::beginTransaction();
+
+            // Calculate total amount
+            $totalAmount = 0;
+            foreach ($request->products as $product) {
+                $totalAmount += $product['quantity'] * $product['price'];
+            }
+
+            // Update purchase
+            $purchase->update([
+                'supplier_id' => $request->supplier_id,
+                'date' => Carbon::parse($request->date),
+                'total_amount' => $totalAmount,
+                'notes' => $request->notes,
+            ]);
+
+            // Delete existing purchase details
+            $purchase->purchaseDetails()->delete();
+
+            // Create new purchase details
+            foreach ($request->products as $item) {
+                PurchaseDetail::create([
+                    'purchase_id' => $purchase->id,
+                    'product_id' => $item['id'],
+                    'quantity' => $item['quantity'],
+                    'received_quantity' => 0,
+                    'purchase_price' => $item['price'],
+                    'subtotal' => $item['quantity'] * $item['price'],
+                ]);
+            }
+
+            \DB::commit();
+            return redirect()->route('purchases.show', $purchase)
+                ->with('success', 'Pembelian berhasil diperbarui.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            Log::error('Purchase update failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    /**
+     * Remove the specified purchase from storage.
+     */
+    public function destroy(Purchase $purchase)
+    {
+        if ($purchase->status !== 'pending') {
+            return redirect()->route('purchases.show', $purchase)
+                ->with('error', 'Pembelian yang sudah diproses tidak dapat dihapus.');
+        }
+
+        try {
+            $purchase->delete();
+            return redirect()->route('purchases.index')
+                ->with('success', 'Pembelian berhasil dihapus.');
+        } catch (\Exception $e) {
+            Log::error('Purchase deletion failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Show the form for creating a receipt for a purchase.
+     */
+    public function createReceipt(Purchase $purchase)
+    {
+        if ($purchase->isReceived()) {
+            return redirect()->route('purchases.show', $purchase)
+                ->with('error', 'Pembelian ini sudah diterima sepenuhnya.');
+        }
+
+        $purchase->load(['supplier', 'purchaseDetails.product']);
+
+        return view('purchases.receipt', compact('purchase'));
+    }
+
+    /**
+     * Store a newly created receipt in storage.
+     */
+    public function storeReceipt(Request $request, Purchase $purchase)
+    {
+        if ($purchase->isReceived()) {
+            return redirect()->route('purchases.show', $purchase)
+                ->with('error', 'Pembelian ini sudah diterima sepenuhnya.');
+        }
+
+        $request->validate([
+            'receipt_date' => 'required|date',
+            'receipt_number' => 'required|string|max:255',
+            'items' => 'required|array',
+            'items.*.product_id' => 'required|exists:products,id',
+            'items.*.purchase_detail_id' => 'required|exists:purchase_details,id',
+            'items.*.received_quantity' => 'required|integer|min:0',
+        ]);
+
+        try {
+            // Begin transaction
+            \DB::beginTransaction();
+
+            // Create receipt
+            $receipt = PurchaseReceipt::create([
+                'purchase_id' => $purchase->id,
+                'user_id' => Auth::id(),
+                'receipt_number' => $request->receipt_number,
+                'receipt_date' => Carbon::parse($request->receipt_date),
+                'notes' => $request->notes,
+            ]);
+
+            // Handle file upload if present
+            if ($request->hasFile('receipt_file')) {
+                $file = $request->file('receipt_file');
+                $filename = time() . '_' . $file->getClientOriginalName();
+                $file->storeAs('receipts', $filename, 'public');
+                $receipt->update(['receipt_file' => $filename]);
+            }
+
+            // Process received items
+            $allReceived = true;
+            $totalReceived = 0;
+
+            foreach ($request->items as $item) {
+                if ($item['received_quantity'] > 0) {
+                    // Create receipt detail
+                    $receipt->receiptDetails()->create([
+                        'purchase_detail_id' => $item['purchase_detail_id'],
+                        'product_id' => $item['product_id'],
+                        'received_quantity' => $item['received_quantity'],
+                    ]);
+
+                    // Update purchase detail received quantity
+                    $purchaseDetail = PurchaseDetail::find($item['purchase_detail_id']);
+                    $newReceivedQty = $purchaseDetail->received_quantity + $item['received_quantity'];
+                    $purchaseDetail->update(['received_quantity' => $newReceivedQty]);
+
+                    // Check if fully received
+                    if ($newReceivedQty < $purchaseDetail->quantity) {
+                        $allReceived = false;
+                    }
+
+                    // Update product stock
+                    $product = Product::find($item['product_id']);
+                    $product->increment('stock', $item['received_quantity']);
+
+                    // Create stock movement record
+                    StockMovement::create([
+                        'product_id' => $item['product_id'],
+                        'reference_id' => $receipt->id,
+                        'reference_type' => 'purchase_receipt',
+                        'quantity' => $item['received_quantity'],
+                        'movement_type' => 'in',
+                        'notes' => 'Penerimaan pembelian #' . $purchase->invoice_number,
+                    ]);
+
+                    $totalReceived += $item['received_quantity'];
+                }
+            }
+
+            // Update purchase status
+            if ($allReceived) {
+                $purchase->update(['status' => 'received']);
+            } else {
+                $purchase->update(['status' => 'partially_received']);
+            }
+
+            \DB::commit();
+            return redirect()->route('purchases.show', $purchase)
+                ->with('success', "Penerimaan barang berhasil dicatat. $totalReceived item telah diterima.");
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            Log::error('Receipt creation failed: ' . $e->getMessage());
+            return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
+        }
+    }
+
+    /**
+     * Generate a unique invoice number.
+     */
+    private function generateInvoiceNumber()
+    {
+        $prefix = 'PO-' . date('Ymd');
+        $lastPurchase = Purchase::where('invoice_number', 'like', $prefix . '%')
+            ->orderBy('invoice_number', 'desc')
+            ->first();
+
+        if ($lastPurchase) {
+            $lastNumber = intval(substr($lastPurchase->invoice_number, -4));
+            $newNumber = $lastNumber + 1;
+        } else {
+            $newNumber = 1;
+        }
+
+        return $prefix . '-' . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+    }
+}

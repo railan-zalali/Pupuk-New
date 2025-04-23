@@ -323,41 +323,41 @@
         <script>
             function createItemRow() {
                 return `
-                        <tr>
-                            <td class="px-6 py-4">
-                                <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300">
-                                    <option value="">Pilih Produk</option>
-                                    @foreach ($products as $product)
-                                        <option value="{{ $product->id }}" 
-                                            data-price="{{ $product->selling_price }}" 
-                                            data-stock="{{ $product->stock }}">
-                                            {{ $product->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </td>
-                            <td class="px-6 py-4 available-stock text-gray-900 dark:text-gray-300">0</td>
-                            <td class="px-6 py-4">
-                                <input type="number" name="quantity[]" required 
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
-                                    value="1" min="1" onchange="calculateSubtotal(this)">
-                            </td>
-                            <td class="px-6 py-4">
-                                <input type="number" name="selling_price[]" required 
-                                    class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
-                                    value="0" min="0" 
-                                    onkeypress="return event.charCode >= 48 && event.charCode <= 57" 
-                                    onchange="calculateSubtotal(this)">
-                            </td>
-                            <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">Rp 0</td>
-                            <td class="px-6 py-4">
-                                <button type="button" onclick="removeItem(this)" 
-                                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                                    Hapus
-                                </button>
-                            </td>
-                        </tr>
-                    `;
+            <tr>
+                <td class="px-6 py-4">
+                    <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300">
+                        <option value="">Pilih Produk</option>
+                        @foreach ($products as $product)
+                            <option value="{{ $product->id }}" 
+                                data-price="{{ $product->selling_price }}" 
+                                data-stock="{{ $product->stock }}">
+                                {{ $product->name }}
+                            </option>
+                        @endforeach
+                    </select>
+                </td>
+                <td class="px-6 py-4 available-stock text-gray-900 dark:text-gray-300">0</td>
+                <td class="px-6 py-4">
+                    <input type="number" name="quantity[]" required 
+                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
+                        value="1" min="1" onchange="calculateSubtotal(this)">
+                </td>
+                <td class="px-6 py-4">
+                    <input type="number" name="selling_price[]" required 
+                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
+                        value="0" min="0" 
+                        onkeypress="return event.charCode >= 48 && event.charCode <= 57" 
+                        onchange="calculateSubtotal(this)">
+                </td>
+                <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">Rp 0</td>
+                <td class="px-6 py-4">
+                    <button type="button" onclick="removeItem(this)" 
+                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                        Hapus
+                    </button>
+                </td>
+            </tr>
+        `;
             }
 
             function updatePrice(select) {
@@ -367,22 +367,23 @@
                 const quantityInput = tr.querySelector('input[name="quantity[]"]');
                 const selectedOption = select.options[select.selectedIndex];
 
-                quantityInput.addEventListener('input', function() {
-                    if (this.value > selectedOption.dataset.stock) {
-                        alert('Jumlah melebihi stok!');
-                        this.value = selectedOption.dataset.stock;
-                    }
-                });
                 if (selectedOption.value) {
-                    const price = selectedOption.dataset.price;
-                    const stock = selectedOption.dataset.stock;
-                    priceInput.value = price || 0; // Set nilai default tapi tetap bisa diubah
+                    const price = selectedOption.dataset.price || 0;
+                    const stock = parseInt(selectedOption.dataset.stock) || 0;
+
+                    priceInput.value = price;
                     stockDisplay.textContent = stock;
                     quantityInput.max = stock;
+
+                    // Jika quantity melebihi stok, set ke stok maksimal
+                    if (parseInt(quantityInput.value) > stock) {
+                        quantityInput.value = stock > 0 ? stock : 1;
+                    }
                 } else {
                     priceInput.value = 0;
                     stockDisplay.textContent = 0;
                     quantityInput.max = 0;
+                    quantityInput.value = 1;
                 }
 
                 calculateSubtotal(priceInput);
@@ -390,8 +391,8 @@
 
             function calculateSubtotal(input) {
                 const tr = input.closest('tr');
-                const quantity = Math.round(tr.querySelector('input[name="quantity[]"]').value || 0);
-                const price = Math.round(tr.querySelector('input[name="selling_price[]"]').value || 0);
+                const quantity = Math.max(1, Math.round(tr.querySelector('input[name="quantity[]"]').value || 0));
+                const price = Math.max(0, Math.round(tr.querySelector('input[name="selling_price[]"]').value || 0));
                 const subtotal = quantity * price;
                 tr.querySelector('.subtotal').textContent = formatRupiah(subtotal);
                 calculateTotal();
@@ -406,20 +407,17 @@
                 });
                 document.getElementById('totalAmount').textContent = formatRupiah(total);
 
-                // Panggil calculateFinalTotal untuk menerapkan diskon
                 calculateFinalTotal();
             }
 
             function calculateFinalTotal() {
                 const totalText = document.getElementById('totalAmount').textContent;
                 const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '')) || 0;
-                const discount = parseFloat(document.getElementById('discount').value) || 0;
+                const discount = Math.max(0, parseFloat(document.getElementById('discount').value) || 0);
 
-                // Hitung total akhir setelah diskon
                 const finalTotal = Math.max(0, total - discount);
                 document.getElementById('finalAmount').textContent = formatRupiah(finalTotal);
 
-                // Perbarui perhitungan pembayaran berdasarkan metode pembayaran
                 const paymentMethod = document.getElementById('payment_method').value;
                 if (paymentMethod === 'credit') {
                     calculateRemainingAmount();
@@ -435,19 +433,54 @@
                 calculateChange();
             }
 
+            function calculateRemainingAmount() {
+                const finalTotal = parseFinalAmount();
+                let dpAmount = parseFloat(document.getElementById('down_payment').value) || 0;
+
+                if (dpAmount > finalTotal) {
+                    alert('Uang muka tidak boleh melebihi total belanja');
+                    dpAmount = finalTotal;
+                    document.getElementById('down_payment').value = dpAmount;
+                }
+
+                document.getElementById('remainingAmount').textContent = formatRupiah(finalTotal - dpAmount);
+
+                // Sync paid_amount dengan DP untuk kredit
+                document.getElementById('paid_amount').value = dpAmount;
+
+                // Validasi tombol submit
+                validateSubmitButton();
+            }
+
             function calculateChange() {
-                const finalText = document.getElementById('finalAmount').textContent; // Use finalAmount
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '')) || 0;
-                const paid = parseFloat(document.getElementById('paid_amount').value) || 0;
-                const change = paid - finalTotal;
+                const finalTotal = parseFinalAmount();
+                const paidAmount = parseFloat(document.getElementById('paid_amount').value) || 0;
+                const change = paidAmount - finalTotal;
                 document.getElementById('changeAmount').textContent = formatRupiah(Math.max(0, change));
 
-                // Validasi jumlah yang dibayar minimum
-                const submitButton = document.querySelector('button[type="submit"]');
-                const paymentMethod = document.getElementById('payment_method').value;
+                validateSubmitButton();
+            }
 
-                if (paymentMethod !== 'credit' && paid < finalTotal) {
-                    // Nonaktifkan tombol submit hanya untuk transaksi non-kredit
+            function validateSubmitButton() {
+                const paymentMethod = document.getElementById('payment_method').value;
+                const finalTotal = parseFinalAmount();
+                const paidAmount = parseFloat(document.getElementById('paid_amount').value) || 0;
+                const dpAmount = parseFloat(document.getElementById('down_payment').value) || 0;
+                const submitButton = document.querySelector('button[type="submit"]:not([name="save_as_draft"])');
+
+                let disable = false;
+
+                if (paymentMethod === 'credit') {
+                    if (dpAmount <= 0 || dpAmount > finalTotal) {
+                        disable = true;
+                    }
+                } else {
+                    if (paidAmount < finalTotal) {
+                        disable = true;
+                    }
+                }
+
+                if (disable) {
                     submitButton.disabled = true;
                     submitButton.classList.add('opacity-50', 'cursor-not-allowed');
                 } else {
@@ -456,50 +489,14 @@
                 }
             }
 
-            function addInputValidations() {
-                // Prevent negative values in all number inputs
-                document.querySelectorAll('input[type="number"]').forEach(input => {
-                    input.addEventListener('input', function() {
-                        if (parseFloat(this.value) < 0) {
-                            this.value = 0;
-                        }
-                    });
-                });
-            }
-            document.addEventListener('DOMContentLoaded', addInputValidations);
-
-            function calculateRemainingAmount() {
-                const totalText = document.getElementById('finalAmount')
-                    .textContent; // Changed from totalAmount to finalAmount
-                const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '')) || 0;
-                const dp = parseFloat(document.getElementById('down_payment').value) || 0;
-                const remaining = total - dp;
-
-                document.getElementById('remainingAmount').textContent = formatRupiah(Math.max(0, remaining));
-
-                // Update hidden paid_amount field for backend processing
-                document.getElementById('paid_amount').value = dp;
-                const dpValue = parseFloat(document.getElementById('down_payment').value) || 0;
-                document.getElementById('paid_amount').value = dpValue;
-
-                // Validasi: DP tidak boleh melebihi total
-                if (dp > total) {
-                    alert('Uang muka tidak boleh melebihi total belanja');
-                    document.getElementById('down_payment').value = total;
-                    calculateRemainingAmount();
-                }
-            }
-
             function setDownPayment(percentage) {
-                const finalText = document.getElementById('finalAmount').textContent;
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '')) || 0;
+                const finalTotal = parseFinalAmount();
                 const downPaymentAmount = Math.round(finalTotal * percentage / 100);
                 document.getElementById('down_payment').value = downPaymentAmount;
                 calculateRemainingAmount();
             }
 
             function formatRupiah(number) {
-                // Hilangkan decimal & format dengan separator ribuan
                 return 'Rp ' + Math.round(number).toLocaleString('id-ID', {
                     maximumFractionDigits: 0,
                     currencyDisplay: 'symbol'
@@ -514,23 +511,9 @@
                 newRow.find('.product-select').on('change', function() {
                     updatePrice(this);
                 });
+
                 initializeSelect2ForRow(newRow);
             }
-
-            // function initializeSelect2ForRow(row) {
-            //     $(row).find('.product-select').select2({
-            //         theme: 'tailwind',
-            //         placeholder: 'Pilih Produk',
-            //         allowClear: true,
-            //         width: '100%',
-            //         dropdownParent: $(row).closest('div.overflow-x-auto'),
-            //         templateResult: formatProductOption,
-            //         templateSelection: formatProductSelection
-            //     }).on('select2:open', function() {
-            //         $('.select2-dropdown').addClass('dark:bg-gray-800 dark:border-gray-700');
-            //         $('.select2-search__field').addClass('dark:bg-gray-800 dark:text-gray-300');
-            //     });
-            // }
 
             function initializeSelect2ForRow(row) {
                 $(row).find('.product-select').select2({
@@ -540,99 +523,47 @@
                     dropdownParent: $('#saleItems').closest('.overflow-x-auto'),
                     templateResult: formatProductOption,
                     templateSelection: formatProductSelection
+                }).on('select2:open', function() {
+                    $('.select2-dropdown').addClass('dark:bg-gray-800 dark:border-gray-700');
+                    $('.select2-search__field').addClass('dark:bg-gray-800 dark:text-gray-300');
                 });
-            }
-
-            document.getElementById('customer_select').addEventListener('change', function() {
-                const paymentMethod = document.getElementById('payment_method').value;
-                if (paymentMethod === 'credit' && !this.value) {
-                    alert('Pilih pelanggan untuk transaksi kredit!');
-                }
-            });
-
-            function formatProduct(product) {
-                if (!product.id) return product.text;
-
-                return $(`
-                <div class="flex items-center justify-between py-2">
-                    <div class="flex-1">
-                        <div class="font-medium dark:text-gray-200">${product.text}</div>
-                        ${product.element ? 
-                            `<div class="text-sm text-gray-500 dark:text-gray-400">
-                                                                                                                                                                                                                                                                                <span class="inline-flex items-center">
-                                                                                                                                                                                                                                                                                <svg class="w-80 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                                                                                                                                                                                                                                d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                Stok: ${$(product.element).data('stock')}
-                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                <span class="inline-flex items-center ml-3">
-                                                                                                                                                                                                                                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                                                                                                                                                                                                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                                                                                                                                                                                                                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                                                                                                                                                                                                                                </svg>
-                                                                                                                                                                                                                                                                                Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}
-                                                                                                                                                                                                                                                                                </span>
-                                                                                                                                                                                                                                                                                </div>` 
-                            : ''
-                        }
-                    </div>
-                </div>
-            `);
             }
 
             function formatProductOption(product) {
                 if (!product.id) return product.text;
                 return $(`
-        <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-            <div class="flex-1">
-                <div class="font-medium text-gray-900 dark:text-gray-100">
-                    ${product.text}
+            <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                <div class="flex-1">
+                    <div class="font-medium text-gray-900 dark:text-gray-100">${product.text}</div>
+                    ${product.element ? `
+                                                                        <div class="grid grid-cols-2 gap-2 mt-1 text-sm">
+                                                                            <div class="flex items-center text-blue-600 dark:text-blue-400">
+                                                                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
+                                                                                        d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                                                </svg>
+                                                                                <span>Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}</span>
+                                                                            </div>
+                                                                        </div>` : ''
+                    }
                 </div>
-                ${product.element ? 
-                    `<div class="grid grid-cols-2 gap-2 mt-1 text-sm">
-                                                                <div class="flex items-center text-emerald-600 dark:text-emerald-400">
-                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                                                                    </svg>
-                                                                    <span>Stok: ${$(product.element).data('stock')}</span>
-                                                                </div>
-                                                                <div class="flex items-center text-blue-600 dark:text-blue-400">
-                                                                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" 
-                                                                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                                                    </svg>
-                                                                    <span>Rp ${parseInt($(product.element).data('price')).toLocaleString('id-ID')}</span>
-                                                                </div>
-                                                            </div>` 
-                    : ''
-                }
             </div>
-        </div>
-    `);
+        `);
             }
 
             function formatProductSelection(product) {
                 if (!product.id) return product.text;
                 return $(`
-        <div class="flex items-center">
-            <div class="font-medium text-gray-900 dark:text-gray-100">${product.text}</div>
-            ${product.element ? 
-                `<div class="ml-2 text-sm text-gray-500 dark:text-gray-400">
-                                                            (Stok: ${$(product.element).data('stock')})
-                                                        </div>` 
-                : ''
-            }
-        </div>
-    `);
+            <div class="flex items-center">
+                <div class="font-medium text-gray-900 dark:text-gray-100">${product.text}</div>
+            </div>
+        `);
             }
 
             function removeItem(button) {
                 const tbody = document.getElementById('saleItems');
                 if (tbody.children.length > 1) {
                     const row = $(button).closest('tr');
-                    // Destroy Select2 before removing the row
                     row.find('.product-select').select2('destroy');
                     row.remove();
                     calculateTotal();
@@ -668,43 +599,46 @@
 
             // Validasi form sebelum submit
             document.getElementById('saleForm').addEventListener('submit', function(e) {
-                const tbody = document.getElementById('saleItems');
-                if (tbody.children.length === 0) {
-                    e.preventDefault();
-                    alert('Tambahkan setidaknya satu item');
-                    return false;
-                }
+                const paymentMethod = document.getElementById('payment_method').value;
+                const finalTotal = parseFinalAmount();
+                const paidAmount = parseFloat(document.getElementById('paid_amount').value) || 0;
+                const customerValue = document.getElementById('customer_select').value;
 
-                // Call the stock validation function
+                // Validasi produk stok
                 if (!validateProductStock()) {
                     e.preventDefault();
                     return false;
                 }
 
-                const paymentMethod = document.getElementById('payment_method').value;
-                const totalText = document.getElementById('finalAmount')
-                    .textContent; // Use finalAmount instead of totalAmount
-                const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '')) || 0;
-                const paid = parseFloat(document.getElementById('paid_amount').value) || 0;
-
-                // Validasi jumlah yang dibayar untuk metode pembayaran non-kredit
-                if (paymentMethod !== 'credit' && paid < total) {
+                // Validasi pelanggan untuk kredit
+                if (paymentMethod === 'credit' && !customerValue) {
                     e.preventDefault();
-                    alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
+                    alert('Transaksi kredit harus memilih pelanggan');
                     return false;
                 }
 
-                // Validasi pemilihan pelanggan untuk pembayaran kredit
+                // Validasi pembayaran untuk non-kredit
+                if (paymentMethod !== 'credit' && paidAmount < finalTotal) {
+                    e.preventDefault();
+                    alert('Jumlah yang dibayar harus mencukupi total belanja');
+                    return false;
+                }
+
+                // Validasi DP untuk kredit
                 if (paymentMethod === 'credit') {
-                    if (!document.getElementById('customer_select').value) {
+                    const dpAmount = parseFloat(document.getElementById('down_payment').value) || 0;
+                    if (dpAmount <= 0) {
                         e.preventDefault();
-                        alert('Transaksi kredit harus memilih pelanggan');
+                        alert('Uang muka (DP) harus lebih dari 0');
                         return false;
                     }
                 }
-
-                return true;
             });
+
+            function parseFinalAmount() {
+                const finalText = document.getElementById('finalAmount').textContent;
+                return parseFloat(finalText.replace('Rp ', '').replace(/\./g, '')) || 0;
+            }
 
             function debounce(func, timeout = 300) {
                 let timer;
@@ -722,83 +656,61 @@
                 const paymentMethod = document.getElementById('payment_method').value;
                 const dpSection = document.getElementById('dp_container');
                 const cashSection = document.getElementById('cash-payment-section');
+                const customerSelect = document.getElementById('customer_select');
+
+                dpSection.classList.add('hidden');
+                cashSection.classList.add('hidden');
+                customerSelect.removeAttribute('required');
 
                 switch (paymentMethod) {
                     case 'credit':
                         dpSection.classList.remove('hidden');
                         cashSection.classList.add('hidden');
+                        customerSelect.setAttribute('required', 'required');
+                        calculateRemainingAmount();
                         break;
                     case 'transfer':
                     case 'cash':
-                        dpSection.classList.add('hidden');
                         cashSection.classList.remove('hidden');
+                        dpSection.classList.add('hidden');
+                        calculateChange();
                         break;
                 }
+                validateSubmitButton();
             }
-            // Fallback if Select2 fails to load
-            if (typeof $.fn.select2 !== 'function') {
-                console.error('Select2 library not loaded');
-                // Implement fallback native select behavior
-            }
-            // Add event listener for payment method change
+
+            // Event listener payment method change
             document.getElementById('payment_method').addEventListener('change', function() {
-                const dpSection = document.getElementById('dp_container');
-                const cashSection = document.getElementById('cash-payment-section');
-                const submitButton = document.querySelector('button[type="submit"]');
-                const paidAmountInput = document.getElementById('paid_amount');
-                const dpInput = document.getElementById('down_payment');
+                const paymentMethod = this.value;
+                const customerSelect = document.getElementById('customer_select');
 
-                if (this.value === 'credit') {
-                    // Untuk pembayaran kredit
-                    dpSection.classList.remove('hidden');
-                    cashSection.classList.add('hidden');
+                document.getElementById('down_payment').value = 0;
+                document.getElementById('paid_amount').value = 0;
 
-                    // Reset nilai
-                    dpInput.value = '0';
-                    paidAmountInput.value = '0';
+                updatePaymentSections();
 
-                    // Enable submit button untuk kredit
-                    submitButton.disabled = false;
-                    submitButton.classList.remove('opacity-50', 'cursor-not-allowed');
-
-                    // Periksa pelanggan
-                    if (!document.getElementById('customer_select').value) {
-                        alert('Untuk pembayaran kredit, pilih pelanggan terlebih dahulu');
-                    }
-
-                    // Hitung sisa hutang
-                    calculateRemainingAmount();
+                if (paymentMethod === 'credit' && !customerSelect.value) {
+                    customerSelect.setCustomValidity('Pilih pelanggan untuk transaksi kredit');
                 } else {
-                    // Untuk pembayaran tunai/transfer
-                    dpSection.classList.add('hidden');
-                    cashSection.classList.remove('hidden');
-
-                    // Reset nilai DP
-                    dpInput.value = '0';
-
-                    // Hitung ulang kembalian
-                    calculateChange();
+                    customerSelect.setCustomValidity('');
                 }
             });
 
-
-            // Inisialisasi Select2
+            // Inisialisasi Select2 untuk customer select dengan tag baru
             $('#customer_select').select2({
                 theme: 'tailwind',
-                tags: true, // Mengizinkan pembuatan tag baru
+                tags: true,
                 placeholder: 'Pilih atau ketik nama pelanggan baru',
                 allowClear: true,
                 createTag: function(params) {
-                    // Jika input kosong, jangan buat tag
                     if ($.trim(params.term) === '') {
                         return null;
                     }
-
                     return {
                         id: 'new:' + params.term,
                         text: params.term,
                         newTag: true
-                    }
+                    };
                 },
                 templateResult: function(data) {
                     if (data.loading) return data.text;
@@ -806,16 +718,12 @@
                     var $container = $("<div class='select2-result-customer'></div>");
 
                     if (data.newTag) {
-                        // Format untuk customer baru
                         $container.append(
                             $("<div class='text-blue-600'><i class='fas fa-plus-circle mr-1'></i> Tambah pelanggan baru: " +
                                 data.text + "</div>")
                         );
                     } else {
-                        // Format untuk customer yang sudah ada
-                        $container.append(
-                            $("<div>" + data.text + "</div>")
-                        );
+                        $container.append($("<div>" + data.text + "</div>"));
                     }
 
                     return $container;
@@ -828,21 +736,15 @@
                 }
             });
 
-            // Event handler saat nilai select berubah
-            $('#customer_select').on('change', function(e) {
+            // Event handler customer select change
+            $('#customer_select').on('change', function() {
                 var selectedValue = $(this).val();
 
                 if (selectedValue && selectedValue.startsWith('new:')) {
-                    // Ekstrak nama pelanggan baru
                     var newCustomerName = selectedValue.substring(4);
-
-                    // Set nilai di hidden input
                     $('#new_customer_name').val(newCustomerName);
-
-                    // Opsional: tambahkan visual feedback
                     $(this).next('.select2-container').find('.select2-selection').addClass('border-blue-500');
                 } else {
-                    // Reset hidden input jika memilih customer yang sudah ada
                     $('#new_customer_name').val('');
                     $(this).next('.select2-container').find('.select2-selection').removeClass('border-blue-500');
                 }
@@ -853,36 +755,43 @@
                 var customerSelect = $('#customer_select');
                 var selectedOption = customerSelect.val();
 
-                // Jika nilai yang dipilih dimulai dengan 'new:', itu adalah nama pelanggan baru
                 if (selectedOption && selectedOption.startsWith('new:')) {
-                    // Ekstrak bagian nama
                     var newName = selectedOption.substring(4);
-
-                    // Setel nama pelanggan baru di input tersembunyi
                     $('#new_customer_name').val(newName);
-
-                    // Reset customer_id menjadi kosong karena kita membuat pelanggan baru
                     customerSelect.val('');
                 }
 
                 return true;
             });
 
-            // Tambahkan item pertama saat halaman dimuat
+            // Prevent negative values in all number inputs
+            function addInputValidations() {
+                document.querySelectorAll('input[type="number"]').forEach(input => {
+                    input.addEventListener('input', function() {
+                        if (parseFloat(this.value) < 0 || isNaN(this.value)) {
+                            this.value = 0;
+                        }
+                    });
+                });
+            }
+
             document.addEventListener('DOMContentLoaded', function() {
+                addInputValidations();
+
+                // Initialize Select2 for existing product selects
                 $('.product-select').each(function() {
                     initializeSelect2ForRow($(this).closest('tr'));
                 });
 
-                // Add first row on page load if needed
+                // Add first row if none exists
                 if ($('#saleItems tr').length === 0) {
                     addItem();
                 }
 
-                // Initialize payment sections based on initial payment method
                 updatePaymentSections();
             });
 
+            // Fallback if Select2 fails to load
             function checkSelect2Loading() {
                 if (typeof $.fn.select2 === 'undefined') {
                     console.error('Select2 not loaded - using native select elements');
@@ -891,7 +800,6 @@
                         select.classList.add('w-full', 'rounded-md', 'border-gray-300', 'dark:border-gray-600',
                             'dark:bg-gray-700', 'dark:text-gray-300');
 
-                        // Add direct event listeners for native selects
                         if (select.classList.contains('product-select')) {
                             select.addEventListener('change', function() {
                                 updatePrice(this);
@@ -901,14 +809,7 @@
                 }
             }
             setTimeout(checkSelect2Loading, 1000);
-
-            setTimeout(() => {
-                if (typeof $.fn.select2 === 'undefined') {
-                    document.querySelectorAll('.product-select').forEach(select => {
-                        select.style.display = 'block'; // Tampilkan native select
-                    });
-                }
-            }, 1000);
         </script>
     @endpush
+
 </x-app-layout>

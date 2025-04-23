@@ -11,14 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('purchases', function (Blueprint $table) {
+        Schema::create('purchase_receipts', function (Blueprint $table) {
             $table->id();
-            $table->string('invoice_number')->unique();
-            $table->foreignId('supplier_id')->constrained();
+            $table->foreignId('purchase_id')->constrained()->onDelete('cascade');
             $table->foreignId('user_id')->constrained();
-            $table->dateTime('date');
-            $table->decimal('total_amount', 12, 2);
-            $table->enum('status', ['pending', 'partially_received', 'received'])->default('pending');
+            $table->date('receipt_date');
+            $table->string('receipt_number');
+            $table->string('receipt_file')->nullable();
             $table->text('notes')->nullable();
             $table->timestamps();
             $table->softDeletes();
@@ -30,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('purchases');
+        Schema::dropIfExists('purchases_receipts');
     }
 };

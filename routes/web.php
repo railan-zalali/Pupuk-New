@@ -101,6 +101,8 @@ Route::middleware('auth')->group(function () {
 
     // Resource routes dengan permission
     Route::middleware(['permission:manage-products'])->group(function () {
+        Route::get('/products/create-batch', [ProductController::class, 'createBatch'])->name('products.create-batch');
+        Route::post('/products/store-batch', [ProductController::class, 'storeBatch'])->name('products.store-batch');
         Route::resource('categories', CategoryController::class);
 
         Route::post('/products/{product}/remove-image', [ProductController::class, 'deleteImage'])
@@ -127,6 +129,12 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['permission:manage-purchases'])->group(function () {
         Route::resource('purchases', PurchaseController::class);
+        Route::get('/purchases/products-by-supplier/{supplier}', [PurchaseController::class, 'getProductsBySupplier'])
+            ->name('purchases.products-by-supplier');
+        Route::get('/purchases/{purchase}/receipt', [PurchaseController::class, 'createReceipt'])
+            ->name('purchases.receipt');
+        Route::post('/purchases/{purchase}/receipt', [PurchaseController::class, 'storeReceipt'])
+            ->name('purchases.storeReceipt');
     });
 
     Route::middleware(['permission:manage-sales'])->group(function () {

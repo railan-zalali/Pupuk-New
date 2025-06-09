@@ -35,10 +35,10 @@ class Purchase extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function purchaseDetails()
-    {
-        return $this->hasMany(PurchaseDetail::class);
-    }
+    // public function purchaseDetails()
+    // {
+    //     return $this->hasMany(PurchaseDetail::class);
+    // }
 
     public function receipts()
     {
@@ -67,6 +67,10 @@ class Purchase extends Model
         return $this->purchaseDetails->sum('received_quantity');
     }
 
+    public function purchaseDetails()
+    {
+        return $this->hasMany(PurchaseDetail::class);
+    }
     // Get total ordered quantity
     public function getTotalOrderedQuantity()
     {

@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->string('type'); // in/out
             $table->integer('quantity');
+            $table->string('movement_type')->default('in')->comment('in or out');
             $table->integer('before_stock');
             $table->integer('after_stock');
             $table->string('reference_type'); // purchase/sale

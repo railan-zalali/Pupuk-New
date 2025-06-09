@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('supplier_id')->constrained();
             $table->foreignId('user_id')->constrained();
             $table->dateTime('date');
-            $table->decimal('total_amount', 12, 2);
+            $table->integer('total_amount');
             $table->enum('status', ['pending', 'partially_received', 'received'])->default('pending');
             $table->text('notes')->nullable();
             $table->timestamps();

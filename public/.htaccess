@@ -3,7 +3,7 @@
         Options -MultiViews -Indexes
         AddOutputFilterByType DEFLATE text/plain text/html text/xml text/css application/javascript application/json
     </IfModule>
-    
+
 
     RewriteEngine On
 

@@ -16,14 +16,16 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        Category::factory(1)->create();
-        Customer::factory(1)->create();
-        Product::factory(1)->create();
-        Supplier::factory(1)->create();
+        // Category::factory(1)->create();
+        // Customer::factory(1)->create();
+        // Product::factory(1)->create();
+        // Supplier::factory(1)->create();
 
         // Memanggil RolePermissionSeeder
         $this->call([
             RolePermissionSeeder::class,
+            // UnitOfMeasureSeeder::class,
+            ProductUnitSeeder::class,
         ]);
     }
 }

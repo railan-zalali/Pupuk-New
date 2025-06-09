@@ -46,6 +46,12 @@
                 <span x-show="sidebarOpen" x-transition>Produk</span>
             </a>
 
+            <a href="{{ route('categories.index') }}"
+                class="nav-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-category"></i>
+                <span x-show="sidebarOpen" x-transition>Kategori</span>
+            </a>
+
             <a href="{{ route('customers.index') }}"
                 class="nav-item {{ request()->routeIs('customers.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-users"></i>
@@ -57,6 +63,11 @@
                 <i class="nav-icon ti ti-building-factory"></i>
                 <span x-show="sidebarOpen" x-transition>Pemasok</span>
             </a>
+            {{-- <a href="{{ route('cash-book.index') }}"
+                class="nav-item {{ request()->routeIs('cash-book.*') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-book"></i>
+                <span x-show="sidebarOpen" x-transition>Buku Kas</span>
+            </a> --}}
         </div>
 
         <!-- Admin Menu -->
@@ -98,24 +109,31 @@
         <div class="nav-group">
             <div x-show="sidebarOpen" x-transition class="nav-title">Laporan</div>
 
+            <a href="{{ route('reports.index') }}"
+                class="nav-item {{ request()->routeIs('reports.index') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-report"></i>
+                <span x-show="sidebarOpen" x-transition>Semua Laporan</span>
+            </a>
+
             <a href="{{ route('reports.sales') }}"
                 class="nav-item {{ request()->routeIs('reports.sales') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-chart-bar"></i>
                 <span x-show="sidebarOpen" x-transition>Laporan Penjualan</span>
             </a>
 
-            <a href="" {{-- <a href="{{ route('reports.purchases') }}" --}}
-                class="nav-item {{ request()->routeIs('reports.purchases') ? 'active' : '' }}">
-                <i class="nav-icon ti ti-chart-line"></i>
-                <span x-show="sidebarOpen" x-transition>Laporan Pembelian</span>
-            </a>
-
-            <a href="" {{-- <a href="{{ route('reports.inventory') }}" --}}
-                class="nav-item {{ request()->routeIs('reports.inventory') ? 'active' : '' }}">
+            <a href="{{ route('reports.stock') }}"
+                class="nav-item {{ request()->routeIs('reports.stock') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-chart-area"></i>
                 <span x-show="sidebarOpen" x-transition>Laporan Stok</span>
             </a>
+
+            <a href="{{ route('reports.profit-loss') }}"
+                class="nav-item {{ request()->routeIs('reports.profit-loss') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-chart-pie"></i>
+                <span x-show="sidebarOpen" x-transition>Laporan Laba Rugi</span>
+            </a>
         </div>
+
     </div>
 </aside>
 

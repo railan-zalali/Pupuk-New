@@ -159,6 +159,36 @@
                 </div>
             </div>
         </div>
+        <!-- Add this after the Purchase Information section -->
+<div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none"
+            viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+        </svg>
+        Status Penerimaan
+    </h3>
+
+    @php
+        $totalOrdered = $purchase->getTotalOrderedQuantity();
+        $totalReceived = $purchase->getTotalReceivedQuantity();
+        $percentage = $totalOrdered > 0 ? round(($totalReceived / $totalOrdered) * 100) : 0;
+    @endphp
+
+    <div class="mb-2 flex justify-between items-center">
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $totalReceived }} dari {{ $totalOrdered }} item diterima
+        </span>
+        <span class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            {{ $percentage }}%
+        </span>
+    </div>
+
+    <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2.5">
+        <div class="bg-indigo-600 h-2.5 rounded-full" style="width: {{ $percentage }}%"></div>
+    </div>
+</div>
 
         <!-- Purchase Details -->
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
@@ -201,7 +231,12 @@
                                 <td class="px-6 py-4">{{ $detail->product->name }}</td>
                                 <td class="px-6 py-4">Rp {{ number_format($detail->purchase_price, 0, ',', '.') }}
                                 </td>
-                                <td class="px-6 py-4">{{ $detail->quantity }}</td>
+                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                    {{ $detail->quantity }} {{ optional($detail->unit)->abbreviation }}
+                                    @if($detail->conversion_factor > 1)
+                                        ({{ $detail->base_quantity }} {{ optional($detail->product->baseUnit)->abbreviation ?? 'pcs' }})
+                                    @endif
+                                </td>
                                 <td class="px-6 py-4 font-medium">Rp
                                     {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
                             </tr>

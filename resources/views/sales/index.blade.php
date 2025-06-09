@@ -87,7 +87,7 @@
                                 </td>
                                 <td class="px-6 py-4">
                                     <span
-                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
+                                        class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                         {{ $sale->payment_method === 'cash' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' }}">
                                         {{ ucfirst($sale->payment_method) }}
                                     </span>

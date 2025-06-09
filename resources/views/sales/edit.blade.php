@@ -894,47 +894,105 @@
 
             function createItemRow(detail = null) {
                 return `
-            <tr>
-                <td class="px-6 py-4">
-                    <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300">
-                        <option value="">Pilih Produk</option>
-                        @foreach ($products as $product)
-                            <option value="{{ $product->id }}" 
-                                data-price="{{ $product->selling_price }}" 
-                                data-stock="{{ $product->stock }}"
-                                ${detail && detail.product_id == {{ $product->id }} ? 'selected' : ''}>
-                                {{ $product->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </td>
-                <td class="px-6 py-4 available-stock text-gray-900 dark:text-gray-300">
-                    ${detail ? detail.product.stock : 0}
-                </td>
-                <td class="px-6 py-4">
-                    <input type="number" name="quantity[]" required 
-                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
-                        value="${detail ? detail.quantity : 1}" min="1" 
-                        onchange="calculateSubtotal(this)">
-                </td>
-                <td class="px-6 py-4">
-                    <input type="number" name="selling_price[]" required 
-                        class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" 
-                        value="${detail ? detail.selling_price : 0}" min="0" 
-                        onchange="calculateSubtotal(this)">
-                </td>
-                <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">
-                    ${detail ? formatRupiah(detail.subtotal) : 'Rp 0'}
-                </td>
-                <td class="px-6 py-4">
-                    <button type="button" onclick="removeItem(this)" 
-                        class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
-                        Hapus
-                    </button>
-                </td>
-            </tr>
-        `;
+        <tr>
+            <td class="px-6 py-4">
+                <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" onchange="updateProductInfo(this)">
+                    <option value="">Pilih Produk</option>
+                    @foreach ($products as $product)
+                        <option value="{{ $product->id }}"
+                            data-price="{{ $product->selling_price }}"
+                            data-stock="{{ $product->stock }}"
+                            ${detail && detail.product_id == {{ $product->id }} ? 'selected' : ''}>
+                            {{ $product->name }}
+                        </option>
+                    @endforeach
+                </select>
+            </td>
+            <td class="px-6 py-4 stock-display text-gray-900 dark:text-gray-300">
+                ${detail ? detail.product.stock : '-'}
+            </td>
+            <td class="px-6 py-4">
+                <select name="unit_id[]" required class="unit-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" onchange="updatePrice(this)">
+                    <option value="">Pilih Satuan</option>
+                    ${detail ? generateUnitOptions(detail) : ''}
+                </select>
+            </td>
+            <td class="px-6 py-4">
+                <input type="number" name="quantity[]" required
+                    class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
+                    value="${detail ? detail.quantity : 1}" min="1"
+                    onchange="calculateSubtotal(this)">
+            </td>
+            <td class="px-6 py-4">
+                <input type="number" name="selling_price[]" required
+                    class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
+                    value="${detail ? detail.price : 0}" min="0"
+                    onchange="calculateSubtotal(this)">
+            </td>
+            <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">
+                ${detail ? formatRupiah(detail.subtotal) : 'Rp 0'}
+            </td>
+            <td class="px-6 py-4">
+                <button type="button" onclick="removeItem(this)"
+                    class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                    Hapus
+                </button>
+            </td>
+        </tr>
+    `;
             }
+
+            function generateUnitOptions(detail) {
+                if (detail && detail.product_unit_id) {
+                    return `<option value="${detail.product_unit_id}" selected>${detail.product_unit.unit.name}</option>`;
+                }
+                return '';
+            }
+
+            function updateProductInfo(select) {
+                const productId = select.value;
+                const row = select.closest('tr');
+                const unitSelect = row.querySelector('select[name="unit_id[]"]');
+                const priceInput = row.querySelector('input[name="selling_price[]"]');
+                const stockDisplay = row.querySelector('.stock-display');
+
+                // Clear unit options
+                unitSelect.innerHTML = '<option value="">-- Pilih Satuan --</option>';
+
+                if (productId) {
+                    // Fetch product units via AJAX
+                    fetch(`/api/products/${productId}/units`)
+                        .then(response => response.json())
+                        .then(data => {
+                            // Update stock display
+                            stockDisplay.textContent = data.stock;
+
+                            // Populate unit options
+                            data.units.forEach(unit => {
+                                const option = document.createElement('option');
+                                option.value = unit.id;
+                                option.textContent = `${unit.unit_name} (${unit.unit_abbreviation})`;
+                                option.dataset.price = unit.selling_price;
+                                option.dataset.conversionFactor = unit.conversion_factor;
+                                unitSelect.appendChild(option);
+                            });
+
+                            // Select default unit if available
+                            const defaultUnit = Array.from(unitSelect.options).find(option =>
+                                option.dataset.isDefault === "1");
+                            if (defaultUnit) {
+                                defaultUnit.selected = true;
+                                unitSelect.dispatchEvent(new Event('change'));
+                            }
+                        });
+                } else {
+                    stockDisplay.textContent = '-';
+                    priceInput.value = 0;
+                    calculateSubtotal(priceInput);
+                }
+            }
+
+
 
             // All calculation functions remain the same as in create.blade.php
             function updatePrice(select) {

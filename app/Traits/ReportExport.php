@@ -5,23 +5,40 @@ namespace App\Traits;
 use App\Models\Product;
 use App\Models\Sale;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Facades\Excel;
+use Illuminate\Http\Request;
 
 trait ReportExport
 {
+    /**
+     * Handle export based on request format
+     *
+     * @param array $data
+     * @param string $view
+     * @param string $filename
+     * @return \Illuminate\View\View|\Illuminate\Http\Response
+     */
     protected function handleExport($data, $view, $filename)
     {
-        switch (request('type')) {
+        $type = request('type', 'view');
+
+        switch ($type) {
             case 'excel':
-                return $this->exportToExcel($data, $filename);
+                return Excel::download(
+                    new \App\Exports\ReportExport($data),
+                    $filename . '.xlsx'
+                );
 
             case 'pdf':
-                return $this->exportToPdf($data, $view, $filename);
+                $pdf = PDF::loadView('reports.exports.' . $view, $data);
+                return $pdf->download($filename . '.pdf');
 
             case 'print':
-                return view("reports.print.{$view}", $data);
+                return view('reports.print.' . $view, $data);
 
             default:
-                return view("reports.{$view}", $data);
+                return view('reports.' . $view, $data);
         }
     }
 

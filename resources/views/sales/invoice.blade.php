@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="id">
 
 <head>
     <meta charset="UTF-8">
@@ -18,46 +18,18 @@
             margin-bottom: 30px;
         }
 
-        .company-name {
-            font-size: 24px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-
-        .company-info {
-            margin-bottom: 5px;
-        }
-
         .invoice-info {
             margin-bottom: 20px;
         }
 
-        .info-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .info-section h3 {
-            margin: 0 0 10px 0;
-            padding-bottom: 5px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .info-item {
-            margin-bottom: 5px;
-        }
-
-        .info-label {
-            font-weight: bold;
-            color: #666;
+        .customer-info {
+            margin-bottom: 20px;
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
         }
 
         th,
@@ -68,41 +40,28 @@
         }
 
         th {
-            background-color: #f8f9fa;
+            background-color: #f5f5f5;
         }
 
         .total-section {
-            margin-left: auto;
-            width: 300px;
+            margin-top: 20px;
+            text-align: right;
         }
 
-        .total-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 5px 0;
-        }
-
-        .total-label {
+        .category-header {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-top: 20px;
             font-weight: bold;
         }
 
         .footer {
-            text-align: center;
             margin-top: 50px;
-            padding-top: 20px;
-            border-top: 1px solid #ddd;
+            text-align: center;
+            font-size: 12px;
         }
 
         @media print {
-            body {
-                padding: 0;
-                margin: 0;
-            }
-
-            @page {
-                margin: 2cm;
-            }
-
             .no-print {
                 display: none;
             }
@@ -111,143 +70,97 @@
 </head>
 
 <body>
-    <div class="no-print" style="position: fixed; top: 20px; right: 20px;">
-        <button onclick="window.print()"
-            style="padding: 10px 20px; background: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer;">
-            Cetak Invoice
-        </button>
-        <button onclick="window.close()"
-            style="padding: 10px 20px; background: #666; color: white; border: none; border-radius: 5px; cursor: pointer; margin-left: 10px;">
-            Tutup
-        </button>
-    </div>
-
     <div class="invoice-header">
-        <div class="company-name">{{ config('app.name', 'Toko Pupuk') }}</div>
-        <div class="company-info">Jl. Contoh No. 123, Kota</div>
-        <div class="company-info">Telp: (123) 456-7890</div>
+        <h1>INVOICE</h1>
+        <h2>#{{ $sale->invoice_number }}</h2>
     </div>
 
     <div class="invoice-info">
-        <h2 style="text-align: center; margin-bottom: 20px;">INVOICE #{{ $sale->invoice_number }}</h2>
+        <p><strong>Tanggal:</strong> {{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y H:i') }}</p>
+        <p><strong>Kasir:</strong> {{ $sale->user->name }}</p>
     </div>
 
-    <div class="info-grid">
-        <div class="info-section">
-            <h3>Informasi Penjualan</h3>
-            <div class="info-item">
-                <div class="info-label">Tanggal</div>
-                <div>{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y H:i') }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Status</div>
-                <div>{{ $sale->trashed() ? 'Dibatalkan' : 'Selesai' }}</div>
-            </div>
-        </div>
-
-        <div class="info-section">
-            <h3>Informasi Pelanggan</h3>
-            <div class="info-item">
-                <div class="info-label">Nama Pelanggan</div>
-                <div>{{ $sale->customer->nama ?? '-' }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Metode Pembayaran</div>
-                <div>{{ ucfirst($sale->payment_method) }}</div>
-                @if ($sale->payment_method === 'credit')
-                    <div class="total-row">
-                        <div class="total-label">Uang Muka (DP):</div>
-                        <div>Rp {{ number_format($sale->down_payment, 0, ',', '.') }}</div>
-                    </div>
-
-                    @if ($sale->payment_status !== 'paid')
-                        <div class="total-row">
-                            <div class="total-label">Sisa Hutang:</div>
-                            <div>Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}</div>
-                        </div>
-                        <div class="total-row">
-                            <div class="total-label">Jatuh Tempo:</div>
-                            <div>{{ \Carbon\Carbon::parse($sale->due_date)->format('d/m/Y') }}</div>
-                        </div>
-                    @endif
-                @endif
-            </div>
-        </div>
-
-        <div class="info-section">
-            <h3>Informasi Pembayaran</h3>
-            <div class="info-item">
-                <div class="info-label">Total</div>
-                <div>Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</div>
-            </div>
-            <div class="total-row">
-                <div class="total-label">Total:</div>
-                <div>Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</div>
-            </div>
-            <div class="total-row">
-                <div class="total-label">Potongan:</div>
-                <div>Rp {{ number_format($sale->discount, 0, ',', '.') }}</div>
-            </div>
-            <div class="total-row">
-                <div class="total-label">Total Setelah Potongan:</div>
-                <div>Rp {{ number_format($sale->total_amount - $sale->discount, 0, ',', '.') }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Jumlah Dibayar</div>
-                <div>Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}</div>
-            </div>
-            <div class="info-item">
-                <div class="info-label">Kembalian</div>
-                <div>Rp {{ number_format($sale->change_amount, 0, ',', '.') }}</div>
-            </div>
-        </div>
+    <div class="customer-info">
+        <h3>Informasi Pelanggan</h3>
+        @if ($sale->customer)
+            <p><strong>Nama:</strong> {{ $sale->customer->nama }}</p>
+            <p><strong>NIK:</strong> {{ $sale->customer->nik }}</p>
+            <p><strong>Alamat:</strong> {{ $sale->customer->alamat ?? '-' }}, {{ $sale->customer->desa_nama }},
+                {{ $sale->customer->kecamatan_nama }}</p>
+        @else
+            <p>Pelanggan Umum</p>
+        @endif
     </div>
 
-    <table>
-        <thead>
-            <tr>
-                <th>No</th>
-                <th>Produk</th>
-                <th>Harga</th>
-                <th>Jumlah</th>
-                <th>Subtotal</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach ($sale->saleDetails as $index => $detail)
+    @php
+        $groupedItems = $sale->saleDetails->groupBy(function ($detail) {
+            return $detail->product->category->name;
+        });
+    @endphp
+
+    @foreach ($groupedItems as $categoryName => $items)
+        <div class="category-header">
+            {{ $categoryName }}
+        </div>
+        <table>
+            <thead>
                 <tr>
-                    <td>{{ $index + 1 }}</td>
-                    <td>
-                        {{ $detail->product->name }}<br>
-                        <small style="color: #666;">{{ $detail->product->code }}</small>
-                    </td>
-                    <td>Rp {{ number_format($detail->selling_price, 0, ',', '.') }}</td>
-                    <td>{{ $detail->quantity }}</td>
-                    <td>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+                    <th>Produk</th>
+                    <th>Satuan</th>
+                    <th>Jumlah</th>
+                    <th>Harga</th>
+                    <th>Subtotal</th>
                 </tr>
-            @endforeach
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                @foreach ($items as $detail)
+                    <tr>
+                        <td>{{ $detail->product->name }}</td>
+                        <td>{{ $detail->productUnit->unit->name }} ({{ $detail->productUnit->unit->abbreviation }})
+                        </td>
+                        <td>{{ $detail->quantity }}</td>
+                        <td>Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
+                        <td>Rp {{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endforeach
 
     <div class="total-section">
-        <div class="total-row">
-            <div class="total-label">Total:</div>
-            <div>Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</div>
-        </div>
-        <div class="total-row">
-            <div class="total-label">Jumlah Dibayar:</div>
-            <div>Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}</div>
-        </div>
-        <div class="total-row">
-            <div class="total-label">Kembalian:</div>
-            <div>Rp {{ number_format($sale->change_amount, 0, ',', '.') }}</div>
-        </div>
+        <p><strong>Total Belanja:</strong> Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</p>
+        <p><strong>Potongan:</strong> Rp {{ number_format($sale->discount, 0, ',', '.') }}</p>
+        <p><strong>Total Setelah Potongan:</strong> Rp
+            {{ number_format($sale->total_amount - $sale->discount, 0, ',', '.') }}</p>
+
+        @if ($sale->payment_method === 'credit')
+            <p><strong>Uang Muka:</strong> Rp {{ number_format($sale->down_payment, 0, ',', '.') }}</p>
+            <p><strong>Sisa Hutang:</strong> Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}</p>
+            @if ($sale->due_date)
+                <p><strong>Jatuh Tempo:</strong> {{ \Carbon\Carbon::parse($sale->due_date)->format('d/m/Y') }}</p>
+            @endif
+        @else
+            <p><strong>Dibayar:</strong> Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}</p>
+            @if ($sale->change_amount > 0)
+                <p><strong>Kembalian:</strong> Rp {{ number_format($sale->change_amount, 0, ',', '.') }}</p>
+            @endif
+        @endif
     </div>
 
+    @if ($sale->notes)
+        <div class="notes">
+            <h3>Catatan:</h3>
+            <p>{{ $sale->notes }}</p>
+        </div>
+    @endif
+
     <div class="footer">
-        <p>Terima kasih atas pembelian Anda!</p>
-        <p style="font-size: 12px; color: #666;">Harap simpan invoice ini sebagai bukti pembelian.</p>
-        <p style="font-size: 12px; color: #666;">Kasir: {{ $sale->user->name }}</p>
+        <p>Terima kasih atas kunjungan Anda</p>
+        <p>Invoice ini adalah bukti pembayaran yang sah</p>
+    </div>
+
+    <div class="no-print" style="margin-top: 20px; text-align: center;">
+        <button onclick="window.print()">Cetak Invoice</button>
     </div>
 </body>
 

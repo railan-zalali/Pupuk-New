@@ -6,12 +6,17 @@
 
             <!-- Optional action buttons -->
             <div class="mt-4 sm:mt-0 flex space-x-2">
-                <div class="relative text-gray-700 focus-within:text-gray-800">
-                    <input type="text" id="searchInput" placeholder="Cari pembelian..."
-                        class="input-primary pl-10 pr-4 py-2 rounded-md border dark:bg-gray-800 dark:text-gray-300 border-gray-300 focus:ring focus:ring-blue-200 focus:outline-none"
-                        autofocus>
-                    <i class="ti ti-search absolute left-3 top-2.5 text-gray-400 dark:text-gray-300"></i>
-                </div>
+                <form action="{{ route('purchases.index') }}" method="GET" class="flex space-x-2">
+                    <div class="relative text-gray-700 focus-within:text-gray-800">
+                        <input type="text" id="searchInput" name="search" placeholder="Cari pembelian..."
+                            class="input-primary pl-10 pr-4 py-2 rounded-md border dark:bg-gray-800 dark:text-gray-300 border-gray-300 focus:ring focus:ring-blue-200 focus:outline-none"
+                            value="{{ request('search') }}" autofocus>
+                        <i class="ti ti-search absolute left-3 top-2.5 text-gray-400 dark:text-gray-300"></i>
+                    </div>
+                    <button type="submit" class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-500">
+                        Cari
+                    </button>
+                </form>
                 <a href="{{ route('purchases.create') }}"
                     class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
@@ -37,6 +42,25 @@
                         <div class="ml-3">
                             <p class="text-sm font-medium text-green-800">
                                 {{ session('success') }}
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if (session('error'))
+                <div class="mb-4 rounded-md bg-red-50 p-4">
+                    <div class="flex">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                                <path fill-rule="evenodd"
+                                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                    clip-rule="evenodd" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-red-800">
+                                {{ session('error') }}
                             </p>
                         </div>
                     </div>
@@ -89,10 +113,20 @@
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200">
                                             Batal
                                         </span>
-                                    @else
+                                    @elseif ($purchase->isReceived())
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                            Aktif
+                                            Diterima
+                                        </span>
+                                    @elseif ($purchase->isPartiallyReceived())
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
+                                            Diterima Sebagian
+                                        </span>
+                                    @else
+                                        <span
+                                            class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                            Pending
                                         </span>
                                     @endif
                                 </td>
@@ -109,7 +143,29 @@
                                             </svg>
                                         </a>
 
-                                        @unless ($purchase->trashed())
+                                        @if (!$purchase->trashed() && $purchase->isPending())
+                                            <a href="{{ route('purchases.receipt', $purchase) }}"
+                                                class="p-2 text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-200 rounded-full hover:bg-green-50 dark:hover:bg-green-900/50"
+                                                title="Catat Penerimaan">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </a>
+                                        @elseif (!$purchase->trashed() && $purchase->isPartiallyReceived())
+                                            <a href="{{ route('purchases.receipt', $purchase) }}"
+                                                class="p-2 text-yellow-600 dark:text-yellow-400 hover:text-yellow-900 dark:hover:text-yellow-200 rounded-full hover:bg-yellow-50 dark:hover:bg-yellow-900/50"
+                                                title="Catat Penerimaan Lanjutan">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"
+                                                    viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                        d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                                </svg>
+                                            </a>
+                                        @endif
+
+                                        @unless ($purchase->trashed() || !$purchase->isPending())
                                             <form action="{{ route('purchases.destroy', $purchase) }}" method="POST"
                                                 class="inline">
                                                 @csrf
@@ -150,7 +206,7 @@
                 </table>
             </div>
             <div class="mt-4">
-                {{ $purchases->links() }}
+                {{ $purchases->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
@@ -159,13 +215,23 @@
         <script>
             document.addEventListener('DOMContentLoaded', function() {
                 const searchInput = document.getElementById('searchInput');
+                const form = searchInput.closest('form');
                 let debounceTimer;
 
+                // Auto-submit form after typing stops
                 searchInput.addEventListener('input', function() {
                     clearTimeout(debounceTimer);
                     debounceTimer = setTimeout(() => {
-                        // Implementasi pencarian AJAX di sini
-                    }, 300);
+                        form.submit();
+                    }, 500);
+                });
+
+                // Clear search with Escape key
+                searchInput.addEventListener('keydown', function(e) {
+                    if (e.key === 'Escape') {
+                        searchInput.value = '';
+                        form.submit();
+                    }
                 });
             });
         </script>

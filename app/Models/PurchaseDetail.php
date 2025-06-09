@@ -12,15 +12,20 @@ class PurchaseDetail extends Model
     protected $fillable = [
         'purchase_id',
         'product_id',
+        'unit_id',
         'quantity',
-        'received_quantity',
+        'base_quantity',
         'purchase_price',
-        'subtotal'
+        'subtotal',
+        'conversion_factor',
     ];
 
     protected $casts = [
-        'purchase_price' => 'decimal:2',
-        'subtotal' => 'decimal:2'
+        'purchase_price' => 'integer',
+        'subtotal' => 'integer',
+        'quantity' => 'integer',
+        'base_quantity' => 'integer',
+        'conversion_factor' => 'integer',
     ];
 
     public function purchase()
@@ -31,6 +36,11 @@ class PurchaseDetail extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+
+    public function unit()
+    {
+        return $this->belongsTo(UnitOfMeasure::class, 'unit_id');
     }
 
     public function receiptDetails()

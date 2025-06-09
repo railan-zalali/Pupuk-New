@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="id">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Faktur Toko Tani Makmur</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 20px;
+            }
+            .invoice {
+                max-width: 800px;
+                margin: 0 auto;
+                border: 1px solid #ccc;
+                padding: 20px;
+            }
+            .header {
+                text-align: center;
+                margin-bottom: 20px;
+            }
+            .store-name {
+                font-size: 18px;
+                font-weight: bold;
+                color: #333;
+            }
+            .store-address {
+                font-size: 14px;
+                color: #333;
+            }
+            .invoice-title {
+                text-align: center;
+                font-size: 18px;
+                font-weight: bold;
+                text-decoration: underline;
+                margin: 20px 0;
+            }
+            .invoice-info {
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 20px;
+            }
+            .invoice-date {
+                text-align: right;
+            }
+            .customer-info {
+                text-align: right;
+            }
+            table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-bottom: 20px;
+            }
+            th,
+            td {
+                border: 1px solid #000;
+                padding: 8px;
+                text-align: left;
+            }
+            th {
+                background-color: #333;
+                color: white;
+            }
+            .total-row {
+                font-weight: bold;
+            }
+            .signatures {
+                display: flex;
+                justify-content: space-between;
+                margin-top: 40px;
+            }
+            .signature-box {
+                width: 45%;
+            }
+            .stamp {
+                margin: 20px 0;
+                padding: 10px;
+                border: 2px solid #6a329f;
+                color: #6a329f;
+                display: inline-block;
+                font-weight: bold;
+                text-align: center;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="invoice">
+            <div class="header">
+                <div class="store-name">TOKO "TANI MAKMUR"</div>
+                <div class="store-address">
+                    JL. KOPO No. 316 Telp. 6043233-6012850<br />BANDUNG
+                </div>
+            </div>
+
+            <div class="invoice-title">SURAT JALAN<br />FAKTUR</div>
+
+            <div class="invoice-info">
+                <div class="truck-info">
+                    TRUCK<br />PICKUP No. _______________
+                </div>
+                <div class="invoice-date">
+                    Bandung, 7-4-2023<br />
+                    Kepada Yth,<br />
+                    <span style="color: blue">Dha Mahn</span><br />
+                    <span style="color: blue">Kelurahan Cipagay</span><br />
+                    <span style="color: blue">Bandung</span>
+                </div>
+            </div>
+
+            <table>
+                <thead>
+                    <tr>
+                        <th>Banyaknya</th>
+                        <th>NAMA BARANG</th>
+                        <th>Satuan</th>
+                        <th>Harga</th>
+                        <th>JUMLAH</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td style="color: blue">Kangkung Bangkok</td>
+                        <td style="color: blue">1 bh</td>
+                        <td style="color: blue">50.000</td>
+                        <td style="color: blue">50.000</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <div style="display: flex; justify-content: space-between">
+                <div class="stamp">
+                    HARGA BELUM TERMASUK PPN<br />
+                    PPN DIBEBASKAN
+                </div>
+                <div style="text-align: right">
+                    <div>
+                        Rp.
+                        <span
+                            style="
+                                color: blue;
+                                border: 1px solid #000;
+                                padding: 5px 10px;
+                            "
+                            >50.000</span
+                        >
+                    </div>
+                </div>
+            </div>
+
+            <div class="signatures">
+                <div class="signature-box">
+                    Tanda terima,
+                    <div style="height: 60px"></div>
+                </div>
+                <div class="signature-box" style="text-align: right">
+                    Hormat kami,
+                    <div style="height: 60px"></div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

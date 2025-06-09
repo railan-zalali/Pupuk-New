@@ -12,18 +12,20 @@
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap"
+        rel="stylesheet">
 
     <!-- Icons -->
     <link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@2.30.0/tabler-icons.min.css" rel="stylesheet">
 
     <!-- Scripts -->
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    {{-- <link rel="stylesheet" href="{{ asset('css/select2.min.css') }}"> --}}
     <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
 
     <style>
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Plus Jakarta Sans', sans-serif;
         }
 
         .app-header {
@@ -31,7 +33,7 @@
         }
 
         .content-card {
-            @apply bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700;
+            @apply bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700;
         }
 
         .btn-primary {
@@ -42,12 +44,27 @@
             @apply inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 font-medium rounded-lg transition-colors;
         }
 
-        .nav-link {
-            @apply flex items-center gap-2 px-4 py-2.5 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors;
+        /* Scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
         }
 
-        .nav-link.active {
-            @apply bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400;
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 3px;
+        }
+
+        .dark ::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .dark ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.15);
         }
     </style>
 </head>
@@ -62,7 +79,7 @@
             :class="sidebarOpen ? 'main-content' : 'main-content expanded'">
 
             <!-- Header -->
-            <header class="app-header">
+            <header class="app-header sticky top-0 z-10">
                 <div class="max-w-7xl mx-auto flex items-center justify-between">
                     <div class="flex items-center gap-4">
                         <!-- Toggle Sidebar Button -->
@@ -75,7 +92,16 @@
                         <span class="text-lg font-semibold hidden md:block">{{ config('app.name', 'Laravel') }}</span>
                     </div>
 
-                    <div class="flex items-center gap-6">
+                    <div class="flex items-center gap-3">
+                        <!-- Search -->
+                        <div class="hidden md:flex items-center relative mx-2">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="ti ti-search text-gray-400"></i>
+                            </div>
+                            <input type="text" placeholder="Cari..."
+                                class="border border-gray-200 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm w-64 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
+                        </div>
+
                         <!-- Dark mode toggle -->
                         <button @click="darkMode = !darkMode"
                             class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
@@ -110,7 +136,7 @@
                             <button @click="open = !open"
                                 class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
                                 <div
-                                    class="w-8 h-8 rounded-full bg-indigo-600 flex items-center justify-center text-white font-medium">
+                                    class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 flex items-center justify-center text-white font-medium shadow-sm">
                                     {{ substr(Auth::user()->name, 0, 1) }}
                                 </div>
                                 <span class="hidden md:block font-medium">{{ Auth::user()->name }}</span>
@@ -119,15 +145,23 @@
 
                             <!-- Profile dropdown -->
                             <div x-show="open" @click.away="open = false"
-                                class="absolute right-0 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
+                                class="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
                                 x-cloak x-transition>
+                                <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
+                                    <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
+                                        {{ Auth::user()->name }}
+                                    </div>
+                                    <div class="text-xs text-gray-500 dark:text-gray-400 truncate">
+                                        {{ Auth::user()->email }}
+                                    </div>
+                                </div>
                                 <a href="{{ route('profile.edit') }}"
-                                    class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <i class="ti ti-user text-gray-500 dark:text-gray-400"></i>
                                     <span>{{ __('Profile') }}</span>
                                 </a>
                                 <a href="#"
-                                    class="flex items-center gap-2 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
                                     <i class="ti ti-settings text-gray-500 dark:text-gray-400"></i>
                                     <span>{{ __('Settings') }}</span>
                                 </a>
@@ -135,7 +169,7 @@
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full flex items-center gap-2 px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/50 transition-colors">
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
                                         <i class="ti ti-logout"></i>
                                         <span>{{ __('Log Out') }}</span>
                                     </button>
@@ -147,7 +181,7 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-grow p-6">
+            <main class="flex-grow p-4 md:p-6">
                 <!-- Page header -->
                 @isset($header)
                     <div class="max-w-7xl mx-auto mb-6">
@@ -157,9 +191,7 @@
 
                 <!-- Content area -->
                 <div class="max-w-7xl mx-auto">
-                    <div class="content-card p-6">
-                        {{ $slot }}
-                    </div>
+                    {{ $slot }}
                 </div>
             </main>
         </div>

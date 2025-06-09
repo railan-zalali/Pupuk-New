@@ -6,7 +6,7 @@ use App\Imports\CustomersImport;
 use App\Models\Customer;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
-use Yajra\DataTables\Facades\DataTables;
+use Illuminate\Support\Facades\DB;
 
 class CustomerController extends Controller
 {
@@ -25,7 +25,7 @@ class CustomerController extends Controller
                 return $query->where('nama', 'like', "%{$search}%")
                     ->orWhere('nik', 'like', "%{$search}%");
             })
-            ->latest()
+            ->orderBy('nama', 'asc')
             ->paginate(10); // Tambahkan paginate di sini
 
         // Jika request AJAX, kembalikan JSON
@@ -33,6 +33,8 @@ class CustomerController extends Controller
             return response()->json($customers);
         }
 
+        // dd($customers);
+        // die();
         // Jika bukan request AJAX, kembalikan view
         return view('customers.index', compact('customers'));
     }
@@ -173,8 +175,56 @@ class CustomerController extends Controller
             'excel_file' => 'required|mimes:xlsx,xls',
         ]);
 
-        Excel::import(new CustomersImport, $request->file('excel_file'));
+        try {
+            Excel::import(new CustomersImport, $request->file('excel_file'));
+            return redirect()->back()->with('success', 'Data pelanggan berhasil diimpor!');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
+        }
+    }
+    public function downloadTemplate()
+    {
+        return response()->download(public_path('templates/customer_import_template.xlsx'));
+    }
 
-        return redirect()->back()->with('success', 'Data pelanggan berhasil diimpor!');
+    /**
+     * Get customer purchase history
+     */
+    public function getCustomerHistory(Customer $customer)
+    {
+        // Ambil 10 transaksi terakhir
+        $history = $customer->sales()
+            ->select('id', 'date', 'invoice_number', 'total_amount', 'payment_status', 'payment_method')
+            ->orderBy('date', 'desc')
+            ->take(10)
+            ->get();
+
+        // Ambil produk yang paling sering dibeli
+        $favoriteProducts = DB::table('sale_details')
+            ->join('sales', 'sale_details.sale_id', '=', 'sales.id')
+            ->join('products', 'sale_details.product_id', '=', 'products.id')
+            ->join('product_units', 'sale_details.product_unit_id', '=', 'product_units.id')
+            ->select(
+                'products.id',
+                'products.name',
+                'product_units.selling_price as price',
+                DB::raw('COUNT(sale_details.product_id) as purchase_count'),
+                DB::raw('SUM(sale_details.quantity) as total_quantity')
+            )
+            ->where('sales.customer_id', $customer->id)
+            ->groupBy('products.id', 'products.name', 'product_units.selling_price')
+            ->orderBy('purchase_count', 'desc')
+            ->orderBy('total_quantity', 'desc')
+            ->take(6)
+            ->get();
+
+        return response()->json([
+            'customer' => [
+                'id' => $customer->id,
+                'name' => $customer->nama
+            ],
+            'history' => $history,
+            'favorite_products' => $favoriteProducts
+        ]);
     }
 }

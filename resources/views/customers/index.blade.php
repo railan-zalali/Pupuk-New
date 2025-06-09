@@ -14,7 +14,6 @@
                 <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Kelola data pelanggan dalam sistem</p>
             </div>
 
-            <!-- Optional action buttons -->
             <div class="mt-4 sm:mt-0 flex space-x-2">
                 <div class="relative text-gray-700 focus-within:text-gray-800">
                     <input type="text" id="searchInput" placeholder="Cari pelanggan..."
@@ -28,6 +27,16 @@
                     </svg>
                 </div>
 
+                <a href="{{ route('customers.template.download') }}"
+                    class="p-2 text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-200 transition-colors rounded-full hover:bg-green-50 dark:hover:bg-green-900/50"
+                    title="Download Template Excel">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                    </svg>
+                </a>
+
                 <a href="{{ route('customers.create') }}"
                     class="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 transition-colors rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
@@ -36,6 +45,9 @@
                     </svg>
                 </a>
             </div>
+
+
+
         </div>
 
         <!-- Content Area -->
@@ -241,7 +253,7 @@
                     <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
                         ${customer.alamat ? customer.alamat.substring(0, 30) : '-'}
                         <span class="text-xs text-gray-500 dark:text-gray-400 block">
-                            ${customer.desa?.nama || '-'}, ${customer.kecamatan?.nama || '-'}
+                            ${customer.desa_nama || '-'}, ${customer.kecamatan_nama || '-'}
                         </span>
                     </td>
                     <td class="px-6 py-4">
@@ -291,7 +303,7 @@
                     </svg>
                 </a>
 
-                <button onclick="deleteCustomer(${id})" 
+                <button onclick="deleteCustomer(${id})"
                     class="p-2 text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 transition-colors rounded-full hover:bg-red-50 dark:hover:bg-red-900/50">
                     <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />

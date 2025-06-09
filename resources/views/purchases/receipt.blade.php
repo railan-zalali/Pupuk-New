@@ -95,143 +95,230 @@
             </div>
 
             <!-- Form for receipt submission -->
-<form action="{{ route('purchases.storeReceipt', $purchase) }}" method="POST" enctype="multipart/form-data" class="mt-6">
-    @csrf
-    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none"
-                viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            Detail Penerimaan
-        </h3>
+            <form action="{{ route('purchases.storeReceipt', $purchase) }}" method="POST" enctype="multipart/form-data"
+                class="mt-6">
+                @csrf
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Detail Penerimaan
+                    </h3>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
-            <div>
-                <label for="receipt_number" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Nomor Penerimaan
-                </label>
-                <input type="text" name="receipt_number" id="receipt_number" required
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                    value="{{ old('receipt_number', 'RCV-' . date('Ymd') . '-' . str_pad(rand(1, 999), 3, '0', STR_PAD_LEFT)) }}">
-            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div>
+                            <label for="receipt_number"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Nomor Penerimaan
+                            </label>
+                            <input type="text" name="receipt_number" id="receipt_number" required
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                                value="{{ old('receipt_number', $receiptNumber) }}">
+                        </div>
 
-            <div>
-                <label for="receipt_date" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    Tanggal Penerimaan
-                </label>
-                <input type="date" name="receipt_date" id="receipt_date" required
-                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                    value="{{ old('receipt_date', date('Y-m-d')) }}">
-            </div>
+                        <div>
+                            <label for="receipt_date"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                Tanggal Penerimaan
+                            </label>
+                            <input type="date" name="receipt_date" id="receipt_date" required
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                                value="{{ old('receipt_date', date('Y-m-d')) }}">
+                        </div>
 
-            <div>
-                <label for="receipt_file" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                    File Bukti Penerimaan (Opsional)
-                </label>
-                <input type="file" name="receipt_file" id="receipt_file"
-                    class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300">
-            </div>
-        </div>
+                        <div>
+                            <label for="receipt_file"
+                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                                File Bukti Penerimaan (Opsional)
+                            </label>
+                            <input type="file" name="receipt_file" id="receipt_file"
+                                class="mt-1 block w-full text-sm text-gray-500 dark:text-gray-400 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100 dark:file:bg-indigo-900 dark:file:text-indigo-300">
+                        </div>
+                    </div>
 
-        <!-- Items to receive -->
-        <div class="overflow-x-auto">
-            <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                <thead class="bg-gray-50 dark:bg-gray-700">
-                    <tr>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Produk
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Jumlah Dipesan
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Sudah Diterima
-                        </th>
-                        <th scope="col"
-                            class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                            Jumlah Diterima
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                    @foreach ($purchase->purchaseDetails as $detail)
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ $detail->product->name }}
-                                <input type="hidden" name="items[{{ $loop->index }}][purchase_detail_id]"
-                                    value="{{ $detail->id }}">
-                                <input type="hidden" name="items[{{ $loop->index }}][product_id]"
-                                    value="{{ $detail->product_id }}">
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ $detail->quantity }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                {{ $detail->received_quantity }}
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm">
-                                <input type="number" name="items[{{ $loop->index }}][received_quantity]"
-                                    class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                                    min="0" max="{{ $detail->quantity - $detail->received_quantity }}"
-                                    value="{{ old('items.' . $loop->index . '.received_quantity', min($detail->quantity - $detail->received_quantity, $detail->quantity)) }}">
-                            </td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                    <!-- Items to receive -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Produk
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Jumlah Dipesan
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Sudah Diterima
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                        Jumlah Diterima
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                                @foreach ($purchase->purchaseDetails as $detail)
+                                    <tr>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {{ $detail->product->name }}
+                                            <input type="hidden"
+                                                name="items[{{ $loop->index }}][purchase_detail_id]"
+                                                value="{{ $detail->id }}">
+                                            <input type="hidden" name="items[{{ $loop->index }}][product_id]"
+                                                value="{{ $detail->product_id }}">
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $detail->quantity }} {{ optional($detail->unit)->abbreviation }}
+                                            @if ($detail->conversion_factor > 1)
+                                                ({{ $detail->base_quantity }}
+                                                {{ optional($detail->product->baseUnit)->abbreviation ?? 'pcs' }})
+                                            @endif
+                                        </td>
+                                        <td
+                                            class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                            {{ $detail->received_quantity }}
+                                            {{ optional($detail->unit)->abbreviation }}
+                                            @if ($detail->conversion_factor > 1)
+                                                ({{ $detail->received_quantity * $detail->conversion_factor }}
+                                                {{ optional($detail->product->baseUnit)->abbreviation ?? 'pcs' }})
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 whitespace-nowrap text-sm">
+                                            <input type="number"
+                                                name="items[{{ $loop->index }}][received_quantity]"
+                                                class="block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                                                min="0"
+                                                max="{{ $detail->quantity - $detail->received_quantity }}"
+                                                value="{{ old('items.' . $loop->index . '.received_quantity', min($detail->quantity - $detail->received_quantity, $detail->quantity)) }}"
+                                                onchange="updateBaseQuantity(this, {{ $detail->conversion_factor }}, '{{ optional($detail->product->baseUnit)->abbreviation ?? 'pcs' }}')"
+                                                required>
+                                            <input type="hidden"
+                                                name="items[{{ $loop->index }}][conversion_factor]"
+                                                value="{{ $detail->conversion_factor }}">
+                                            <span class="text-xs text-gray-500 dark:text-gray-400 mt-1 block">
+                                                {{ optional($detail->unit)->abbreviation }}
+                                                @if ($detail->conversion_factor > 1)
+                                                    (1 {{ optional($detail->unit)->abbreviation }} =
+                                                    {{ $detail->conversion_factor }}
+                                                    {{ optional($detail->product->baseUnit)->abbreviation ?? 'pcs' }})
+                                                @endif
+                                            </span>
+                                            @if ($detail->conversion_factor > 1)
+                                                <span
+                                                    class="text-xs text-indigo-600 dark:text-indigo-400 mt-1 block base-quantity-display"
+                                                    id="base-quantity-{{ $loop->index }}">
+                                                    Setara dengan:
+                                                    {{ old('items.' . $loop->index . '.received_quantity', min($detail->quantity - $detail->received_quantity, $detail->quantity)) * $detail->conversion_factor }}
+                                                    {{ optional($detail->product->baseUnit)->abbreviation ?? 'pcs' }}
+                                                </span>
+                                            @endif
+                                            <div class="mt-2">
+                                                <label
+                                                    class="block text-xs font-medium text-gray-700 dark:text-gray-300">Tanggal
+                                                    Kadaluarsa (Opsional)</label>
+                                                <input type="date" name="items[{{ $loop->index }}][expire_date]"
+                                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 text-xs">
+                                            </div>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
+                        </table>
+                    </div>
 
-        <div class="mt-6">
-            <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                Catatan (Opsional)
-            </label>
-            <textarea name="notes" id="notes" rows="3"
-                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                placeholder="Tambahkan catatan penerimaan jika diperlukan...">{{ old('notes') }}</textarea>
-        </div>
+                    <div class="mt-6">
+                        <label for="notes" class="block text-sm font-medium text-gray-700 dark:text-gray-300">
+                            Catatan (Opsional)
+                        </label>
+                        <textarea name="notes" id="notes" rows="3"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
+                            placeholder="Tambahkan catatan penerimaan jika diperlukan...">{{ old('notes') }}</textarea>
+                    </div>
 
-        <div class="mt-6 flex justify-end space-x-3">
-            <a href="{{ route('purchases.show', $purchase) }}"
-                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
-                Batal
-            </a>
-            <button type="submit"
-                class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 border border-transparent rounded-md shadow-sm">
-                Proses Penerimaan
-            </button>
-        </div>
-    </div>
-</form>
+                    <div class="mt-6 flex justify-end space-x-3">
+                        <a href="{{ route('purchases.show', $purchase) }}"
+                            class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                            Batal
+                        </a>
+                        <button type="submit"
+                            class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 border border-transparent rounded-md shadow-sm">
+                            Proses Penerimaan
+                        </button>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
     @push('scripts')
         <script>
+            function updateBaseQuantity(input, conversionFactor, baseUnit) {
+                const receivedQty = parseFloat(input.value) || 0;
+                const baseQty = receivedQty * conversionFactor;
+
+                // Find the corresponding base quantity display element
+                const row = input.closest('tr');
+                const baseQtyDisplay = row.querySelector('.base-quantity-display');
+
+                if (baseQtyDisplay) {
+                    baseQtyDisplay.textContent = `Setara dengan: ${baseQty} ${baseUnit}`;
+                }
+            }
             document.addEventListener('DOMContentLoaded', function() {
+                document.querySelectorAll('input[name^="items"][name$="[received_quantity]"]').forEach((input,
+                    index) => {
+                    const row = input.closest('tr');
+                    const conversionFactorInput = row.querySelector(
+                        'input[name^="items"][name$="[conversion_factor]"]');
+
+                    if (conversionFactorInput) {
+                        const conversionFactor = parseFloat(conversionFactorInput.value) || 1;
+                        const baseUnitElement = document.getElementById(`base-quantity-${index}`);
+                        const baseUnit = baseUnitElement ? baseUnitElement.textContent.split(' ').pop() : 'pcs';
+
+                        updateBaseQuantity(input, conversionFactor, baseUnit);
+                    }
+                });
                 // Validasi form sebelum submit
                 document.querySelector('form').addEventListener('submit', function(e) {
-    let hasReceivedItems = false;
-    const inputs = document.querySelectorAll('input[name^="items"][name$="[received_quantity]"]');
+                    let hasReceivedItems = false;
+                    let totalReceived = 0;
+                    const inputs = document.querySelectorAll(
+                        'input[name^="items"][name$="[received_quantity]"]');
 
-    inputs.forEach(input => {
-        if (parseInt(input.value) > 0) {
-            hasReceivedItems = true;
-        }
-    });
+                    inputs.forEach(input => {
+                        const value = parseInt(input.value) || 0;
+                        totalReceived += value;
+                        if (value > 0) {
+                            hasReceivedItems = true;
+                        }
+                    });
 
-    if (!hasReceivedItems) {
-        e.preventDefault();
-        alert('Setidaknya satu item harus diterima');
-        return false;
-    }
-});
+                    if (!hasReceivedItems) {
+                        e.preventDefault();
+                        alert('Setidaknya satu item harus diterima');
+                        return false;
+                    }
 
-                // Validasi input quantity
-                document.querySelectorAll('input[name^="received_quantity"]').forEach(input => {
+                    // Confirm large receipts to prevent accidental data entry errors
+                    if (totalReceived > 1000) {
+                        if (!confirm(`Anda akan menerima ${totalReceived} item. Apakah jumlah ini benar?`)) {
+                            e.preventDefault();
+                            return false;
+                        }
+                    }
+                });
+
+                // Validasi input quantity dengan lebih baik
+                document.querySelectorAll('input[name^="items"][name$="[received_quantity]"]').forEach(input => {
                     input.addEventListener('change', function() {
                         const max = parseInt(this.getAttribute('max'));
                         const value = parseInt(this.value) || 0;

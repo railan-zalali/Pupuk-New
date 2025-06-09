@@ -121,6 +121,20 @@ class DashboardController extends Controller
             ->whereDate('created_at', Carbon::today())
             ->sum('quantity');
 
+        // Get products that will expire in the next 30 days
+        $data['expiringProducts'] = Product::whereHas('productUnits', function ($query) {
+            $query->whereNotNull('expire_date')
+                ->where('expire_date', '>=', now())
+                ->where('expire_date', '<=', now()->addDays(30));
+        })
+            ->with(['productUnits' => function ($query) {
+                $query->whereNotNull('expire_date')
+                    ->where('expire_date', '>=', now())
+                    ->where('expire_date', '<=', now()->addDays(30))
+                    ->orderBy('expire_date');
+            }])
+            ->get();
+
         return view('dashboard', $data);
     }
     public function dailyStockDetails()

@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('code')->unique();
             $table->text('description')->nullable();
             $table->string('image_path')->nullable();
-            $table->decimal('purchase_price', 12, 2);
-            $table->decimal('selling_price', 12, 2);
+            $table->integer('purchase_price');
+            $table->integer('selling_price');
             $table->integer('stock');
             $table->integer('min_stock');
             $table->timestamps();

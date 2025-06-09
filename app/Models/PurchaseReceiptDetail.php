@@ -13,17 +13,26 @@ class PurchaseReceiptDetail extends Model
         'purchase_receipt_id',
         'purchase_detail_id',
         'product_id',
-        'received_quantity'
+        'quantity',
+        'base_quantity',
+        'receipt_quantity',
+        'received_quantity',
+        'expire_date',
     ];
 
-    public function purchaseReceipt()
+    protected $casts = [
+        'quantity' => 'integer',
+        'base_quantity' => 'integer',
+    ];
+
+    public function receipt()
     {
-        return $this->belongsTo(PurchaseReceipt::class);
+        return $this->belongsTo(PurchaseReceipt::class, 'purchase_receipt_id');
     }
 
     public function purchaseDetail()
     {
-        return $this->belongsTo(PurchaseDetail::class);
+        return $this->belongsTo(PurchaseDetail::class, 'purchase_detail_id');
     }
 
     public function product()

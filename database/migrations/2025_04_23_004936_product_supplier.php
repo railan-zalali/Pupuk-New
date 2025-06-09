@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->onDelete('cascade');
             $table->foreignId('supplier_id')->constrained()->onDelete('cascade');
-            $table->decimal('purchase_price', 15, 2)->default(0);
+            // $table->decimal('purchase_price', 15, 2)->default(0);
+            $table->integer('purchase_price')->default(0);
             $table->timestamps();
 
             // Mencegah duplikasi produk-supplier

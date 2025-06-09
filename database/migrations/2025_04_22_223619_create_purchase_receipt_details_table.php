@@ -16,7 +16,9 @@ return new class extends Migration
             $table->foreignId('purchase_receipt_id')->constrained()->onDelete('cascade');
             $table->foreignId('purchase_detail_id')->constrained();
             $table->foreignId('product_id')->constrained();
-            $table->integer('received_quantity');
+            $table->integer('received_quantity')->default(0);
+            $table->date('expire_date')->nullable();
+            $table->integer('base_quantity')->default(0);
             $table->timestamps();
         });
     }

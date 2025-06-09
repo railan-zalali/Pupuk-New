@@ -4,409 +4,289 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductUnit;
 use App\Models\StockMovement;
 use App\Models\Supplier;
+use App\Models\UnitOfMeasure;
+use App\Imports\ProductsImport;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
+use Maatwebsite\Excel\Facades\Excel;
 
 class ProductController extends Controller
 {
     public function index()
     {
-        $products = Product::with('category')
-            ->orderByRaw('CASE WHEN stock < min_stock THEN 0 ELSE 1 END')
-            ->orderBy('stock')
+        $products = Product::with(['category', 'supplier', 'units'])
+            ->orderBy('name', 'asc')
             ->paginate(10);
-        return view('products.index', compact('products'));
+
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+        $units = UnitOfMeasure::all();
+
+        return view('products.index', compact('products', 'categories', 'suppliers', 'units'));
     }
 
     public function create()
     {
-        $categories = Category::orderBy('name')->get();
-        $suppliers = Supplier::orderBy('name')->get();
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+        $units = UnitOfMeasure::all();
+        $productCode = 'PRD' . date('Ymd') . rand(1000, 9999);
 
-        // Generate a unique product code
-        $today = date('Ymd');
-        $baseCode = 'PRD-' . $today . '-';
-
-        // Find the highest number for today's products
-        $lastProduct = Product::withTrashed()->where('code', 'like', $baseCode . '%')
-            ->orderBy('code', 'desc')
-            ->first();
-
-        $lastNumber = 0;
-        if ($lastProduct) {
-            $lastNumber = (int) substr($lastProduct->code, -4);
-        }
-
-        // Generate new code
-        $newNumber = $lastNumber + 1;
-        $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-
-        // Make sure it's unique
-        while (Product::withTrashed()->where('code', $productCode)->exists()) {
-            $newNumber++;
-            $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        }
-
-        return view('products.create', compact('categories', 'suppliers', 'productCode'));
+        return view('products.create', compact('categories', 'suppliers', 'units', 'productCode'));
     }
 
     public function store(Request $request)
     {
-        // Check if batch input
-        if ($request->input('is_batch')) {
-            return $this->storeBatch($request);
-        }
-
-        // Validate the request
-        $validated = $request->validate([
-            'category_id' => 'required|exists:categories,id',
-            'name' => 'required|string|max:255',
-            'description' => 'nullable|string',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'purchase_price' => 'required|numeric|min:0',
-            'selling_price' => 'required|numeric|min:0',
-            'stock' => 'required|integer|min:0',
-            'min_stock' => 'required|integer|min:0',
-            'supplier_id' => 'required|exists:suppliers,id'
-        ]);
-
-        // Generate unique product code
-        $code = $this->generateProductCode();
-
         try {
+            DB::beginTransaction();
+
+            $validated = $request->validate([
+                'category_id' => 'required|exists:categories,id',
+                'supplier_id' => 'required|exists:suppliers,id',
+                'name' => 'required|string|max:255',
+                'code' => 'required|string|unique:products,code,NULL,id,deleted_at,NULL',
+                'description' => 'nullable|string',
+                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+                'stock' => 'required|integer|min:0',
+                'min_stock' => 'required|integer|min:0',
+                'units' => 'required|array|min:1',
+                'units.*.unit_id' => 'required|exists:unit_of_measures,id',
+                'units.*.conversion_factor' => 'required|numeric|min:1',
+                'units.*.purchase_price' => 'required|numeric|min:0',
+                'units.*.selling_price' => 'required|numeric|min:0',
+                'units.*.expire_date' => 'nullable|date',
+                'units.*.is_default' => 'nullable'
+            ]);
+
             // Process image if uploaded
-            $imagePath = null;
             if ($request->hasFile('image')) {
                 $image = $request->file('image');
                 $imageName = time() . '_' . $image->getClientOriginalName();
+
+                // Make sure the directory exists
                 Storage::makeDirectory('public/products');
+
+                // Store the image with a consistent path
                 $image->storeAs('products', $imageName, 'public');
-                $imagePath = 'products/' . $imageName;
+                $validated['image_path'] = 'products/' . $imageName;
             }
 
-            // Create the product
+            // Get base unit values for product table
+            $baseUnitIndex = null;
+            foreach ($request->units as $index => $unit) {
+                if (isset($unit['is_default']) && $unit['is_default']) {
+                    $baseUnitIndex = $index;
+                    break;
+                }
+            }
+
+            // If no default unit is specified, use the first one
+            if ($baseUnitIndex === null) {
+                $baseUnitIndex = 0;
+                $request->units[0]['is_default'] = true;
+            }
+
+            // Create product
             $product = Product::create([
                 'category_id' => $validated['category_id'],
+                'supplier_id' => $validated['supplier_id'],
                 'name' => $validated['name'],
-                'code' => $code,
+                'code' => $validated['code'],
                 'description' => $validated['description'],
-                'image_path' => $imagePath,
-                'purchase_price' => $validated['purchase_price'],
-                'selling_price' => $validated['selling_price'],
+                'image_path' => $validated['image_path'] ?? null,
+                'purchase_price' => $request->units[$baseUnitIndex]['purchase_price'],
+                'selling_price' => $request->units[$baseUnitIndex]['selling_price'],
                 'stock' => $validated['stock'],
                 'min_stock' => $validated['min_stock'],
-                'supplier_id' => $validated['supplier_id']
+                'expire_date' => $request->units[$baseUnitIndex]['expire_date'] ?? null,
             ]);
 
-            // Create the many-to-many relationship with supplier
-            $product->suppliers()->attach($validated['supplier_id'], [
-                'purchase_price' => $validated['purchase_price']
-            ]);
-
-            // Record initial stock movement if there's stock
-            if ($validated['stock'] > 0) {
-                StockMovement::create([
+            // Create product units
+            foreach ($request->units as $unit) {
+                ProductUnit::create([
                     'product_id' => $product->id,
-                    'type' => 'in',
-                    'quantity' => $validated['stock'],
-                    'before_stock' => 0,
-                    'after_stock' => $validated['stock'],
-                    'reference_type' => 'initial',
-                    'reference_id' => $product->id,
-                    'notes' => 'Initial stock'
+                    'unit_id' => $unit['unit_id'],
+                    'conversion_factor' => $unit['conversion_factor'],
+                    'purchase_price' => $unit['purchase_price'],
+                    'selling_price' => $unit['selling_price'],
+                    'expire_date' => $unit['expire_date'] ?? null,
+                    'is_default' => isset($unit['is_default']) && $unit['is_default'],
                 ]);
             }
 
-            return redirect()
-                ->route('products.index')
-                ->with('success', 'Product created successfully');
+            // Create initial stock movement
+            StockMovement::create([
+                'product_id' => $product->id,
+                'type' => 'in',
+                'quantity' => $validated['stock'],
+                'before_stock' => 0,
+                'after_stock' => $validated['stock'],
+                'reference_type' => 'initial',
+                'reference_id' => $product->id,
+                'notes' => 'Initial stock'
+            ]);
+
+            DB::commit();
+
+            return redirect()->route('products.index')
+                ->with('success', 'Produk berhasil ditambahkan.');
         } catch (\Exception $e) {
-            Log::error('Failed to create product: ' . $e->getMessage());
-            return back()
+            DB::rollBack();
+            return redirect()->back()
                 ->withInput()
-                ->with('error', 'Failed to create product. Please try again.');
+                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
         }
-    }
-
-    // Add this new helper method for generating product codes
-    private function generateProductCode()
-    {
-        $today = date('Ymd');
-        $baseCode = 'PRD-' . $today . '-';
-
-        $lastProduct = Product::withTrashed()
-            ->where('code', 'like', $baseCode . '%')
-            ->orderBy('code', 'desc')
-            ->first();
-
-        $lastNumber = $lastProduct ? (int) substr($lastProduct->code, -4) : 0;
-        $newNumber = $lastNumber + 1;
-        $code = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-
-        // Make sure the code is unique
-        while (Product::withTrashed()->where('code', $code)->exists()) {
-            $newNumber++;
-            $code = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-        }
-
-        return $code;
     }
 
     public function storeBatch(Request $request)
     {
-        $supplierID = $request->input('supplier_id');
-        $products = $request->input('products', []);
+        try {
+            DB::beginTransaction();
 
-        if (empty($products)) {
-            return back()->with('error', 'No products were submitted');
-        }
+            $request->validate([
+                'supplier_id' => 'required|exists:suppliers,id',
+                'products' => 'required|array|min:1',
+                'products.*.category_id' => 'required|exists:categories,id',
+                'products.*.name' => 'required|string|max:255',
+                'products.*.purchase_price' => 'required|numeric|min:0',
+                'products.*.selling_price' => 'required|numeric|min:0',
+                'products.*.stock' => 'required|integer|min:0',
+                'products.*.min_stock' => 'required|integer|min:0',
+                'products.*.unit_id' => 'required|exists:unit_of_measures,id',
+                'products.*.description' => 'nullable|string',
+            ]);
 
-        $createdCount = 0;
+            // Log untuk debug
+            Log::info('Request batch product masuk', [
+                'supplier_id' => $request->supplier_id,
+                'is_batch' => $request->is_batch,
+                'products_count' => count($request->products),
+                'request_data' => $request->all()
+            ]);
 
-        foreach ($products as $productData) {
-            // Skip empty rows
-            if (empty($productData['name'])) {
-                continue;
+            $today = date('Ymd');
+            $baseCode = 'PRD-' . $today . '-';
+
+            // Find the highest number for today's products
+            $lastProduct = Product::withTrashed()->where('code', 'like', $baseCode . '%')
+                ->orderBy('code', 'desc')
+                ->first();
+
+            $lastNumber = 0;
+            if ($lastProduct) {
+                $lastNumber = (int) substr($lastProduct->code, -4);
             }
 
-            try {
-                // Generate a unique code for each product
-                $code = $this->generateProductCode();
+            $createdProducts = [];
+            $supplierId = $request->input('supplier_id');
 
-                // Process image if it exists
-                $imagePath = null;
-                if (isset($productData['image']) && $productData['image']) {
-                    $image = $productData['image'];
-                    $imageName = time() . '_' . $createdCount . '_' . $image->getClientOriginalName();
-                    Storage::makeDirectory('public/products');
-                    $image->storeAs('products', $imageName, 'public');
-                    $imagePath = 'products/' . $imageName;
+            // Ambil supplier untuk log
+            $supplier = Supplier::find($supplierId);
+            Log::info('Processing batch dengan supplier', [
+                'supplier_id' => $supplierId,
+                'supplier_name' => $supplier ? $supplier->name : 'Unknown'
+            ]);
+
+            foreach ($request->products as $index => $productData) {
+                // Generate new code for each product
+                $newNumber = ++$lastNumber;
+                $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+                // Make sure it's unique
+                while (Product::withTrashed()->where('code', $productCode)->exists()) {
+                    $newNumber++;
+                    $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
                 }
+
+                // Log produk yang sedang dibuat
+                Log::info('Membuat produk batch #' . ($index + 1), [
+                    'product_name' => $productData['name'],
+                    'product_code' => $productCode,
+                    'category_id' => $productData['category_id'],
+                    'unit_id' => $productData['unit_id']
+                ]);
 
                 // Create the product
                 $product = Product::create([
                     'category_id' => $productData['category_id'],
+                    'supplier_id' => $supplierId,
                     'name' => $productData['name'],
-                    'code' => $code,
+                    'code' => $productCode,
                     'description' => $productData['description'] ?? null,
-                    'image_path' => $imagePath,
                     'purchase_price' => $productData['purchase_price'],
                     'selling_price' => $productData['selling_price'],
-                    'stock' => $productData['stock'] ?? 0,
-                    'min_stock' => $productData['min_stock'] ?? 0,
-                    'supplier_id' => $supplierID
+                    'stock' => $productData['stock'],
+                    'min_stock' => $productData['min_stock']
                 ]);
 
-                // Create the many-to-many relationship with supplier
-                $product->suppliers()->attach($supplierID, [
-                    'purchase_price' => $productData['purchase_price']
+                Log::info('Produk batch berhasil dibuat', [
+                    'product_id' => $product->id,
+                    'product_name' => $product->name
                 ]);
 
-                // Record initial stock movement if there's stock
-                $initialStock = $productData['stock'] ?? 0;
-                if ($initialStock > 0) {
-                    StockMovement::create([
+                // Create default product unit
+                $productUnit = ProductUnit::create([
+                    'product_id' => $product->id,
+                    'unit_id' => $productData['unit_id'],
+                    'conversion_factor' => 1, // Base unit
+                    'purchase_price' => $productData['purchase_price'],
+                    'selling_price' => $productData['selling_price'],
+                    'is_default' => true
+                ]);
+
+                Log::info('Unit produk batch berhasil dibuat', [
+                    'product_unit_id' => $productUnit->id,
+                    'unit_id' => $productUnit->unit_id
+                ]);
+
+                // Record initial stock movement if needed
+                if ($productData['stock'] > 0) {
+                    $stockMovement = StockMovement::create([
                         'product_id' => $product->id,
                         'type' => 'in',
-                        'quantity' => $initialStock,
+                        'quantity' => $productData['stock'],
                         'before_stock' => 0,
-                        'after_stock' => $initialStock,
+                        'after_stock' => $productData['stock'],
                         'reference_type' => 'initial',
                         'reference_id' => $product->id,
-                        'notes' => 'Initial stock - Batch input'
+                        'notes' => 'Initial stock'
+                    ]);
+
+                    Log::info('Stock movement untuk batch berhasil dibuat', [
+                        'stock_movement_id' => $stockMovement->id,
+                        'quantity' => $stockMovement->quantity
                     ]);
                 }
 
-                $createdCount++;
-            } catch (\Exception $e) {
-                Log::error('Failed to create product in batch: ' . $e->getMessage());
-                // Continue with the next product
+                $createdProducts[] = $product;
             }
-        }
 
-        if ($createdCount > 0) {
+            DB::commit();
+            Log::info('Batch insert berhasil', [
+                'products_count' => count($createdProducts)
+            ]);
+
             return redirect()
                 ->route('products.index')
-                ->with('success', "Berhasil menambahkan $createdCount produk baru");
-        } else {
-            return back()->with('error', 'Gagal menambahkan produk. Silakan coba lagi.');
+                ->with('success', count($createdProducts) . ' produk berhasil ditambahkan');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            Log::error('Error saat melakukan batch insert: ' . $e->getMessage(), [
+                'line' => $e->getLine(),
+                'file' => $e->getFile(),
+                'trace' => $e->getTraceAsString()
+            ]);
+
+            return back()->withInput()->with('error', 'Gagal menambahkan produk batch: ' . $e->getMessage());
         }
     }
-    // public function store(Request $request)
-    // {
-    //     // Check if batch input
-    //     if ($request->input('is_batch')) {
-    //         return $this->storeBatch($request);
-    //     }
 
-    //     // Re-check if the code is unique before validating
-    //     $code = $request->input('code');
-    //     if (Product::withTrashed()->where('code', $code)->exists()) {
-    //         // Generate a new unique code
-    //         $today = date('Ymd');
-    //         $baseCode = 'PRD-' . $today . '-';
-    //         $lastProduct = Product::where('code', 'like', $baseCode . '%')
-    //             ->orderBy('code', 'desc')
-    //             ->first();
-
-    //         $lastNumber = $lastProduct ? (int) substr($lastProduct->code, -4) : 0;
-    //         $newNumber = $lastNumber + 1;
-    //         $newCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-
-    //         // Make sure new code is unique
-    //         while (Product::withTrashed()->where('code', $newCode)->exists()) {
-    //             $newNumber++;
-    //             $newCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-    //         }
-
-    //         // Replace the code in the request
-    //         $request->merge(['code' => $newCode]);
-    //     }
-
-    //     $validated = $request->validate([
-    //         'category_id' => 'required|exists:categories,id',
-    //         'name' => 'required|string|max:255',
-    //         'code' => 'required|string|unique:products,code,NULL,id,deleted_at,NULL',
-    //         'description' => 'nullable|string',
-    //         'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-    //         'purchase_price' => 'required|numeric|min:0',
-    //         'selling_price' => 'required|numeric|min:0',
-    //         'stock' => 'required|integer|min:0',
-    //         'min_stock' => 'required|integer|min:0',
-    //         'supplier_id' => 'nullable|exists:suppliers,id'
-    //     ]);
-
-    //     // Process image if uploaded
-    //     if ($request->hasFile('image')) {
-    //         $image = $request->file('image');
-    //         $imageName = time() . '_' . $image->getClientOriginalName();
-
-    //         // Make sure the directory exists
-    //         Storage::makeDirectory('public/products');
-
-    //         // Store the image with a consistent path
-    //         $image->storeAs('products', $imageName, 'public');
-    //         $validated['image_path'] = 'products/' . $imageName;
-    //     }
-
-    //     $product = Product::create($validated);
-
-    //     // Record initial stock movement
-    //     $initialStock = $validated['stock'];
-    //     if ($initialStock > 0) {
-    //         StockMovement::create([
-    //             'product_id' => $product->id,
-    //             'type' => 'in',
-    //             'quantity' => $initialStock,
-    //             'before_stock' => 0,
-    //             'after_stock' => $initialStock,
-    //             'reference_type' => 'initial',
-    //             'reference_id' => $product->id,
-    //             'notes' => 'Initial stock'
-    //         ]);
-    //     }
-
-    //     return redirect()
-    //         ->route('products.index')
-    //         ->with('success', 'Product created successfully');
-    // }
-
-    // public function storeBatch(Request $request)
-    // {
-    //     $supplierID = $request->input('supplier_id');
-    //     $products = $request->input('products', []);
-
-    //     if (empty($products)) {
-    //         return back()->with('error', 'No products were submitted');
-    //     }
-
-    //     $today = date('Ymd');
-    //     $baseCode = 'PRD-' . $today . '-';
-    //     $lastProduct = Product::withTrashed()->where('code', 'like', $baseCode . '%')
-    //         ->orderBy('code', 'desc')
-    //         ->first();
-
-    //     $lastNumber = $lastProduct ? (int) substr($lastProduct->code, -4) : 0;
-    //     $createdCount = 0;
-
-    //     foreach ($products as $index => $productData) {
-    //         // Skip empty rows
-    //         if (empty($productData['name'])) {
-    //             continue;
-    //         }
-
-    //         try {
-    //             // Generate a unique code for each product
-    //             $lastNumber++;
-    //             $code = $baseCode . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
-
-    //             // Make sure the code is unique
-    //             while (Product::withTrashed()->where('code', $code)->exists()) {
-    //                 $lastNumber++;
-    //                 $code = $baseCode . str_pad($lastNumber, 4, '0', STR_PAD_LEFT);
-    //             }
-
-    //             $productData['code'] = $code;
-    //             $productData['supplier_id'] = $supplierID;
-
-    //             // Process image if it exists
-    //             $imagePath = null;
-    //             if (isset($productData['image']) && $productData['image']) {
-    //                 $image = $productData['image'];
-    //                 $imageName = time() . '_' . $index . '_' . $image->getClientOriginalName();
-    //                 Storage::makeDirectory('public/products');
-    //                 $image->storeAs('products', $imageName, 'public');
-    //                 $imagePath = 'products/' . $imageName;
-    //             }
-
-    //             // Create the product
-    //             $product = Product::create([
-    //                 'category_id' => $productData['category_id'],
-    //                 'name' => $productData['name'],
-    //                 'code' => $code,
-    //                 'description' => $productData['description'] ?? null,
-    //                 'image_path' => $imagePath,
-    //                 'purchase_price' => $productData['purchase_price'],
-    //                 'selling_price' => $productData['selling_price'],
-    //                 'stock' => $productData['stock'] ?? 0,
-    //                 'min_stock' => $productData['min_stock'] ?? 0,
-    //                 'supplier_id' => $supplierID
-    //             ]);
-
-    //             // Record initial stock movement if there's stock
-    //             $initialStock = $productData['stock'] ?? 0;
-    //             if ($initialStock > 0) {
-    //                 StockMovement::create([
-    //                     'product_id' => $product->id,
-    //                     'type' => 'in',
-    //                     'quantity' => $initialStock,
-    //                     'before_stock' => 0,
-    //                     'after_stock' => $initialStock,
-    //                     'reference_type' => 'initial',
-    //                     'reference_id' => $product->id,
-    //                     'notes' => 'Initial stock - Batch input'
-    //                 ]);
-    //             }
-
-    //             $createdCount++;
-    //         } catch (\Exception $e) {
-    //             Log::error('Failed to create product in batch: ' . $e->getMessage());
-    //             // Continue with the next product
-    //         }
-    //     }
-
-    //     if ($createdCount > 0) {
-    //         return redirect()
-    //             ->route('products.index')
-    //             ->with('success', "Berhasil menambahkan $createdCount produk baru");
-    //     } else {
-    //         return back()->with('error', 'Gagal menambahkan produk. Silakan coba lagi.');
-    //     }
-    // }
     public function show(Product $product)
     {
         $product = Product::with(['category', 'stockMovements' => function ($query) {
@@ -418,65 +298,152 @@ class ProductController extends Controller
     public function edit(Product $product)
     {
         $categories = Category::all();
-        $suppliers = Supplier::orderBy('name')->get();
-        return view('products.edit', compact('product', 'suppliers', 'categories'));
-    }
+        $suppliers = Supplier::all();
+        $units = UnitOfMeasure::all();
+        $supplierId = $product->supplier_id;
 
+        // Load product units with their relationships
+        $product->load(['productUnits' => function ($query) {
+            $query->orderBy('is_default', 'desc');
+        }]);
+
+        return view('products.edit', compact('product', 'categories', 'suppliers', 'units', 'supplierId'));
+    }
     public function update(Request $request, Product $product)
     {
+        $request->validate([
+            'category_id' => 'required|exists:categories,id',
+            'supplier_id' => 'required|exists:suppliers,id',
+            'name' => 'required|string|max:255',
+            'code' => 'required|string|max:50|unique:products,code,' . $product->id,
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'units' => 'required|array|min:1',
+            'units.*.unit_id' => 'required|exists:unit_of_measures,id',
+            'units.*.conversion_factor' => 'required|numeric|min:1',
+            'units.*.purchase_price' => 'required|numeric|min:0',
+            'units.*.selling_price' => 'required|numeric|min:0',
+            'units.*.expire_date' => 'nullable|date',
+            'units.*.is_default' => 'nullable|boolean',
+        ]);
+
+        DB::beginTransaction();
         try {
-            $validated = $request->validate([
-                'category_id' => 'required|exists:categories,id',
-                'name' => 'required|string|max:255',
-                'code' => 'required|string|unique:products,code,' . $product->id,
-                'description' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'purchase_price' => 'required|numeric|min:0',
-                'selling_price' => 'required|numeric|min:0',
-                'min_stock' => 'required|integer|min:0',
-                'supplier_id' => 'nullable|exists:suppliers,id'
+            // Update product data
+            $product->update([
+                'category_id' => $request->category_id,
+                'supplier_id' => $request->supplier_id,
+                'name' => $request->name,
+                'code' => $request->code,
+                'description' => $request->description,
             ]);
 
-            // Create an array of fields to update
-            $dataToUpdate = [
-                'category_id' => $validated['category_id'],
-                'name' => $validated['name'],
-                'code' => $validated['code'],
-                'description' => $validated['description'],
-                'purchase_price' => $validated['purchase_price'],
-                'selling_price' => $validated['selling_price'],
-                'min_stock' => $validated['min_stock'],
-            ];
-
-            // Handle image upload separately
+            // Handle image upload
             if ($request->hasFile('image')) {
                 // Delete old image if exists
                 if ($product->image_path) {
-                    Storage::disk('public')->delete($product->image_path);
+                    Storage::delete($product->image_path);
                 }
 
-                $image = $request->file('image');
-                $imageName = time() . '_' . $image->getClientOriginalName();
-
-                // Make sure the directory exists
-                Storage::makeDirectory('public/products');
-
-                // Store with consistent path format
-                $image->storeAs('products', $imageName, 'public');
-                $dataToUpdate['image_path'] = 'products/' . $imageName;
+                $imagePath = $request->file('image')->store('products', 'public');
+                $product->update(['image_path' => $imagePath]);
             }
 
-            // Update product
-            $product->update($dataToUpdate);
+            // Handle product units
+            $existingUnitIds = [];
+            $hasDefaultUnit = false;
 
-            return redirect()
-                ->route('products.index')
-                ->with('success', 'Product updated successfully');
+            foreach ($request->units as $unitData) {
+                $unitData['is_default'] = isset($unitData['is_default']) ? true : false;
+
+                if ($unitData['is_default']) {
+                    $hasDefaultUnit = true;
+                }
+
+                if (isset($unitData['id'])) {
+                    // Update existing unit
+                    $productUnit = $product->productUnits()->find($unitData['id']);
+                    if ($productUnit) {
+                        $productUnit->update([
+                            'unit_id' => $unitData['unit_id'],
+                            'conversion_factor' => $unitData['conversion_factor'],
+                            'purchase_price' => $unitData['purchase_price'],
+                            'selling_price' => $unitData['selling_price'],
+                            'expire_date' => $unitData['expire_date'],
+                            'is_default' => $unitData['is_default'],
+                        ]);
+                        $existingUnitIds[] = $productUnit->id;
+                    }
+                } else {
+                    // Create new unit
+                    $productUnit = $product->productUnits()->create([
+                        'unit_id' => $unitData['unit_id'],
+                        'conversion_factor' => $unitData['conversion_factor'],
+                        'purchase_price' => $unitData['purchase_price'],
+                        'selling_price' => $unitData['selling_price'],
+                        'expire_date' => $unitData['expire_date'],
+                        'is_default' => $unitData['is_default'],
+                    ]);
+                    $existingUnitIds[] = $productUnit->id;
+                }
+            }
+
+            // If no default unit is set, set the first unit as default
+            if (!$hasDefaultUnit && count($request->units) > 0) {
+                $firstUnit = $product->productUnits()->whereIn('id', $existingUnitIds)->first();
+                if ($firstUnit) {
+                    $firstUnit->update(['is_default' => true]);
+                }
+            }
+
+            // Delete units that are no longer present
+            $product->productUnits()->whereNotIn('id', $existingUnitIds)->delete();
+
+            DB::commit();
+            return redirect()->route('products.index')->with('success', 'Produk berhasil diperbarui.');
         } catch (\Exception $e) {
-            // Log the error
-            Log::error('Error updating product: ' . $e->getMessage());
-            return back()->withInput()->with('error', 'Failed to update product: ' . $e->getMessage());
+            DB::rollBack();
+            return back()->with('error', 'Terjadi kesalahan saat memperbarui produk: ' . $e->getMessage());
         }
+    }
+
+    public function duplicate(Product $product)
+    {
+        $categories = Category::all();
+        $units = UnitOfMeasure::all();
+        $suppliers = Supplier::all();
+
+        // Generate kode produk baru
+        $today = date('Ymd');
+        $baseCode = 'PRD-' . $today . '-';
+        $lastProduct = Product::withTrashed()
+            ->where('code', 'like', $baseCode . '%')
+            ->orderBy('code', 'desc')
+            ->first();
+
+        $lastNumber = 0;
+        if ($lastProduct) {
+            $lastNumber = (int) substr($lastProduct->code, -4);
+        }
+
+        $newNumber = $lastNumber + 1;
+        $newCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+        // Duplikasi data produk
+        $duplicatedProduct = $product->replicate();
+        $duplicatedProduct->name = 'Copy of ' . $product->name;
+        $duplicatedProduct->code = $newCode;
+        $duplicatedProduct->stock = 0; // Reset stock
+        $duplicatedProduct->image_path = null; // Reset image
+
+        return view('products.create', [
+            'productTemplate' => $duplicatedProduct,
+            'categories' => $categories,
+            'units' => $units,
+            'suppliers' => $suppliers,
+            'productCode' => $newCode,
+            'productUnits' => $product->productUnits
+        ]);
     }
 
     public function destroy(Product $product)
@@ -560,7 +527,7 @@ class ProductController extends Controller
                         $q->where('name', 'like', "%{$search}%");
                     });
             })
-            ->latest()
+            ->orderBy('name', 'asc')
             ->take(10)
             ->get();
 
@@ -568,5 +535,63 @@ class ProductController extends Controller
             'status' => 'success',
             'data' => $products
         ]);
+    }
+    public function getUnits(Product $product)
+    {
+        return response()->json([
+            'stock' => $product->stock,
+            'units' => $product->productUnits->map(function ($unit) {
+                return [
+                    'id' => $unit->id,
+                    'unit_name' => $unit->unit->name,
+                    'unit_abbreviation' => $unit->unit->abbreviation,
+                    'selling_price' => $unit->selling_price,
+                    'conversion_factor' => $unit->conversion_factor,
+                    'is_default' => $unit->is_default
+                ];
+            })
+        ]);
+    }
+
+    /**
+     * Menampilkan form upload untuk import produk
+     */
+    public function importForm()
+    {
+        $categories = Category::all();
+        $suppliers = Supplier::all();
+        $units = UnitOfMeasure::all();
+
+        return view('products.import', compact('categories', 'suppliers', 'units'));
+    }
+
+    /**
+     * Memproses file import produk
+     */
+    public function importProcess(Request $request)
+    {
+        $request->validate([
+            'file' => 'required|mimes:xlsx,xls,csv|max:10240', // Max 10MB
+        ]);
+
+        try {
+            $import = new ProductsImport();
+            Excel::import($import, $request->file('file'));
+
+            return redirect()->route('products.index')
+                ->with('success', 'Produk berhasil diimport.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()]);
+        }
+    }
+
+    /**
+     * Download template Excel untuk import produk
+     */
+    public function downloadTemplate()
+    {
+        return Excel::download(new \App\Exports\ProductsTemplateExport(), 'template_import_produk.xlsx');
     }
 }

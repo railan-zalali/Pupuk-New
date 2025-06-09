@@ -20,57 +20,208 @@ class ReportController extends Controller
         return view('reports.index');
     }
 
-    public function sales(Request $request)
+    public function purchases(Request $request)
     {
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+        $suppliers = \App\Models\Supplier::orderBy('name')->get();
 
-        $sales = Sale::with(['user', 'customer'])
+        $purchases = Purchase::with(['supplier'])
             ->whereBetween('created_at', [$startDate, $endDate])
-            ->when($request->payment_method, function ($query, $method) {
-                $query->where('payment_method', $method);
-            })
             ->latest()
             ->get();
 
         $data = [
-            'sales' => $sales,
+            'purchases' => $purchases,
             'startDate' => $startDate,
             'endDate' => $endDate,
             'summary' => [
-                'total_sales' => $sales->count(),
-                'total_amount' => $sales->sum('total_amount'),
-                'average_sale' => $sales->avg('total_amount'),
-                'payment_methods' => $sales->groupBy('payment_method')
-                    ->map(fn($group) => $group->count())
+                'total_purchases' => $purchases->count(),
+                'total_amount' => $purchases->sum('total_amount'),
+                'average_purchase' => $purchases->avg('total_amount')
             ],
             'headers' => [
                 'Date' => 'date',
                 'Invoice' => 'invoice_number',
-                'Customer' => 'customer_name',
+                'Supplier' => 'supplier_name',
                 'Amount' => 'total_amount',
-                'Payment' => 'payment_method'
+                'Status' => 'status'
             ],
-            'items' => $sales
+            'items' => $purchases
         ];
 
         return $this->handleExport(
             $data,
-            'sales',
-            'sales_report_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d')
+            'purchases',
+            'purchase_report_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d')
         );
+    }
+
+    public function sales(Request $request)
+    {
+        try {
+            $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+            $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+
+            // Validate date range
+            if ($startDate > $endDate) {
+                return back()->with('error', 'Tanggal mulai tidak boleh lebih besar dari tanggal akhir');
+            }
+
+            // Optimize query with eager loading and specific columns
+            $sales = Sale::select([
+                'id',
+                'invoice_number',
+                'created_at',
+                'total_amount',
+                'payment_method',
+                'customer_id',
+                'user_id',
+                'deleted_at'
+            ])
+                ->with([
+                    'customer:id,nama',
+                    'user:id,nama',
+                    'saleDetails:id,sale_id,product_id,quantity,price,subtotal',
+                    'saleDetails.product:id,nama'
+                ])
+                ->whereBetween('created_at', [$startDate, $endDate])
+                ->when($request->payment_method, function ($query, $method) {
+                    $query->where('payment_method', $method);
+                })
+                ->latest()
+                ->get();
+
+            // Prepare chart data for sales by date
+            $salesChartData = $sales->groupBy(function ($sale) {
+                return $sale->created_at->format('d/m/Y');
+            })->map(function ($group) {
+                return $group->sum('total_amount');
+            });
+
+            // Calculate total products sold using collection methods
+            $totalProductsSold = $sales->sum(function ($sale) {
+                return $sale->saleDetails->sum('quantity');
+            });
+
+            $avgProductsPerTransaction = $sales->count() > 0
+                ? $totalProductsSold / $sales->count()
+                : 0;
+
+            $data = [
+                'sales' => $sales,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'salesChartData' => $salesChartData,
+                'summary' => [
+                    'total_sales' => $sales->count(),
+                    'total_amount' => $sales->sum('total_amount'),
+                    'average_sale' => $sales->count() > 0 ? $sales->sum('total_amount') / $sales->count() : 0,
+                    'payment_methods' => $sales->groupBy('payment_method')
+                        ->map(fn($group) => $group->count()),
+                    'total_products_sold' => $totalProductsSold,
+                    'avg_products_per_transaction' => round($avgProductsPerTransaction, 1)
+                ],
+                'headers' => [
+                    'Tanggal' => 'date',
+                    'Faktur' => 'invoice_number',
+                    'Pelanggan' => 'customer_name',
+                    'Total' => 'total_amount',
+                    'Pembayaran' => 'payment_method',
+                    'Status' => 'status'
+                ],
+                'items' => $sales
+            ];
+
+            return $this->handleExport(
+                $data,
+                'sales',
+                'sales_report_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d')
+            );
+        } catch (\Exception $e) {
+            Log::error('Sales Report Error: ' . $e->getMessage(), [
+                'file' => $e->getFile(),
+                'line' => $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+                'request_data' => $request->all()
+            ]);
+
+            return back()->with('error', 'Terjadi kesalahan saat memuat laporan: ' . $e->getMessage());
+        }
+    }
+
+    public function cashFlow(Request $request)
+    {
+        $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+        $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+
+        $cashBooks = \App\Models\CashBook::whereBetween('date', [$startDate, $endDate])
+            ->orderBy('date')
+            ->get();
+
+        $data = [
+            'cashBooks' => $cashBooks,
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'summary' => [
+                'total_income' => $cashBooks->where('type', 'income')->sum('amount'),
+                'total_expense' => $cashBooks->where('type', 'expense')->sum('amount'),
+                'net_flow' => $cashBooks->where('type', 'income')->sum('amount') - $cashBooks->where('type', 'expense')->sum('amount')
+            ]
+        ];
+
+        return view('reports.cash-flow', $data);
+    }
+
+    public function accounts(Request $request)
+    {
+        $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+        $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+
+        $purchases = Purchase::whereBetween('date', [$startDate, $endDate])
+            ->with('supplier')
+            ->get();
+
+        $sales = Sale::whereBetween('date', [$startDate, $endDate])
+            ->with('customer')
+            ->get();
+
+        $data = [
+            'startDate' => $startDate,
+            'endDate' => $endDate,
+            'payables' => $purchases->where('payment_status', '!=', 'paid'),
+            'receivables' => $sales->where('payment_status', '!=', 'paid'),
+            'summary' => [
+                'total_payables' => $purchases->where('payment_status', '!=', 'paid')->sum('remaining_amount'),
+                'total_receivables' => $sales->where('payment_status', '!=', 'paid')->sum('remaining_amount')
+            ]
+        ];
+
+        return view('reports.accounts', $data);
     }
 
     public function stock()
     {
+        // $products = Product::with('category')
+        //     ->withSum('purchaseDetails as total_purchased', 'quantity')
+        //     ->withSum('saleDetails as total_sold', 'quantity')
+        //     ->get()
+        //     ->map(function ($product) {
+        //         $product->stock_value = $product->stock * $product->purchase_price;
+        //         return $product;
+        //     });
         $products = Product::with('category')
             ->withSum('purchaseDetails as total_purchased', 'quantity')
             ->withSum('saleDetails as total_sold', 'quantity')
-            ->get()
-            ->map(function ($product) {
-                $product->stock_value = $product->stock * $product->purchase_price;
-                return $product;
-            });
+            ->paginate(20); // Add pagination here
+
+        $productsCollection = $products->getCollection()->map(function ($product) {
+            $product->stock_value = $product->stock * $product->purchase_price;
+            return $product;
+        });
+
+        // Replace the collection in the paginator with our modified collection
+        $products->setCollection($productsCollection);
 
         $data = [
             'products' => $products,

@@ -1,0 +1,130 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Warna background track */
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888; /* Warna scroll thumb */
+    border-radius: 10px;
+    transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Warna saat hover */
+}
+
+/* Style the Select2 container to match Tailwind inputs */
+.select2-container--tailwind {
+    @apply w-full;
+}
+
+/* Selection box */
+.select2-container--tailwind .select2-selection {
+    @apply block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
+    min-height: 38px;
+}
+
+/* Selection box when focused */
+.select2-container--tailwind.select2-container--focus .select2-selection {
+    @apply border-indigo-500 ring-2 ring-indigo-200 dark:ring-indigo-400;
+}
+
+/* Selection box text */
+.select2-container--tailwind .select2-selection__rendered {
+    @apply block px-3 py-2 text-gray-900 dark:text-gray-200;
+}
+
+/* Dropdown arrow */
+.select2-container--tailwind .select2-selection__arrow {
+    @apply absolute right-0 px-2 text-gray-400 dark:text-gray-300;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+/* Placeholder text */
+.select2-container--tailwind
+    .select2-selection--single
+    .select2-selection__placeholder {
+    @apply text-gray-500 dark:text-gray-400;
+}
+
+/* Dropdown panel */
+.select2-container--tailwind .select2-dropdown {
+    @apply mt-1 overflow-hidden rounded-md border border-gray-300 bg-white shadow-lg dark:border-gray-600 dark:bg-gray-800;
+}
+
+/* Search field */
+.select2-container--tailwind .select2-search--dropdown .select2-search__field {
+    @apply block w-full rounded-md border border-gray-300 px-3 py-2 focus:border-indigo-500 focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-200;
+}
+
+/* Option items */
+.select2-container--tailwind .select2-results__option {
+    @apply px-3 py-2 text-gray-900 dark:text-gray-200;
+}
+
+/* Highlighted option */
+.select2-container--tailwind
+    .select2-results__option--highlighted[aria-selected] {
+    @apply bg-indigo-600 text-white dark:bg-indigo-500;
+}
+
+/* Selected option */
+.select2-container--tailwind .select2-results__option[aria-selected="true"] {
+    @apply bg-indigo-100 dark:bg-indigo-900;
+}
+
+/* Disabled option */
+.select2-container--tailwind .select2-results__option[aria-disabled="true"] {
+    @apply text-gray-400 dark:text-gray-500;
+}
+
+/* Group headers */
+.select2-container--tailwind .select2-results__group {
+    @apply px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 dark:text-gray-300 dark:bg-gray-700;
+}
+
+.sidebar {
+    @apply bg-white dark:bg-gray-800 transition-all duration-300 ease-in-out fixed lg:static z-50;
+}
+
+.sidebar.collapsed {
+    @apply w-20;
+}
+
+.nav-group {
+    @apply mb-6 px-3;
+}
+
+.nav-title {
+    @apply text-xs font-semibold uppercase tracking-wider text-gray-500 dark:text-gray-400 px-3 mb-2;
+}
+
+.nav-item {
+    @apply flex items-center gap-3 px-3 py-2 rounded-lg text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700/50 transition-colors duration-200;
+}
+
+.nav-item.active {
+    @apply bg-indigo-50 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400 font-medium;
+}
+
+.nav-icon {
+    @apply text-xl flex-shrink-0;
+}
+
+.badge {
+    @apply px-2 py-0.5 text-xs font-medium rounded-full;
+}
+
+.badge-primary {
+    @apply bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400;
+}

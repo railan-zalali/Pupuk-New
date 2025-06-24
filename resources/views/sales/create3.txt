@@ -1,0 +1,830 @@
+<x-app-layout>
+    <div class="space-y-6">
+        <!-- Page Heading -->
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                <span class="inline-flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    {{ __('Buat Penjualan Baru') }}
+                </span>
+            </h2>
+        </div>
+
+        <!-- Error Messages -->
+        @if ($errors->any())
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Ada kesalahan dalam pengisian
+                            form:</h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <form action="{{ route('sales.store') }}" method="POST" id="saleForm">
+            @csrf
+
+            <!-- Section: Informasi Penjualan -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <h3
+                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Informasi Penjualan
+                </h3>
+
+                <input type="hidden" name="new_customer_name" id="new_customer_name">
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <x-input-label for="invoice_number" value="Nomor Faktur" />
+                        <x-text-input id="invoice_number" name="invoice_number" type="text"
+                            class="mt-1 block w-full bg-gray-50 dark:bg-gray-700" :value="$invoiceNumber" readonly />
+                    </div>
+
+                    <div>
+                        <x-input-label for="date" value="Tanggal" />
+                        <x-text-input id="date" name="date" type="date" class="mt-1 block w-full"
+                            :value="old('date', date('Y-m-d'))" required />
+                    </div>
+
+                    <div>
+                        <x-input-label for="customer_select" value="Nama Pelanggan" />
+                        <select id="customer_select" name="customer_id"
+                            class="select2 mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500">
+                            <option value="">-- Pilih Pelanggan atau Ketik Nama Baru --</option>
+                            @foreach ($customers as $customer)
+                                <option value="{{ $customer->id }}">{{ $customer->nama }} -
+                                    {{ $customer->kecamatan_nama }},
+                                    {{ $customer->kabupaten_nama }}</option>
+                            @endforeach
+                        </select>
+                        <div class="mt-1 text-xs text-gray-500">Pilih pelanggan yang ada atau ketik nama
+                            baru</div>
+                    </div>
+
+                    <div>
+                        <x-input-label for="payment_method" value="Metode Pembayaran" />
+                        <select id="payment_method" name="payment_method"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                            required>
+                            <option value="cash">Tunai</option>
+                            <option value="transfer">Transfer</option>
+                            <option value="credit">Kredit</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <x-input-label for="vehicle_type" value="Jenis Kendaraan" />
+                        <select id="vehicle_type" name="vehicle_type"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300">
+                            <option value="Truk">Truk</option>
+                            <option value="Pickup">Pickup</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <x-input-label for="vehicle_number" value="Nomor Kendaraan" />
+                        <x-text-input id="vehicle_number" name="vehicle_number" type="text"
+                            class="mt-1 block w-full" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Item Penjualan -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        Item Penjualan
+                    </h3>
+                    <button type="button" onclick="addItem()"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Item
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Produk
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Stok
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Satuan
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Jumlah
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Harga
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Subtotal
+                                </th>
+                                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Aksi
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="saleItems"
+                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section: Perhitungan -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <h3
+                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    Detail Pembayaran
+                </h3>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Kolom Kiri: Total dan Diskon -->
+                    <div class="space-y-4">
+                        <div class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                            <div class="grid gap-4">
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Total:</span>
+                                    <span id="totalAmount"
+                                        class="text-lg font-bold text-gray-900 dark:text-gray-100">Rp 0</span>
+                                </div>
+
+                                <div class="flex justify-between items-center">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Diskon:</span>
+                                    <div class="w-1/2">
+                                        <input type="number" name="discount" id="discount"
+                                            class="w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 text-right"
+                                            value="0" min="0" onchange="calculateFinalTotal()">
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-600">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Setelah
+                                        Diskon:</span>
+                                    <span id="finalAmount"
+                                        class="text-lg font-bold text-gray-900 dark:text-gray-100">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Kolom Kanan: Detail Pembayaran -->
+                    <div class="space-y-4">
+                        <!-- Pembayaran Kredit -->
+                        <div id="dp_container" class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Uang Muka (DP):</span>
+                                    <div class="flex space-x-2">
+                                        <input type="number" name="down_payment" id="down_payment"
+                                            class="w-32 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                            value="0" min="0" onchange="calculateRemainingAmount()">
+                                        <div class="flex space-x-1">
+                                            <button type="button" onclick="setDownPayment(50)"
+                                                class="px-2 py-1 text-xs font-medium text-white bg-blue-600 rounded hover:bg-blue-700">
+                                                50%
+                                            </button>
+                                            <button type="button" onclick="setDownPayment(75)"
+                                                class="px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700">
+                                                75%
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-600">
+                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Sisa
+                                        Hutang:</span>
+                                    <span id="remainingAmount"
+                                        class="text-lg font-bold text-gray-900 dark:text-gray-100">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Pembayaran Tunai -->
+                        <div id="cash-payment-section" class="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4">
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm text-gray-600 dark:text-gray-400">Jumlah Dibayar:</span>
+                                    <div class="flex space-x-2">
+                                        <input type="number" name="paid_amount" id="paid_amount"
+                                            class="w-32 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                                            value="0" min="0" onchange="calculateChange()">
+                                        <button type="button" onclick="setExactAmount()"
+                                            class="px-3 py-1 text-xs font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500">
+                                            Uang Pas
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div
+                                    class="flex justify-between items-center pt-2 border-t border-gray-200 dark:border-gray-600">
+                                    <span
+                                        class="text-sm font-medium text-gray-700 dark:text-gray-300">Kembalian:</span>
+                                    <span id="changeAmount"
+                                        class="text-lg font-bold text-gray-900 dark:text-gray-100">Rp 0</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Catatan -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <h3
+                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Catatan
+                </h3>
+
+                <textarea id="notes" name="notes" rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    placeholder="Tambahkan catatan transaksi jika diperlukan...">{{ old('notes') }}</textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="window.history.back()"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Batal
+                </button>
+                <button type="submit" name="save_as_draft" value="1"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Simpan sebagai Draft
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 border border-transparent rounded-md shadow-sm">
+                    Proses Transaksi
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @push('scripts')
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+    <script>
+        $(document).ready(function() {
+            // Initialize Select2 for customer select
+            initializeCustomerSelect();
+
+            // Initialize the first item row on page load if no items exist
+            if ($('#saleItems tr').length === 0) {
+                addItem();
+            } else {
+                // Initialize Select2 for existing item rows
+                $('#saleItems tr').each(function() {
+                    initializeProductSelect($(this));
+                });
+            }
+
+            // Update payment sections based on initial payment method
+            updatePaymentSections();
+
+            // Add input validations
+            addInputValidations();
+
+            // Event listeners
+            $('#payment_method').on('change', updatePaymentSections);
+            $('#discount').on('input', calculateFinalTotal);
+            $('#paid_amount').on('input', calculateChange);
+            $('#down_payment').on('input', calculateRemainingAmount);
+            $('#set_exact_amount').on('click', setExactAmount);
+            $('#set_dp_percentage_10').on('click', function() {
+                setDownPayment(10);
+            });
+            $('#set_dp_percentage_25').on('click', function() {
+                setDownPayment(25);
+            });
+            $('#set_dp_percentage_50').on('click', function() {
+                setDownPayment(50);
+            });
+            $('#add_item').on('click', addItem);
+
+            // Event delegation for dynamically added rows
+            $('#saleItems').on('change', 'select[name="product_id[]"]', function() {
+                updateProductInfo($(this));
+            });
+            $('#saleItems').on('change', 'select[name="unit_id[]"]', function() {
+                updatePrice($(this));
+            });
+            $('#saleItems').on('input', 'input[name="quantity[]"], input[name="selling_price[]"]', function() {
+                calculateSubtotal($(this).closest('tr'));
+            });
+            $('#saleItems').on('click', '.remove-item', function() {
+                removeItem($(this).closest('tr'));
+            });
+
+
+            // Form submission validation
+            $('#saleForm').on('submit', function(e) {
+                if (!validateForm()) {
+                    e.preventDefault();
+                }
+            });
+        });
+
+        function createItemRow() {
+            return `
+                <tr>
+                    <td class="px-6 py-4">
+                        <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                            <option value="">-- Pilih Produk --</option>
+                            @foreach ($products as $product)
+                                <option value="{{ $product->id }}" data-stock="{{ $product->stock }}">{{ $product->name }}</option>
+                            @endforeach
+                        </select>
+                    </td>
+                    <td class="px-6 py-4 stock-display text-gray-900 dark:text-gray-300">-</td>
+                    <td class="px-6 py-4">
+                        <select name="unit_id[]" required class="unit-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                            <option value="">-- Pilih Satuan --</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="number" name="quantity[]" required class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300" value="1" min="1">
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="number" name="selling_price[]" required class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300" value="0" min="0">
+                    </td>
+                    <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">Rp 0</td>
+                    <td class="px-6 py-4">
+                        <button type="button" class="remove-item text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">Hapus</button>
+                    </td>
+                </tr>
+            `;
+        }
+
+        function addItem() {
+            const tbody = $('#saleItems');
+            const newRow = $(createItemRow());
+            tbody.append(newRow);
+            initializeProductSelect(newRow);
+        }
+
+        function removeItem(row) {
+            const tbody = $('#saleItems');
+            if (tbody.children('tr').length > 1) {
+                // Destroy Select2 before removing the row
+                row.find('.product-select').select2('destroy');
+                row.remove();
+                calculateTotal();
+            } else {
+                alert('Minimal satu item harus ada');
+            }
+        }
+
+        function initializeProductSelect(row) {
+            try {
+                row.find('.product-select').select2({
+                    theme: 'tailwind',
+                    placeholder: 'Pilih Produk',
+                    width: '100%',
+                    dropdownParent: $('#saleItems').closest('.overflow-x-auto'),
+                    templateResult: formatProductOption,
+                    templateSelection: formatProductSelection
+                }).on('select2:open', function() {
+                    $('.select2-dropdown').addClass('dark:bg-gray-800 dark:border-gray-700');
+                    $('.select2-search__field').addClass('dark:bg-gray-800 dark:text-gray-300');
+                });
+            } catch (e) {
+                console.error('Error initializing Select2:', e);
+                // Fallback to native select if Select2 fails
+                row.find('.product-select').removeClass('select2-hidden-accessible').css('display', 'block')
+                    .next('.select2-container').remove();
+                row.find('.product-select').addClass('w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300');
+            }
+        }
+
+
+        function updateProductInfo(selectElement) {
+            const productId = selectElement.val();
+            const row = selectElement.closest('tr');
+            const unitSelect = row.find('select[name="unit_id[]"]');
+            const priceInput = row.find('input[name="selling_price[]"]');
+            const stockDisplay = row.find('.stock-display');
+
+            // Clear unit options
+            unitSelect.html('<option value="">-- Pilih Satuan --</option>');
+
+            if (productId) {
+                // Show loading indicator
+                stockDisplay.text('Loading...');
+
+                // Fetch product units via Fetch API
+                fetch(`/products/${productId}/units`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        // Update stock display
+                        stockDisplay.text(data.stock || '0');
+
+                        // Populate unit options
+                        if (data.units && data.units.length > 0) {
+                            data.units.forEach(unit => {
+                                const option = $('<option></option>');
+                                option.val(unit.id);
+                                option.text(`${unit.unit_name} (${unit.unit_abbreviation})`);
+                                option.data('price', unit.selling_price);
+                                option.data('conversionFactor', unit.conversion_factor);
+                                option.data('isDefault', unit.is_default ? "1" : "0");
+                                unitSelect.append(option);
+                            });
+
+                            // Select default unit if available
+                            const defaultUnit = unitSelect.find('option[data-is-default="1"]');
+                            if (defaultUnit.length) {
+                                defaultUnit.prop('selected', true);
+                                updatePrice(unitSelect);
+                            } else if (data.units.length > 0) {
+                                // Select the first unit if no default is set
+                                unitSelect.find('option:eq(1)').prop('selected', true);
+                                updatePrice(unitSelect);
+                            }
+                        } else {
+                            console.warn('No units found for product:', productId);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching product units:', error);
+                        stockDisplay.textContent = 'Error';
+                    });
+            } else {
+                stockDisplay.text('-');
+                priceInput.val(0);
+                calculateSubtotal(row);
+            }
+        }
+
+        function updatePrice(selectElement) {
+            const selectedOption = selectElement.find('option:selected');
+            const row = selectElement.closest('tr');
+            const priceInput = row.find('input[name="selling_price[]"]');
+
+            if (selectedOption.length && selectedOption.data('price') !== undefined) {
+                priceInput.val(selectedOption.data('price'));
+            } else {
+                priceInput.val(0);
+            }
+
+            calculateSubtotal(row);
+        }
+
+        function calculateSubtotal(row) {
+            const quantity = parseInt(row.find('input[name="quantity[]"]').val()) || 0;
+            const price = parseInt(row.find('input[name="selling_price[]"]').val()) || 0;
+            const subtotal = quantity * price;
+            row.find('.subtotal').text(formatRupiah(subtotal));
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            $('#saleItems .subtotal').each(function() {
+                const value = parseFloat($(this).text().replace('Rp ', '').replace(/\./g, '') || 0);
+                total += value;
+            });
+            $('#totalAmount').text(formatRupiah(total));
+            calculateFinalTotal(); // Recalculate final total after total changes
+        }
+
+        function calculateFinalTotal() {
+            const totalText = $('#totalAmount').text();
+            const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const discount = parseFloat($('#discount').val()) || 0;
+
+            // Calculate final total after discount
+            const finalTotal = Math.max(0, total - discount);
+            $('#finalAmount').text(formatRupiah(finalTotal));
+
+            // Update payment calculations based on payment method
+            const paymentMethod = $('#payment_method').val();
+            if (paymentMethod === 'credit') {
+                calculateRemainingAmount();
+            } else {
+                calculateChange();
+            }
+        }
+
+        function setExactAmount() {
+            const finalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            $('#paid_amount').val(finalTotal);
+            calculateChange();
+        }
+
+        function calculateChange() {
+            const finalText = $('#finalAmount').text(); // Use finalAmount
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const paid = parseFloat($('#paid_amount').val()) || 0;
+            const change = paid - finalTotal;
+            $('#changeAmount').text(formatRupiah(Math.max(0, change)));
+
+            // Validation for minimum paid amount
+            const submitButton = $('button[type="submit"]');
+            const paymentMethod = $('#payment_method').val();
+
+            if (paymentMethod !== 'credit' && paid < finalTotal) {
+                // Disable submit button only for non-credit transactions
+                submitButton.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            } else {
+                submitButton.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+            }
+        }
+
+        function calculateRemainingAmount() {
+            const finalTotalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalTotalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const dp = parseFloat($('#down_payment').val()) || 0;
+            const remaining = finalTotal - dp;
+
+            $('#remainingAmount').text(formatRupiah(Math.max(0, remaining)));
+
+            // Update hidden paid_amount field for backend processing (DP is considered paid amount for credit)
+            $('#paid_amount').val(dp);
+
+            // Validation: DP cannot exceed total
+            if (dp > finalTotal) {
+                alert('Uang muka tidak boleh melebihi total belanja');
+                $('#down_payment').val(finalTotal);
+                calculateRemainingAmount();
+            }
+        }
+
+        function setDownPayment(percentage) {
+            const finalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const downPaymentAmount = Math.round(finalTotal * percentage / 100);
+            $('#down_payment').val(downPaymentAmount);
+            calculateRemainingAmount();
+        }
+
+        function formatRupiah(number) {
+            // Remove decimals & format with thousand separator
+            return 'Rp ' + Math.round(number).toLocaleString('id-ID', {
+                maximumFractionDigits: 0,
+                currencyDisplay: 'symbol'
+            });
+        }
+
+        function addInputValidations() {
+            // Prevent negative values in all number inputs
+            $('input[type="number"]').each(function() {
+                $(this).on('input', function() {
+                    if (parseFloat($(this).val()) < 0) {
+                        $(this).val(0);
+                    }
+                });
+            });
+        }
+
+        function validateProductStock() {
+            let isValid = true;
+            $('#saleItems tr').each(function() {
+                const row = $(this);
+                const productSelect = row.find('select[name="product_id[]"]');
+                const quantityInput = row.find('input[name="quantity[]"]');
+                const selectedOption = productSelect.find('option:selected');
+
+                if (selectedOption.length && selectedOption.val()) {
+                    const availableStock = parseInt(selectedOption.data('stock')) || 0;
+                    const requestedQuantity = parseInt(quantityInput.val()) || 0;
+
+                    if (requestedQuantity > availableStock) {
+                        alert(
+                            `Stok tidak mencukupi untuk produk ${selectedOption.text()}. Tersedia: ${availableStock}`
+                        );
+                        isValid = false;
+                        return false; // Break .each loop
+                    }
+                }
+            });
+
+            return isValid;
+        }
+
+        function validateForm() {
+            const tbody = $('#saleItems');
+            if (tbody.children('tr').length === 0) {
+                alert('Tambahkan setidaknya satu item');
+                return false;
+            }
+
+            if (!validateProductStock()) {
+                return false;
+            }
+
+            const paymentMethod = $('#payment_method').val();
+            const finalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const paid = parseFloat($('#paid_amount').val()) || 0;
+
+            // Validation for paid amount for non-credit methods
+            if (paymentMethod !== 'credit' && paid < finalTotal) {
+                alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
+                return false;
+            }
+
+            // Validation for customer selection for credit payments
+            if (paymentMethod === 'credit') {
+                if (!$('#customer_select').val()) {
+                    alert('Transaksi kredit harus memilih pelanggan');
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        function updatePaymentSections() {
+            const paymentMethod = $('#payment_method').val();
+            const dpSection = $('#dp_container');
+            const cashSection = $('#cash-payment-section');
+            const submitButton = $('button[type="submit"]');
+            const paidAmountInput = $('#paid_amount');
+            const dpInput = $('#down_payment');
+
+            if (paymentMethod === 'credit') {
+                dpSection.removeClass('hidden');
+                cashSection.addClass('hidden');
+
+                // Reset values
+                dpInput.val('0');
+                paidAmountInput.val('0');
+
+                // Enable submit button for credit
+                submitButton.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+
+                // Check for customer selection
+                if (!$('#customer_select').val()) {
+                    // This validation is also in validateForm, but an early alert might be helpful
+                }
+
+                // Calculate remaining amount
+                calculateRemainingAmount();
+            } else {
+                dpSection.addClass('hidden');
+                cashSection.removeClass('hidden');
+
+                // Reset DP value
+                dpInput.val('0');
+
+                // Calculate change
+                calculateChange();
+            }
+        }
+
+        function initializeCustomerSelect() {
+    try {
+        $('#customer_select').select2({
+            theme: 'tailwind',
+            tags: true, // Allow creating new tags
+            placeholder: 'Pilih atau ketik nama pelanggan baru',
+            allowClear: true,
+            createTag: function(params) {
+                // Don't create a tag if input is empty
+                if ($.trim(params.term) === '') {
+                    return null;
+                }
+                return {
+                    id: 'new:' + params.term,
+                    text: params.term,
+                    newTag: true
+                }
+            },
+            templateResult: function(data) {
+                if (data.loading) return data.text;
+                const $container = $("<div class='select2-result-customer'></div>");
+                if (data.newTag) {
+                    $container.append(
+                        $("<div class='text-blue-600'><i class='fas fa-plus-circle mr-1'></i> Tambah pelanggan baru: " +
+                            data.text + "</div>")
+                    );
+                } else {
+                    $container.append($("<div>" + data.text + "</div>"));
+                }
+                return $container;
+            },
+            templateSelection: function(data) {
+                if (data.newTag) {
+                    return "Pelanggan Baru: " + data.text;
+                }
+                return data.text;
+            }
+        }).on('change', function(e) {
+            const selectedValue = $(this).val();
+            if (selectedValue && selectedValue.startsWith('new:')) {
+                const newCustomerName = selectedValue.substring(4);
+                $('#new_customer_name').val(newCustomerName);
+                $(this).next('.select2-container').find('.select2-selection').addClass('border-blue-500');
+            } else {
+                $('#new_customer_name').val('');
+                $(this).next('.select2-container').find('.select2-selection').removeClass('border-blue-500');
+            }
+        });
+    } catch (e) {
+        console.error('Error initializing customer Select2:', e);
+        // Fallback to native select
+        $('#customer_select').removeClass('select2-hidden-accessible').css('display', 'block')
+            .next('.select2-container').remove();
+        $('#customer_select').addClass('w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300');
+    }
+}
+
+
+        function formatProductOption(product) {
+            if (!product.id) return product.text;
+            const $option = $(product.element); // Get the original option element
+            const stock = $option.data('stock') || 0;
+
+            return $(`
+                <div class="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                    <div class="flex-1">
+                        <div class="font-medium text-gray-900 dark:text-gray-100">
+                            ${product.text}
+                        </div>
+                        <div class="grid grid-cols-2 gap-2 mt-1 text-sm">
+                            <div class="flex items-center text-gray-600 dark:text-gray-400">
+                                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                                </svg>
+                                <span>Stok: ${stock}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            `);
+        }
+
+        function formatProductSelection(product) {
+            if (!product.id) return product.text;
+            return $(`
+                <div class="flex items-center">
+                    <div class="font-medium text-gray-900 dark:text-gray-100">${product.text}</div>
+                </div>
+            `);
+        }
+    </script>
+@endpush
+
+</x-app-layout>

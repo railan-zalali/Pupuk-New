@@ -1,0 +1,163 @@
+<x-app-layout>
+    <div class="space-y-6">
+        <!-- Page Heading -->
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ __('Page Title') }}</h2>
+
+            <!-- Optional action buttons -->
+            <div class="flex items-center gap-3">
+                <button class="btn-secondary">
+                    <i class="ti ti-filter mr-1"></i> Filter
+                </button>
+                <button class="btn-primary">
+                    <i class="ti ti-plus mr-1"></i> Add New
+                </button>
+            </div>
+        </div>
+
+        <!-- Stats Cards Row -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Sales</p>
+                        <h3 class="text-2xl font-bold mt-1">Rp 12,345,678</h3>
+                        <p class="text-xs font-medium text-green-500 mt-1">
+                            <i class="ti ti-trending-up"></i> 12% from last month
+                        </p>
+                    </div>
+                    <div class="stat-icon bg-blue-50 dark:bg-blue-900/30 text-blue-500">
+                        <i class="ti ti-coin"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Orders</p>
+                        <h3 class="text-2xl font-bold mt-1">234</h3>
+                        <p class="text-xs font-medium text-green-500 mt-1">
+                            <i class="ti ti-trending-up"></i> 8% from last month
+                        </p>
+                    </div>
+                    <div class="stat-icon bg-purple-50 dark:bg-purple-900/30 text-purple-500">
+                        <i class="ti ti-shopping-cart"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Customers</p>
+                        <h3 class="text-2xl font-bold mt-1">567</h3>
+                        <p class="text-xs font-medium text-green-500 mt-1">
+                            <i class="ti ti-trending-up"></i> 5% from last month
+                        </p>
+                    </div>
+                    <div class="stat-icon bg-amber-50 dark:bg-amber-900/30 text-amber-500">
+                        <i class="ti ti-users"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div class="stat-card">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Products</p>
+                        <h3 class="text-2xl font-bold mt-1">789</h3>
+                        <p class="text-xs font-medium text-red-500 mt-1">
+                            <i class="ti ti-trending-down"></i> 3% from last month
+                        </p>
+                    </div>
+                    <div class="stat-icon bg-green-50 dark:bg-green-900/30 text-green-500">
+                        <i class="ti ti-box"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="p-6">
+                <!-- Content goes here -->
+                <p>Your content here...</p>
+            </div>
+        </div>
+
+        <!-- Data Table Example -->
+        <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm overflow-hidden">
+            <div class="border-b border-gray-200 dark:border-gray-700 px-6 py-4 flex items-center justify-between">
+                <h3 class="font-medium">Recent Orders</h3>
+                <button class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline">View All</button>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-900/50">
+                        <tr>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                ID</th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Customer</th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Date</th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Status</th>
+                            <th
+                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Amount</th>
+                            <th
+                                class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                                Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">#INV-001</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">John Doe</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">March 15, 2025</td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                <span
+                                    class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Completed</span>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm">Rp 1,250,000</td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-right space-x-2">
+                                <button class="text-blue-600 dark:text-blue-400 hover:text-blue-800"><i
+                                        class="ti ti-eye"></i></button>
+                                <button class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-800"><i
+                                        class="ti ti-edit"></i></button>
+                                <button class="text-red-600 dark:text-red-400 hover:text-red-800"><i
+                                        class="ti ti-trash"></i></button>
+                            </td>
+                        </tr>
+                        <!-- More rows... -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .btn-primary {
+            @apply flex items-center px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors;
+        }
+
+        .btn-secondary {
+            @apply flex items-center px-4 py-2 bg-white hover:bg-gray-50 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-700 dark:text-gray-200 border border-gray-300 dark:border-gray-600 rounded-lg text-sm font-medium transition-colors;
+        }
+
+        .stat-card {
+            @apply bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-100 dark:border-gray-700;
+        }
+
+        .stat-icon {
+            @apply w-12 h-12 rounded-lg flex items-center justify-center text-xl;
+        }
+    </style>
+</x-app-layout>

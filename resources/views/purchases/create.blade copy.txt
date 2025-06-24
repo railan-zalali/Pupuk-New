@@ -1,0 +1,319 @@
+<x-app-layout>
+    <div class="space-y-6">
+        <!-- Page Heading -->
+        <div class="flex items-center justify-between">
+            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                <span class="inline-flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
+                        viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    {{ __('Buat Pembelian Baru') }}
+                </span>
+            </h2>
+        </div>
+
+        @if ($errors->any())
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Ada kesalahan dalam pengisian
+                            form:</h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <ul class="list-disc pl-5 space-y-1">
+                                @foreach ($errors->all() as $error)
+                                    <li>{{ $error }}</li>
+                                @endforeach
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        <form action="{{ route('purchases.store') }}" method="POST" id="purchaseForm">
+            @csrf
+
+            <!-- Section: Informasi Pembelian -->
+            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                <h3
+                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    Informasi Pembelian
+                </h3>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                        <x-input-label for="invoice_number" value="Nomor Faktur" />
+                        <x-text-input id="invoice_number" name="invoice_number" type="text"
+                            class="mt-1 block w-full bg-gray-50 dark:bg-gray-700" :value="$invoiceNumber" readonly />
+                    </div>
+
+                    <div>
+                        <x-input-label for="date" value="Tanggal" />
+                        <x-text-input id="date" name="date" type="date" class="mt-1 block w-full"
+                            :value="old('date', date('Y-m-d'))" required />
+                    </div>
+
+                    <div>
+                        <x-input-label for="supplier_id" value="Supplier" />
+                        <select id="supplier_id" name="supplier_id"
+                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                            required>
+                            <option value="">Pilih Supplier</option>
+                            @foreach ($suppliers as $supplier)
+                                <option value="{{ $supplier->id }}"
+                                    {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
+                                    {{ $supplier->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section: Item Pembelian -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <div class="flex justify-between items-center mb-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                        </svg>
+                        Item Pembelian
+                    </h3>
+                    <button type="button" onclick="addItem()"
+                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                        </svg>
+                        Tambah Item
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                        <thead class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Produk
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Jumlah
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Harga
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Subtotal
+                                </th>
+                                <th
+                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                    Aksi
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody id="purchaseItems"
+                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                        </tbody>
+                        <tfoot class="bg-gray-50 dark:bg-gray-700">
+                            <tr>
+                                <td colspan="3"
+                                    class="px-6 py-4 text-right font-medium text-gray-500 dark:text-gray-400">Total:
+                                </td>
+                                <td class="px-6 py-4 font-bold text-gray-900 dark:text-gray-100" id="totalAmount">Rp 0
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Section: Catatan -->
+            <div
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 mt-6">
+                <h3
+                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                    Catatan
+                </h3>
+
+                <textarea id="notes" name="notes" rows="3"
+                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300"
+                    placeholder="Tambahkan catatan transaksi jika diperlukan...">{{ old('notes') }}</textarea>
+            </div>
+
+            <!-- Form Actions -->
+            <div class="flex justify-end space-x-3 mt-6">
+                <button type="button" onclick="window.history.back()"
+                    class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
+                    Batal
+                </button>
+                <button type="submit"
+                    class="px-4 py-2 text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 dark:bg-indigo-500 dark:hover:bg-indigo-600 border border-transparent rounded-md shadow-sm">
+                    Proses Pembelian
+                </button>
+            </div>
+        </form>
+    </div>
+
+    @push('scripts')
+        <script>
+            function createItemRow() {
+                return `
+                <tr>
+                    <td class="px-6 py-4">
+                        <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" onchange="updatePrice(this)">
+                            <option value="">Pilih Produk</option>
+                        </select>
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="number" name="quantity[]" required
+                            class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
+                            value="1" min="1" onchange="calculateSubtotal(this)">
+                    </td>
+                    <td class="px-6 py-4">
+                        <input type="number" name="purchase_price[]" required
+                            class="w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300"
+                            value="0" min="0" onchange="calculateSubtotal(this)">
+                    </td>
+                    <td class="px-6 py-4 subtotal text-gray-900 dark:text-gray-300">Rp 0</td>
+                    <td class="px-6 py-4">
+                        <button type="button" onclick="removeItem(this)"
+                            class="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300">
+                            Hapus
+                        </button>
+                    </td>
+                </tr>
+            `;
+            }
+
+            function updatePrice(select) {
+                const tr = select.closest('tr');
+                const priceInput = tr.querySelector('input[name="purchase_price[]"]');
+                const selectedOption = select.options[select.selectedIndex];
+                const price = selectedOption.dataset.price;
+                priceInput.value = price || 0;
+                calculateSubtotal(priceInput);
+            }
+
+            function calculateSubtotal(input) {
+                const tr = input.closest('tr');
+                const quantity = Math.max(1, Math.round(tr.querySelector('input[name="quantity[]"]').value || 0));
+                const price = Math.max(0, Math.round(tr.querySelector('input[name="purchase_price[]"]').value || 0));
+                const subtotal = quantity * price;
+                tr.querySelector('.subtotal').textContent = formatRupiah(subtotal);
+                calculateTotal();
+            }
+
+            function calculateTotal() {
+                const subtotals = document.querySelectorAll('.subtotal');
+                let total = 0;
+                subtotals.forEach(subtotal => {
+                    const value = subtotal.textContent.replace('Rp ', '').replace(/\./g, '');
+                    total += parseFloat(value) || 0;
+                });
+                document.getElementById('totalAmount').textContent = formatRupiah(total);
+            }
+
+            function formatRupiah(number) {
+                return 'Rp ' + Math.round(number).toLocaleString('id-ID');
+            }
+
+            function addItem() {
+                const tbody = document.getElementById('purchaseItems');
+                tbody.insertAdjacentHTML('beforeend', createItemRow());
+                const newRow = tbody.lastElementChild;
+                updateProductOptions(newRow.querySelector('select[name="product_id[]"]'));
+            }
+
+            function removeItem(button) {
+                const tbody = document.getElementById('purchaseItems');
+                if (tbody.children.length > 1) {
+                    button.closest('tr').remove();
+                    calculateTotal();
+                } else {
+                    alert('Minimal satu item harus ada');
+                }
+            }
+
+            function updateProductOptions(selectElement = null) {
+                const supplierId = document.getElementById('supplier_id').value;
+
+                if (!supplierId) {
+                    document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
+                        select.innerHTML = '<option value="">Pilih Produk</option>';
+                    });
+                    return;
+                }
+
+                fetch(`/purchases/products-by-supplier/${supplierId}`)
+                    .then(response => response.json())
+                    .then(products => {
+                        let optionsHtml = '<option value="">Pilih Produk</option>';
+                        products.forEach(product => {
+                            const supplierInfo = product.suppliers[0];
+                            const price = supplierInfo ? supplierInfo.pivot.purchase_price : 0;
+                            optionsHtml +=
+                                `<option value="${product.id}" data-price="${price}">${product.name}</option>`;
+                        });
+
+                        if (selectElement) {
+                            selectElement.innerHTML = optionsHtml;
+                        } else {
+                            document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
+                                select.innerHTML = optionsHtml;
+                            });
+                        }
+                    })
+                    .catch(error => console.error('Error fetching products:', error));
+            }
+
+            // Event Listeners
+            document.addEventListener('DOMContentLoaded', function() {
+                const supplierSelect = document.getElementById('supplier_id');
+                supplierSelect.addEventListener('change', function() {
+                    updateProductOptions();
+                });
+
+                // Add first item on page load
+                addItem();
+            });
+
+            // Prevent negative values in all number inputs
+            document.addEventListener('input', function(e) {
+                if (e.target.type === 'number') {
+                    if (parseFloat(e.target.value) < 0 || isNaN(e.target.value)) {
+                        e.target.value = 0;
+                    }
+                }
+            });
+        </script>
+    @endpush
+
+</x-app-layout>

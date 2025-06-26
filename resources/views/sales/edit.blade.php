@@ -716,7 +716,14 @@
                                 data.units.forEach(unit => {
                                     const option = $('<option></option>');
                                     option.val(unit.id);
-                                    option.text(`${unit.name} (${unit.abbreviation})`);
+
+                                    // Handle different possible unit data formats
+                                    const name = unit.name || (unit.unit && unit.unit.name) || unit.unit_name ||
+                                        'Unknown';
+                                    const abbreviation = unit.abbreviation || (unit.unit && unit.unit
+                                        .abbreviation) || unit.unit_abbreviation || '';
+
+                                    option.text(`${name} (${abbreviation})`);
                                     option.data('price', unit.selling_price);
 
                                     if (selectedUnit && selectedUnit == unit.id) {

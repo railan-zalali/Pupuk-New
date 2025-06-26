@@ -638,7 +638,7 @@ class SaleController extends Controller
 
         // Load draft with all necessary relationships
         $sale->load([
-            'saleDetails.product.units.unit',
+            'saleDetails.product',
             'saleDetails.productUnit.unit',
             'customer'
         ]);
@@ -649,12 +649,12 @@ class SaleController extends Controller
             $product = $detail->product;
             $requiredStock = $detail->base_quantity;
 
-            if ($product->stock < $requiredStock) {
+            if ($detail->productUnit) {
                 $stockIssues[] = [
                     'product' => $product->name,
                     'required' => $requiredStock,
                     'available' => $product->stock,
-                    'unit' => $detail->productUnit->unit->name
+                    'unit' =>  $detail->productUnit->load('unit'),
                 ];
             }
         }

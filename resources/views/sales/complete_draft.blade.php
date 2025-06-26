@@ -96,7 +96,13 @@
                                     <tr>
                                         <td class="px-4 py-3">{{ $detail->product->name }}</td>
                                         <td class="px-4 py-3">{{ $detail->quantity }}
-                                            {{ $detail->productUnit->unit->name }}</td>
+                                            {{ $detail->productUnit->unit->name ?? ($detail->productUnit->unit_name ?? 'N/A') }}
+                                        </td>
+                                        {{-- <td class="px-4 py-3">{{ $detail->quantity }}
+                                            {{ $detail->productUnit->unit->name }}
+                                            <td class="px-4 py-3">{{ $detail->quantity }} 
+    {{ $detail->productUnit->unit->name ?? $detail->productUnit->unit_name ?? 'N/A' }}</td>
+                                        </td> --}}
                                         <td class="px-4 py-3">Rp {{ number_format($detail->price, 0, ',', '.') }}</td>
                                         <td class="px-4 py-3">Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
                                         </td>

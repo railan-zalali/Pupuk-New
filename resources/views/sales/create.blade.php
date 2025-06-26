@@ -150,8 +150,7 @@
                                     </svg>
                                 </div>
                                 <select id="payment_method" name="payment_method"
-                                    class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                                    required>
+                                    class="pl-10 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
                                     <option value="cash">Tunai</option>
                                     <option value="transfer">Transfer</option>
                                     <option value="credit">Kredit</option>
@@ -677,13 +676,13 @@
                                     <span
                                         class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+A</span>
                                 </div>
-                                <div
+                                {{-- <div
                                     class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
                                     <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Scan
                                         barcode</span>
                                     <span
                                         class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+B</span>
-                                </div>
+                                </div> --}}
                                 <div
                                     class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
                                     <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Proses
@@ -717,10 +716,9 @@
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                 </button>
-                <div class="tooltip">Histori Pelanggan (Alt+H)</div>
             </div>
 
-            <div id="barcode-scan-button" class="tooltip-container">
+            {{-- <div id="barcode-scan-button" class="tooltip-container">
                 <button type="button" onclick="showBarcodeScanner()"
                     class="inline-flex items-center justify-center p-3 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
                     title="Scan Barcode (Alt+B)">
@@ -731,7 +729,7 @@
                     </svg>
                 </button>
                 <div class="tooltip">Scan Barcode (Alt+B)</div>
-            </div>
+            </div> --}}
 
             <div id="help-button" class="tooltip-container">
                 <button type="button"
@@ -743,7 +741,6 @@
                             d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
                 </button>
-                <div class="tooltip">Pintasan Keyboard</div>
             </div>
         </div>
 
@@ -752,6 +749,7 @@
         <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
         <script>
+            let isDraftSubmission = false;
             $(document).ready(function() {
                 // Initialize Select2 for customer select
                 initializeCustomerSelect();
@@ -827,16 +825,10 @@
                         e.preventDefault();
                         addItem();
                     }
-
-                    // Alt+B: Show barcode scanner
-                    if (e.altKey && e.which === 66) { // 'B' key
-                        e.preventDefault();
-                        showBarcodeScanner();
-                    }
-
                     // Alt+S: Submit form (process transaction)
                     if (e.altKey && e.which === 83) { // 'S' key
                         e.preventDefault();
+                        isDraftSubmission = false;
                         if (validateForm()) {
                             $('#saleForm').submit();
                         }
@@ -845,28 +837,60 @@
                     // Alt+D: Save as draft
                     if (e.altKey && e.which === 68) { // 'D' key
                         e.preventDefault();
-                        if (validateForm()) {
-                            $('button[name="save_as_draft"]').click();
-                        }
+                        isDraftSubmission = true;
+                        $('#payment_method').removeAttr('required');
+                        $('button[name="save_draft"]').click();
                     }
+                });
+
+                $('button[name="save_draft"]').on('click', function(e) {
+                    isDraftSubmission = true;
+                    // Temporarily remove HTML5 validation
+                    $('#payment_method').removeAttr('required');
+                    $('#date').removeAttr('required');
+                    $('input[name="quantity[]"]').removeAttr('required');
+                    $('input[name="selling_price[]"]').removeAttr('required');
+                    $('select[name="product_id[]"]').removeAttr('required');
+                    $('select[name="unit_id[]"]').removeAttr('required');
+                });
+
+                $('button[type="submit"]:not([name="save_draft"])').on('click', function(e) {
+                    isDraftSubmission = false;
+                    // Restore HTML5 validation
+                    $('#payment_method').attr('required', true);
+                    $('#date').attr('required', true);
+                    $('input[name="quantity[]"]').attr('required', true);
+                    $('input[name="selling_price[]"]').attr('required', true);
+                    $('select[name="product_id[]"]').attr('required', true);
+                    $('select[name="unit_id[]"]').attr('required', true);
                 });
 
                 // Form submission validation
                 $('#saleForm').on('submit', function(e) {
-                    if (!validateForm()) {
-                        e.preventDefault();
+                    if (isDraftSubmission) {
+                        // Only validate basic requirements for draft
+                        if (!validateDraftForm()) {
+                            e.preventDefault();
+                            return false;
+                        }
                     } else {
-                        // Show loading state
-                        const submitBtn = $(document.activeElement);
-                        const originalText = submitBtn.html();
-
-                        submitBtn.prop('disabled', true)
-                            .html(
-                                '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...'
-                            );
+                        if (!validateForm()) {
+                            e.preventDefault();
+                        }
                     }
+                    // Show loading state
+                    const submitBtn = $(document.activeElement);
+                    const originalText = submitBtn.html();
+
+                    submitBtn.prop('disabled', true)
+                        .html(
+                            '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...'
+                        );
                 });
 
+                $('#saleForm').on('reset', function() {
+                    isDraftSubmission = false;
+                });
                 // Show keyboard shortcuts notification on page load
                 setTimeout(() => {
                     showNotification('Gunakan Alt+H untuk melihat histori pembelian pelanggan', 'info');
@@ -880,6 +904,50 @@
                 // Initialize auto-save
                 initializeAutoSave();
             });
+
+            function validateForm() {
+                const tbody = $('#saleItems');
+                if (tbody.children('tr').length === 0) {
+                    alert('Tambahkan setidaknya satu item');
+                    return false;
+                }
+
+                // Skip stock validation for drafts
+                if (!isDraftSubmission && !validateProductStock()) {
+                    return false;
+                }
+
+                const paymentMethod = $('#payment_method').val();
+
+                // Only validate payment for non-draft submissions
+                if (!isDraftSubmission) {
+                    if (!paymentMethod) {
+                        alert('Pilih metode pembayaran');
+                        return false;
+                    }
+
+                    const finalText = $('#finalAmount').text();
+                    const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+                    const paid = parseFloat($('#paid_amount').val()) || 0;
+
+                    // Validation for paid amount for non-credit methods
+                    if (paymentMethod !== 'credit' && paid < finalTotal) {
+                        alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
+                        return false;
+                    }
+
+                    // Validation for customer selection for credit payments
+                    if (paymentMethod === 'credit') {
+                        if (!$('#customer_select').val()) {
+                            alert('Transaksi kredit harus memilih pelanggan');
+                            return false;
+                        }
+                    }
+                }
+
+                return true;
+            }
+
 
             // Auto-save functions
             function initializeAutoSave() {
@@ -1119,7 +1187,8 @@
                     row.find('.product-select').removeClass('select2-hidden-accessible').css('display', 'block')
                         .next('.select2-container').remove();
                     row.find('.product-select').addClass(
-                        'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300');
+                        'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                    );
                 }
             }
 
@@ -1168,7 +1237,8 @@
                                 stockDisplay.addClass(
                                     'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400');
                             } else {
-                                stockDisplay.addClass('bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
+                                stockDisplay.addClass(
+                                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
                             }
 
                             // Populate unit options
@@ -1290,7 +1360,8 @@
                             stockDisplay.addClass(
                                 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400');
                         } else {
-                            stockDisplay.addClass('bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
+                            stockDisplay.addClass(
+                                'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
                         }
                     }
                 });
@@ -1448,6 +1519,12 @@
             }
 
             function validateForm() {
+                // If draft submission, use simpler validation
+                if (isDraftSubmission) {
+                    return validateDraftForm();
+                }
+
+                // Existing validation code for completed transactions
                 const tbody = $('#saleItems');
                 if (tbody.children('tr').length === 0) {
                     alert('Tambahkan setidaknya satu item');
@@ -1563,7 +1640,8 @@
                         if (selectedValue && selectedValue.startsWith('new:')) {
                             const newCustomerName = selectedValue.substring(4);
                             $('#new_customer_name').val(newCustomerName);
-                            $(this).next('.select2-container').find('.select2-selection').addClass('border-blue-500');
+                            $(this).next('.select2-container').find('.select2-selection').addClass(
+                                'border-blue-500');
                         } else {
                             $('#new_customer_name').val('');
                             $(this).next('.select2-container').find('.select2-selection').removeClass(
@@ -1576,7 +1654,8 @@
                     $('#customer_select').removeClass('select2-hidden-accessible').css('display', 'block')
                         .next('.select2-container').remove();
                     $('#customer_select').addClass(
-                        'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300');
+                        'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                    );
                 }
             }
 
@@ -1616,123 +1695,123 @@
             }
 
             // Floating tooltips for keyboard shortcuts
-            function showBarcodeScanner() {
-                // Create a modal dialog for barcode input
-                const modalHtml = `
-                <div id="barcode-modal" class="fixed inset-0 overflow-y-auto z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-                    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 transition-opacity" aria-hidden="true"></div>
-                        <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
-                        <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
-                            <div>
-                                <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                                    </svg>
-                                </div>
-                                <div class="mt-3 text-center sm:mt-5">
-                                    <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100" id="modal-title">
-                                        Scan Barcode Produk
-                                    </h3>
-                                    <div class="mt-2">
-                                        <p class="text-sm text-gray-500 dark:text-gray-400">
-                                            Masukkan atau scan barcode produk untuk menambahkannya ke transaksi
-                                        </p>
-                                        <div class="mt-4">
-                                            <input type="text" id="barcode-input" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan barcode..." autofocus>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
-                                <button type="button" id="scan-barcode-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
-                                    Cari Produk
-                                </button>
-                                <button type="button" id="close-barcode-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
-                                    Batal
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                `;
+            // function showBarcodeScanner() {
+            //     // Create a modal dialog for barcode input
+            //     const modalHtml = `
+    //     <div id="barcode-modal" class="fixed inset-0 overflow-y-auto z-50" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    //         <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+    //             <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+    //             <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    //             <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg px-4 pt-5 pb-4 text-left shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full sm:p-6">
+    //                 <div>
+    //                     <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-indigo-100 dark:bg-indigo-900">
+    //                         <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    //                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
+    //                         </svg>
+    //                     </div>
+    //                     <div class="mt-3 text-center sm:mt-5">
+    //                         <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100" id="modal-title">
+    //                             Scan Barcode Produk
+    //                         </h3>
+    //                         <div class="mt-2">
+    //                             <p class="text-sm text-gray-500 dark:text-gray-400">
+    //                                 Masukkan atau scan barcode produk untuk menambahkannya ke transaksi
+    //                             </p>
+    //                             <div class="mt-4">
+    //                                 <input type="text" id="barcode-input" class="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" placeholder="Masukkan barcode..." autofocus>
+    //                             </div>
+    //                         </div>
+    //                     </div>
+    //                 </div>
+    //                 <div class="mt-5 sm:mt-6 sm:grid sm:grid-cols-2 sm:gap-3 sm:grid-flow-row-dense">
+    //                     <button type="button" id="scan-barcode-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:col-start-2 sm:text-sm">
+    //                         Cari Produk
+    //                     </button>
+    //                     <button type="button" id="close-barcode-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-700 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:col-start-1 sm:text-sm">
+    //                         Batal
+    //                     </button>
+    //                 </div>
+    //             </div>
+    //         </div>
+    //     </div>
+    //     `;
 
-                $('body').append(modalHtml);
+            //     $('body').append(modalHtml);
 
-                // Focus on the input field
-                setTimeout(() => {
-                    $('#barcode-input').focus();
-                }, 100);
+            //     // Focus on the input field
+            //     setTimeout(() => {
+            //         $('#barcode-input').focus();
+            //     }, 100);
 
-                // Handle the scan button click
-                $('#scan-barcode-btn').on('click', function() {
-                    const barcode = $('#barcode-input').val();
-                    if (barcode) {
-                        searchProductByBarcode(barcode);
-                    }
-                });
+            //     // Handle the scan button click
+            //     $('#scan-barcode-btn').on('click', function() {
+            //         const barcode = $('#barcode-input').val();
+            //         if (barcode) {
+            //             searchProductByBarcode(barcode);
+            //         }
+            //     });
 
-                // Handle Enter key press in the input field
-                $('#barcode-input').on('keydown', function(e) {
-                    if (e.which === 13) { // Enter key
-                        e.preventDefault();
-                        const barcode = $(this).val();
-                        if (barcode) {
-                            searchProductByBarcode(barcode);
-                        }
-                    }
-                });
+            //     // Handle Enter key press in the input field
+            //     $('#barcode-input').on('keydown', function(e) {
+            //         if (e.which === 13) { // Enter key
+            //             e.preventDefault();
+            //             const barcode = $(this).val();
+            //             if (barcode) {
+            //                 searchProductByBarcode(barcode);
+            //             }
+            //         }
+            //     });
 
-                // Close modal when close button is clicked
-                $('#close-barcode-btn').on('click', function() {
-                    $('#barcode-modal').remove();
-                });
+            //     // Close modal when close button is clicked
+            //     $('#close-barcode-btn').on('click', function() {
+            //         $('#barcode-modal').remove();
+            //     });
 
-                // Close modal when clicking outside
-                $(document).on('click', '#barcode-modal', function(e) {
-                    if ($(e.target).closest('.sm\\:max-w-lg').length === 0) {
-                        $('#barcode-modal').remove();
-                    }
-                });
-            }
+            //     // Close modal when clicking outside
+            //     $(document).on('click', '#barcode-modal', function(e) {
+            //         if ($(e.target).closest('.sm\\:max-w-lg').length === 0) {
+            //             $('#barcode-modal').remove();
+            //         }
+            //     });
+            // }
 
-            function searchProductByBarcode(barcode) {
-                // Show loading indicator
-                $('#barcode-input').prop('disabled', true);
-                $('#scan-barcode-btn').html(
-                    '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Mencari...'
-                );
+            // function searchProductByBarcode(barcode) {
+            //     // Show loading indicator
+            //     $('#barcode-input').prop('disabled', true);
+            //     $('#scan-barcode-btn').html(
+            //         '<svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Mencari...'
+            //     );
 
-                // Simulate a search (replace with actual API call)
-                // Here you would typically make an AJAX call to search for the product by barcode
-                fetch(`/products/find-by-barcode?barcode=${barcode}`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Product not found');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        if (data && data.id) {
-                            // Close the modal
-                            $('#barcode-modal').remove();
+            //     // Simulate a search (replace with actual API call)
+            //     // Here you would typically make an AJAX call to search for the product by barcode
+            //     fetch(`/products/find-by-barcode?barcode=${barcode}`)
+            //         .then(response => {
+            //             if (!response.ok) {
+            //                 throw new Error('Product not found');
+            //             }
+            //             return response.json();
+            //         })
+            //         .then(data => {
+            //             if (data && data.id) {
+            //                 // Close the modal
+            //                 $('#barcode-modal').remove();
 
-                            // Add the product to the sale
-                            addProductToSale(data);
+            //                 // Add the product to the sale
+            //                 addProductToSale(data);
 
-                            // Show success notification
-                            showNotification(`Produk ${data.name} berhasil ditambahkan`, 'success');
-                        } else {
-                            throw new Error('Product not found');
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error finding product by barcode:', error);
-                        $('#barcode-input').prop('disabled', false);
-                        $('#scan-barcode-btn').text('Cari Produk');
-                        showNotification('Produk tidak ditemukan', 'error');
-                    });
-            }
+            //                 // Show success notification
+            //                 showNotification(`Produk ${data.name} berhasil ditambahkan`, 'success');
+            //             } else {
+            //                 throw new Error('Product not found');
+            //             }
+            //         })
+            //         .catch(error => {
+            //             console.error('Error finding product by barcode:', error);
+            //             $('#barcode-input').prop('disabled', false);
+            //             $('#scan-barcode-btn').text('Cari Produk');
+            //             showNotification('Produk tidak ditemukan', 'error');
+            //         });
+            // }
 
             function addProductToSale(product) {
                 // Add a new row if needed
@@ -1857,7 +1936,8 @@
                     .catch(error => {
                         console.error('Error fetching customer history:', error);
                         $('#customer-history-loading').addClass('hidden');
-                        $('#customer-history-info').text('Terjadi kesalahan saat mengambil histori. Silakan coba lagi.');
+                        $('#customer-history-info').text(
+                            'Terjadi kesalahan saat mengambil histori. Silakan coba lagi.');
                     });
             }
 
@@ -2005,7 +2085,8 @@
                             const row = $('#saleItems tr:last');
 
                             // Pilih produk
-                            row.find('select[name="product_id[]"]').val(detail.product_id).trigger('change');
+                            row.find('select[name="product_id[]"]').val(detail.product_id).trigger(
+                                'change');
 
                             // Tambahkan handler untuk memilih unit dan jumlah setelah produk dimuat
                             const checkUnitLoaded = setInterval(() => {
@@ -2017,8 +2098,9 @@
                                     unitSelect.val(detail.product_unit_id).trigger('change');
 
                                     // Set jumlah
-                                    row.find('input[name="quantity[]"]').val(detail.quantity).trigger(
-                                        'input');
+                                    row.find('input[name="quantity[]"]').val(detail.quantity)
+                                        .trigger(
+                                            'input');
                                 }
                             }, 100);
                         });
@@ -2080,7 +2162,8 @@
                     // Hapus kelas setelah animasi
                     setTimeout(() => {
                         existingRow.removeClass('bg-yellow-50 dark:bg-yellow-900/20')
-                            .find('.subtotal').removeClass('animate-pulse text-indigo-700 dark:text-indigo-400');
+                            .find('.subtotal').removeClass(
+                                'animate-pulse text-indigo-700 dark:text-indigo-400');
                     }, 1000);
                 } else {
                     // Jika produk belum ada, tambahkan baris baru

@@ -158,6 +158,8 @@ Route::middleware('auth')->group(function () {
         Route::post('/sales/auto-save-draft', [SaleController::class, 'autoSaveDraft'])->name('sales.auto-save-draft');
         Route::get('sales/credit', [SaleController::class, 'creditSales'])->name('sales.credit');
         Route::get('sales/drafts', [SaleController::class, 'drafts'])->name('sales.drafts');
+        Route::get('/sales/{sale}/complete-draft', [SaleController::class, 'completeDraft'])
+            ->name('sales.complete-draft');
 
 
         Route::get('/products/{product}/get', [SaleController::class, 'getProduct'])->name('products.get');

@@ -11,93 +11,49 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Cache;
 
-class DraftService
+class DraftSaleService
 {
     /**
-     * Auto-save a draft sale
+     * Auto-save draft sale
      */
-    public function autoSave(array $data): array
+    public function autoSaveDraft(array $data): array
     {
         try {
             DB::beginTransaction();
 
-            $saleId = $data['sale_id'] ?? null;
-            $totalAmount = collect($data['items'])->sum(function ($item) {
-                return $item['quantity'] * $item['selling_price'];
-            });
+            // Validate minimum requirements
+            $this->validateAutoSaveData($data);
 
-            if ($saleId) {
-                // Update existing draft
-                $sale = Sale::find($saleId);
-                if (!$sale || !$sale->isDraft()) {
-                    throw new \Exception('Draft tidak ditemukan atau sudah diselesaikan');
-                }
+            // Calculate totals
+            $totals = $this->calculateTotalsFromItems($data['items'], $data['discount'] ?? 0);
 
-                $sale->update([
-                    'total_amount' => $totalAmount,
-                    'discount' => $data['discount'] ?? 0,
-                    'customer_id' => $data['customer_id'] ?? null,
-                    'notes' => $data['notes'] ?? null,
-                    'vehicle_type' => $data['vehicle_type'] ?? null,
-                    'vehicle_number' => $data['vehicle_number'] ?? null,
-                    'payment_method' => $data['payment_method'] ?? 'cash',
-                    'updated_at' => now(),
-                ]);
-
-                // Update items
-                $sale->saleDetails()->delete();
+            if (!empty($data['draft_id'])) {
+                $sale = $this->updateExistingDraft($data['draft_id'], $data, $totals);
             } else {
-                // Create new draft
-                $sale = Sale::create([
-                    'invoice_number' => $data['invoice_number'],
-                    'date' => now(),
-                    'customer_id' => $data['customer_id'] ?? null,
-                    'user_id' => auth()->id(),
-                    'payment_method' => $data['payment_method'] ?? 'cash',
-                    'payment_status' => 'pending',
-                    'status' => 'draft',
-                    'total_amount' => $totalAmount,
-                    'discount' => $data['discount'] ?? 0,
-                    'paid_amount' => 0,
-                    'down_payment' => 0,
-                    'remaining_amount' => $totalAmount - ($data['discount'] ?? 0),
-                    'change_amount' => 0,
-                    'notes' => $data['notes'] ?? null,
-                    'vehicle_type' => $data['vehicle_type'] ?? null,
-                    'vehicle_number' => $data['vehicle_number'] ?? null,
-                ]);
+                $sale = $this->createNewDraft($data, $totals);
             }
 
-            // Save items
-            foreach ($data['items'] as $item) {
-                $productUnit = ProductUnit::findOrFail($item['unit_id']);
-                $baseQuantity = $item['quantity'] * $productUnit->conversion_factor;
-
-                $sale->saleDetails()->create([
-                    'product_id' => $item['product_id'],
-                    'product_unit_id' => $productUnit->id,
-                    'unit_id' => $productUnit->unit_id,
-                    'quantity' => $item['quantity'],
-                    'base_quantity' => $baseQuantity,
-                    'price' => $item['selling_price'],
-                    'subtotal' => $item['quantity'] * $item['selling_price'],
-                ]);
-            }
+            // Update sale details
+            $this->updateDraftSaleDetails($sale, $data['items']);
 
             DB::commit();
 
-            // Clear draft caches
-            $this->clearDraftCaches();
+            // Clear relevant caches
+            Cache::forget('draft_sales_page_1');
 
             return [
                 'success' => true,
-                'sale_id' => $sale->id,
                 'message' => 'Draft berhasil disimpan otomatis',
-                'saved_at' => now()->format('H:i:s')
+                'draft_id' => $sale->id,
+                'saved_at' => now()->format('H:i:s'),
+                'expires_at' => $sale->created_at->addDays(30)->format('Y-m-d H:i:s')
             ];
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Auto-save Draft Error: ' . $e->getMessage());
+            Log::error('Auto-save draft error: ' . $e->getMessage(), [
+                'data' => $data,
+                'user_id' => auth()->id()
+            ]);
 
             return [
                 'success' => false,
@@ -107,408 +63,523 @@ class DraftService
     }
 
     /**
-     * Load a draft for editing
+     * Complete a draft sale
      */
-    public function loadDraft(int $draftId): array
+    public function completeDraft(Sale $draft, array $data): array
     {
-        $sale = Sale::with(['saleDetails.product', 'saleDetails.productUnit.unit', 'customer'])
-            ->where('id', $draftId)
-            ->where('status', 'draft')
-            ->first();
-
-        if (!$sale) {
-            throw new \Exception('Draft tidak ditemukan');
-        }
-
-        return [
-            'sale' => $sale,
-            'items' => $sale->saleDetails->map(function ($detail) {
-                return [
-                    'product_id' => $detail->product_id,
-                    'product_name' => $detail->product->name,
-                    'unit_id' => $detail->product_unit_id,
-                    'unit_name' => $detail->productUnit->unit->name,
-                    'quantity' => $detail->quantity,
-                    'selling_price' => $detail->price,
-                    'subtotal' => $detail->subtotal,
-                ];
-            })
-        ];
-    }
-
-    /**
-     * Duplicate a draft
-     */
-    public function duplicateDraft(int $draftId): array
-    {
-        $draft = Sale::with('saleDetails')->where('id', $draftId)->where('status', 'draft')->first();
-
-        if (!$draft) {
-            throw new \Exception('Draft tidak ditemukan');
-        }
-
         try {
+            if (!$draft->isDraft()) {
+                throw new \Exception('Sale ini bukan draft');
+            }
+
+            if ($draft->isExpired()) {
+                throw new \Exception('Draft sudah expired');
+            }
+
             DB::beginTransaction();
 
-            // Generate new invoice number
-            $newInvoiceNumber = $this->generateInvoiceNumber();
+            // Validate stock availability
+            $this->validateStockAvailability($data);
 
-            // Create duplicate draft
-            $newDraft = Sale::create([
-                'invoice_number' => $newInvoiceNumber,
-                'date' => now(),
-                'customer_id' => $draft->customer_id,
-                'user_id' => auth()->id(),
-                'payment_method' => $draft->payment_method,
-                'payment_status' => 'pending',
-                'status' => 'draft',
-                'total_amount' => $draft->total_amount,
-                'discount' => $draft->discount,
-                'paid_amount' => 0,
-                'down_payment' => 0,
-                'remaining_amount' => $draft->total_amount - $draft->discount,
-                'change_amount' => 0,
-                'notes' => $draft->notes ? 'Copy: ' . $draft->notes : 'Duplikasi dari ' . $draft->invoice_number,
-                'vehicle_type' => $draft->vehicle_type,
-                'vehicle_number' => $draft->vehicle_number,
-            ]);
+            // Calculate totals and payment
+            $totals = $this->calculateTotals($data);
+            $paymentData = $this->calculatePaymentData($data, $totals);
 
-            // Duplicate sale details
-            foreach ($draft->saleDetails as $detail) {
-                $newDraft->saleDetails()->create([
-                    'product_id' => $detail->product_id,
-                    'product_unit_id' => $detail->product_unit_id,
-                    'unit_id' => $detail->unit_id,
-                    'quantity' => $detail->quantity,
-                    'base_quantity' => $detail->base_quantity,
-                    'price' => $detail->price,
-                    'subtotal' => $detail->subtotal,
-                ]);
-            }
+            // Handle customer
+            $customerId = $this->handleCustomer($data);
+
+            // Update the draft to completed
+            $this->updateDraftToCompleted($draft, $data, $customerId, $totals, $paymentData);
+
+            // Update sale details and stock
+            $this->updateSaleDetailsAndStock($draft, $data, true);
 
             DB::commit();
 
-            // Clear draft caches
-            $this->clearDraftCaches();
+            // Clear caches
+            $this->clearRelevantCaches($draft, $paymentData);
 
             return [
                 'success' => true,
-                'message' => 'Draft berhasil diduplikasi',
-                'new_draft_id' => $newDraft->id,
-                'new_invoice_number' => $newInvoiceNumber
+                'message' => 'Draft berhasil diselesaikan',
+                'sale_id' => $draft->id
             ];
         } catch (\Exception $e) {
             DB::rollBack();
-            Log::error('Duplicate draft error: ' . $e->getMessage());
-            throw $e;
+            Log::error('Complete draft error: ' . $e->getMessage(), [
+                'draft_id' => $draft->id,
+                'data' => $data,
+                'user_id' => auth()->id()
+            ]);
+
+            return [
+                'success' => false,
+                'message' => 'Gagal menyelesaikan draft: ' . $e->getMessage()
+            ];
         }
     }
 
     /**
-     * Bulk complete drafts
+     * Clean expired drafts
      */
-    public function bulkComplete(array $draftIds): array
+    public function cleanExpiredDrafts(int $days = 30): array
     {
-        $drafts = Sale::whereIn('id', $draftIds)
-            ->where('status', 'draft')
-            ->with(['saleDetails.product', 'saleDetails.productUnit'])
-            ->get();
-
-        if ($drafts->count() !== count($draftIds)) {
-            throw new \Exception('Beberapa transaksi yang dipilih bukan draft atau tidak ditemukan');
-        }
-
-        $completedCount = 0;
-        $failedDrafts = [];
-        $errors = [];
-
-        DB::beginTransaction();
-
         try {
-            foreach ($drafts as $draft) {
-                try {
-                    // Validate stock for each draft
-                    $stockValidation = $this->validateDraftStock($draft);
-                    if (!$stockValidation['valid']) {
-                        $failedDrafts[] = $draft->invoice_number;
-                        $errors[] = $stockValidation['message'];
-                        continue;
-                    }
+            $expiredDrafts = Sale::expiredDrafts($days)->get();
 
-                    // Complete the draft
-                    $this->completeDraft($draft);
-                    $completedCount++;
+            if ($expiredDrafts->isEmpty()) {
+                return [
+                    'success' => true,
+                    'message' => 'Tidak ada draft yang expired',
+                    'deleted_count' => 0
+                ];
+            }
+
+            $deletedCount = 0;
+
+            foreach ($expiredDrafts as $draft) {
+                try {
+                    $draft->saleDetails()->delete();
+                    $draft->forceDelete();
+                    $deletedCount++;
                 } catch (\Exception $e) {
-                    $failedDrafts[] = $draft->invoice_number;
-                    $errors[] = "Draft {$draft->invoice_number}: " . $e->getMessage();
-                    Log::error('Error completing draft in bulk operation', [
-                        'draft_id' => $draft->id,
-                        'error' => $e->getMessage()
-                    ]);
+                    Log::error("Failed to delete expired draft {$draft->id}: " . $e->getMessage());
                 }
             }
 
-            if ($completedCount === 0) {
-                throw new \Exception('Tidak ada draft yang berhasil diselesaikan. ' . implode('; ', $errors));
-            }
-
-            DB::commit();
-
             // Clear caches
-            $this->clearDraftCaches();
-            $this->clearSalesCaches();
+            Cache::flush(); // More aggressive cache clearing for cleanup
 
-            $message = "Berhasil menyelesaikan {$completedCount} draft";
-            if (count($failedDrafts) > 0) {
-                $message .= ". Gagal: " . implode(', ', $failedDrafts);
-            }
-
-            return [
-                'success' => true,
-                'message' => $message,
-                'completed_count' => $completedCount,
-                'failed_count' => count($failedDrafts),
-                'failed_drafts' => $failedDrafts
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    /**
-     * Bulk delete drafts
-     */
-    public function bulkDelete(array $draftIds): array
-    {
-        $drafts = Sale::whereIn('id', $draftIds)
-            ->where('status', 'draft')
-            ->get();
-
-        if ($drafts->count() !== count($draftIds)) {
-            throw new \Exception('Beberapa transaksi yang dipilih bukan draft atau tidak ditemukan');
-        }
-
-        DB::beginTransaction();
-
-        try {
-            foreach ($drafts as $draft) {
-                // Delete sale details first
-                $draft->saleDetails()->delete();
-
-                // Delete the draft
-                $draft->delete();
-            }
-
-            DB::commit();
-
-            // Clear relevant caches
-            $this->clearDraftCaches();
-
-            return [
-                'success' => true,
-                'message' => "Berhasil menghapus {$drafts->count()} draft",
-                'deleted_count' => $drafts->count()
-            ];
-        } catch (\Exception $e) {
-            DB::rollBack();
-            throw $e;
-        }
-    }
-
-    /**
-     * Clean up old drafts
-     */
-    public function cleanupOldDrafts(int $daysOld = 30): array
-    {
-        $cutoffDate = now()->subDays($daysOld);
-
-        $oldDrafts = Sale::where('status', 'draft')
-            ->where('created_at', '<', $cutoffDate)
-            ->get();
-
-        DB::beginTransaction();
-
-        try {
-            $deletedCount = 0;
-            foreach ($oldDrafts as $draft) {
-                $draft->saleDetails()->delete();
-                $draft->delete();
-                $deletedCount++;
-            }
-
-            DB::commit();
-
-            // Clear caches
-            $this->clearDraftCaches();
-
-            Log::info('Old drafts cleanup completed', [
-                'days_old' => $daysOld,
-                'deleted_count' => $deletedCount
+            Log::info("Expired drafts cleanup completed", [
+                'deleted_count' => $deletedCount,
+                'total_found' => $expiredDrafts->count(),
+                'days' => $days
             ]);
 
             return [
                 'success' => true,
-                'deleted_count' => $deletedCount,
-                'message' => "Berhasil membersihkan {$deletedCount} draft lama"
+                'message' => "Berhasil menghapus {$deletedCount} draft yang expired",
+                'deleted_count' => $deletedCount
             ];
         } catch (\Exception $e) {
-            DB::rollBack();
-            Log::error('Cleanup old drafts error: ' . $e->getMessage());
-            throw $e;
+            Log::error('Clean expired drafts error: ' . $e->getMessage());
+
+            return [
+                'success' => false,
+                'message' => 'Gagal membersihkan draft expired: ' . $e->getMessage()
+            ];
         }
     }
 
     /**
      * Get draft statistics
      */
-    public function getStatistics(): array
+    public function getDraftStatistics(): array
     {
-        $cacheKey = 'draft_statistics';
+        $totalDrafts = Sale::drafts()->count();
+        $expiringSoon = Sale::expiringSoon(3)->count();
+        $expired = Sale::expiredDrafts()->count();
+        $withStockIssues = 0;
 
-        return Cache::remember($cacheKey, 300, function () {
-            $today = now()->startOfDay();
-            $weekAgo = now()->subDays(7);
-
-            $drafts = Sale::where('status', 'draft')->get();
-
-            return [
-                'total_drafts' => $drafts->count(),
-                'total_value' => $drafts->sum('total_amount'),
-                'today_drafts' => $drafts->where('created_at', '>=', $today)->count(),
-                'old_drafts' => $drafts->where('created_at', '<', $weekAgo)->count(),
-                'avg_draft_value' => $drafts->count() > 0 ? $drafts->avg('total_amount') : 0,
-                'largest_draft' => $drafts->max('total_amount') ?: 0,
-                'oldest_draft' => $drafts->min('created_at'),
-                'newest_draft' => $drafts->max('created_at'),
-            ];
+        // Count drafts with stock issues
+        Sale::drafts()->with('saleDetails.product')->chunk(50, function ($drafts) use (&$withStockIssues) {
+            foreach ($drafts as $draft) {
+                if ($draft->hasStockIssues()) {
+                    $withStockIssues++;
+                }
+            }
         });
+
+        return [
+            'total_drafts' => $totalDrafts,
+            'expiring_soon' => $expiringSoon,
+            'expired' => $expired,
+            'with_stock_issues' => $withStockIssues,
+            'healthy_drafts' => $totalDrafts - $expiringSoon - $expired - $withStockIssues
+        ];
     }
 
     /**
-     * Export drafts data
+     * Validate data for auto-save
      */
-    public function exportDrafts(string $format = 'array'): array
+    private function validateAutoSaveData(array $data): void
     {
-        $drafts = Sale::where('status', 'draft')
-            ->with(['customer', 'user', 'saleDetails.product'])
-            ->latest('created_at')
-            ->get();
+        if (empty($data['invoice_number'])) {
+            throw new \Exception('Invoice number is required');
+        }
 
-        $exportData = $drafts->map(function ($draft) {
-            return [
-                'invoice_number' => $draft->invoice_number,
-                'created_at' => $draft->created_at->format('d/m/Y H:i'),
-                'customer_name' => $draft->customer ? $draft->customer->nama : 'Pelanggan Umum',
-                'total_amount' => $draft->total_amount,
-                'discount' => $draft->discount,
-                'final_total' => $draft->total_amount - $draft->discount,
-                'items_count' => $draft->saleDetails->count(),
-                'payment_method' => ucfirst($draft->payment_method),
-                'notes' => $draft->notes ?: '-',
-                'created_by' => $draft->user->name,
-                'vehicle_info' => $draft->vehicle_type && $draft->vehicle_number ?
-                    $draft->vehicle_type . ' - ' . $draft->vehicle_number : '-',
-                'age_in_days' => $draft->created_at->diffInDays(now()),
-            ];
-        });
+        if (empty($data['items']) || !is_array($data['items'])) {
+            throw new \Exception('Items are required');
+        }
 
-        return $exportData->toArray();
+        foreach ($data['items'] as $index => $item) {
+            if (empty($item['product_id'])) {
+                throw new \Exception("Product ID is required for item {$index}");
+            }
+
+            if (empty($item['unit_id'])) {
+                throw new \Exception("Unit ID is required for item {$index}");
+            }
+
+            if (!isset($item['quantity']) || $item['quantity'] <= 0) {
+                throw new \Exception("Valid quantity is required for item {$index}");
+            }
+
+            if (!isset($item['selling_price']) || $item['selling_price'] < 0) {
+                throw new \Exception("Valid selling price is required for item {$index}");
+            }
+        }
     }
 
     /**
-     * Validate stock for draft before completion
+     * Calculate totals from items array
      */
-    private function validateDraftStock(Sale $draft): array
+    private function calculateTotalsFromItems(array $items, float $discount = 0): array
     {
-        foreach ($draft->saleDetails as $detail) {
-            $product = $detail->product;
-            $baseQuantity = $detail->base_quantity;
+        $totalAmount = 0;
 
-            if ($baseQuantity > $product->stock) {
-                return [
-                    'valid' => false,
-                    'message' => "Stok tidak cukup untuk produk {$product->name} di draft {$draft->invoice_number}. Dibutuhkan: {$baseQuantity}, Tersedia: {$product->stock}"
-                ];
+        foreach ($items as $item) {
+            $quantity = floatval($item['quantity'] ?? 0);
+            $price = floatval($item['selling_price'] ?? 0);
+            $totalAmount += $quantity * $price;
+        }
+
+        $finalTotal = max(0, $totalAmount - $discount);
+
+        return [
+            'total_amount' => $totalAmount,
+            'discount' => $discount,
+            'final_total' => $finalTotal
+        ];
+    }
+
+    /**
+     * Calculate totals from request data
+     */
+    private function calculateTotals(array $data): array
+    {
+        $totalAmount = 0;
+
+        if (isset($data['product_id']) && is_array($data['product_id'])) {
+            foreach ($data['product_id'] as $index => $productId) {
+                $quantity = floatval($data['quantity'][$index] ?? 0);
+                $price = floatval($data['selling_price'][$index] ?? 0);
+                $totalAmount += $quantity * $price;
             }
         }
 
-        return ['valid' => true];
+        $discount = floatval($data['discount'] ?? 0);
+        $finalTotal = max(0, $totalAmount - $discount);
+
+        return [
+            'total_amount' => $totalAmount,
+            'discount' => $discount,
+            'final_total' => $finalTotal
+        ];
     }
 
     /**
-     * Complete a single draft transaction
+     * Calculate payment data
      */
-    private function completeDraft(Sale $draft): void
+    private function calculatePaymentData(array $data, array $totals): array
     {
-        // Set default payment values for completing draft
-        $finalTotal = $draft->total_amount - $draft->discount;
+        $paymentMethod = $data['payment_method'] ?? 'cash';
+        $finalTotal = $totals['final_total'];
 
-        // Update draft to completed status with default cash payment
-        $draft->update([
-            'status' => 'completed',
-            'payment_method' => $draft->payment_method ?: 'cash',
-            'payment_status' => 'paid',
-            'paid_amount' => $finalTotal,
-            'remaining_amount' => 0,
-            'date' => now(),
-        ]);
+        $paymentData = [
+            'payment_method' => $paymentMethod,
+            'payment_status' => 'pending',
+            'paid_amount' => 0,
+            'down_payment' => 0,
+            'remaining_amount' => $finalTotal,
+            'change_amount' => 0,
+            'due_date' => null
+        ];
 
-        // Update stock for each item
-        foreach ($draft->saleDetails as $detail) {
-            $product = $detail->product;
-            $baseQuantity = $detail->base_quantity;
+        if ($paymentMethod === 'credit') {
+            $downPayment = floatval($data['down_payment'] ?? 0);
 
-            $beforeStock = $product->stock;
-            $product->decrement('stock', $baseQuantity);
+            $paymentData['down_payment'] = $downPayment;
+            $paymentData['paid_amount'] = $downPayment;
+            $paymentData['remaining_amount'] = $finalTotal - $downPayment;
+            $paymentData['due_date'] = now()->addDays(30);
 
-            // Record stock movement
-            $product->stockMovements()->create([
-                'type' => 'out',
-                'quantity' => $baseQuantity,
-                'before_stock' => $beforeStock,
-                'after_stock' => $product->stock,
-                'reference_type' => 'sale',
-                'reference_id' => $draft->id,
-                'notes' => 'Bulk completion of draft transaction'
+            if ($downPayment >= $finalTotal) {
+                $paymentData['payment_status'] = 'paid';
+                $paymentData['remaining_amount'] = 0;
+                $paymentData['change_amount'] = $downPayment - $finalTotal;
+            } elseif ($downPayment > 0) {
+                $paymentData['payment_status'] = 'partial';
+            }
+        } else {
+            $paidAmount = floatval($data['paid_amount'] ?? $finalTotal);
+
+            if ($paidAmount < $finalTotal) {
+                throw new \Exception('Jumlah pembayaran kurang dari total belanja');
+            }
+
+            $paymentData['paid_amount'] = $paidAmount;
+            $paymentData['remaining_amount'] = 0;
+            $paymentData['change_amount'] = $paidAmount - $finalTotal;
+            $paymentData['payment_status'] = 'paid';
+        }
+
+        return $paymentData;
+    }
+
+    /**
+     * Handle customer creation/selection
+     */
+    private function handleCustomer(array $data): ?int
+    {
+        $customerId = $data['customer_id'] ?? null;
+
+        if (!empty($data['new_customer_name']) || !empty($data['customer_name'])) {
+            $customerName = $data['new_customer_name'] ?? $data['customer_name'];
+
+            $customer = Customer::create([
+                'nama' => $customerName,
+                'nik' => 'TEMP-' . time(),
+                'desa_id' => '0',
+                'kecamatan_id' => '0',
+                'kabupaten_id' => '0',
+                'provinsi_id' => '0',
+                'desa_nama' => '-',
+                'kecamatan_nama' => '-',
+                'kabupaten_nama' => '-',
+                'provinsi_nama' => '-'
             ]);
 
-            // Clear product cache
-            Cache::forget('product_details_' . $product->id);
+            $customerId = $customer->id;
+            Cache::forget('all_customers');
         }
 
+        return $customerId;
+    }
+
+    /**
+     * Validate stock availability
+     */
+    private function validateStockAvailability(array $data): void
+    {
+        if (!isset($data['product_id']) || !is_array($data['product_id'])) {
+            return;
+        }
+
+        foreach ($data['product_id'] as $index => $productId) {
+            $product = Product::find($productId);
+            $productUnit = ProductUnit::find($data['unit_id'][$index] ?? null);
+
+            if (!$product || !$productUnit) {
+                continue;
+            }
+
+            $quantity = floatval($data['quantity'][$index] ?? 0);
+            $baseQuantity = $quantity * $productUnit->conversion_factor;
+
+            if ($baseQuantity > $product->stock) {
+                throw new \Exception("Stok tidak cukup untuk {$product->name}. Tersedia: {$product->stock}, Diminta: {$baseQuantity}");
+            }
+        }
+    }
+
+    /**
+     * Update existing draft
+     */
+    private function updateExistingDraft(int $draftId, array $data, array $totals): Sale
+    {
+        $sale = Sale::where('id', $draftId)
+            ->where('status', 'draft')
+            ->where('user_id', auth()->id())
+            ->lockForUpdate()
+            ->first();
+
+        if (!$sale) {
+            throw new \Exception('Draft tidak ditemukan atau tidak dapat diakses');
+        }
+
+        if ($sale->isExpired()) {
+            throw new \Exception('Draft sudah expired');
+        }
+
+        $sale->update([
+            'customer_id' => $data['customer_id'] ?? null,
+            'payment_method' => $data['payment_method'] ?? 'cash',
+            'vehicle_type' => $data['vehicle_type'] ?? null,
+            'vehicle_number' => $data['vehicle_number'] ?? null,
+            'discount' => $totals['discount'],
+            'notes' => $data['notes'] ?? null,
+            'total_amount' => $totals['total_amount'],
+            'remaining_amount' => $totals['final_total'],
+        ]);
+
+        return $sale;
+    }
+
+    /**
+     * Create new draft
+     */
+    private function createNewDraft(array $data, array $totals): Sale
+    {
+        return Sale::create([
+            'invoice_number' => $data['invoice_number'],
+            'date' => now(),
+            'customer_id' => $data['customer_id'] ?? null,
+            'user_id' => auth()->id(),
+            'payment_method' => $data['payment_method'] ?? 'cash',
+            'vehicle_type' => $data['vehicle_type'] ?? null,
+            'vehicle_number' => $data['vehicle_number'] ?? null,
+            'status' => 'draft',
+            'payment_status' => 'pending',
+            'total_amount' => $totals['total_amount'],
+            'discount' => $totals['discount'],
+            'paid_amount' => 0,
+            'remaining_amount' => $totals['final_total'],
+            'notes' => $data['notes'] ?? null,
+        ]);
+    }
+
+    /**
+     * Update draft sale details
+     */
+    private function updateDraftSaleDetails(Sale $sale, array $items): void
+    {
+        // Delete existing details
+        $sale->saleDetails()->delete();
+
+        // Add new details
+        foreach ($items as $item) {
+            if (empty($item['product_id']) || empty($item['unit_id'])) {
+                continue;
+            }
+
+            $productUnit = ProductUnit::find($item['unit_id']);
+            if (!$productUnit) {
+                continue;
+            }
+
+            $quantity = floatval($item['quantity'] ?? 1);
+            $price = floatval($item['selling_price'] ?? 0);
+            $baseQuantity = $quantity * $productUnit->conversion_factor;
+
+            $sale->saleDetails()->create([
+                'product_id' => $item['product_id'],
+                'product_unit_id' => $item['unit_id'],
+                'unit_id' => $productUnit->unit_id,
+                'quantity' => $quantity,
+                'base_quantity' => $baseQuantity,
+                'price' => $price,
+                'subtotal' => $quantity * $price,
+            ]);
+        }
+    }
+
+    /**
+     * Update draft to completed status
+     */
+    private function updateDraftToCompleted(Sale $draft, array $data, ?int $customerId, array $totals, array $paymentData): void
+    {
+        $draft->update([
+            'customer_id' => $customerId,
+            'date' => now(),
+            'status' => 'completed',
+            'total_amount' => $totals['total_amount'],
+            'discount' => $totals['discount'],
+            'paid_amount' => $paymentData['paid_amount'],
+            'down_payment' => $paymentData['down_payment'],
+            'change_amount' => $paymentData['change_amount'],
+            'payment_method' => $paymentData['payment_method'],
+            'payment_status' => $paymentData['payment_status'],
+            'remaining_amount' => $paymentData['remaining_amount'],
+            'due_date' => $paymentData['due_date'],
+            'vehicle_type' => $data['vehicle_type'] ?? null,
+            'vehicle_number' => $data['vehicle_number'] ?? null,
+            'notes' => $data['notes'] ?? null,
+        ]);
+    }
+
+    /**
+     * Update sale details and stock
+     */
+    private function updateSaleDetailsAndStock(Sale $sale, array $data, bool $updateStock = false): void
+    {
+        // Remove old details
+        $sale->saleDetails()->delete();
+
+        // Add new details
+        foreach ($data['product_id'] as $index => $productId) {
+            $quantity = floatval($data['quantity'][$index]);
+            $price = floatval($data['selling_price'][$index]);
+            $product = Product::findOrFail($productId);
+            $productUnit = ProductUnit::findOrFail($data['unit_id'][$index]);
+
+            $baseQuantity = $quantity * $productUnit->conversion_factor;
+
+            $sale->saleDetails()->create([
+                'product_id' => $productId,
+                'product_unit_id' => $productUnit->id,
+                'unit_id' => $productUnit->unit_id,
+                'quantity' => $quantity,
+                'base_quantity' => $baseQuantity,
+                'price' => $price,
+                'subtotal' => $quantity * $price
+            ]);
+
+            // Update stock if required
+            if ($updateStock) {
+                $this->updateProductStock($product, $baseQuantity, $sale, 'out');
+            }
+        }
+    }
+
+    /**
+     * Update product stock
+     */
+    private function updateProductStock(Product $product, float $baseQuantity, Sale $sale, string $type): void
+    {
+        $beforeStock = $product->stock;
+
+        if ($type === 'out') {
+            $product->decrement('stock', $baseQuantity);
+            $notes = 'Penjualan produk';
+        } else {
+            $product->increment('stock', $baseQuantity);
+            $notes = 'Pembatalan penjualan';
+        }
+
+        $product->stockMovements()->create([
+            'type' => $type,
+            'quantity' => $baseQuantity,
+            'before_stock' => $beforeStock,
+            'after_stock' => $product->stock,
+            'reference_type' => 'sale',
+            'reference_id' => $sale->id,
+            'notes' => $notes
+        ]);
+
+        // Clear product cache
         Cache::forget('available_products');
+        Cache::forget('product_details_' . $product->id);
     }
 
     /**
-     * Generate a new invoice number
+     * Clear relevant caches
      */
-    private function generateInvoiceNumber(): string
+    private function clearRelevantCaches(Sale $sale, array $paymentData): void
     {
-        $lastSale = Sale::whereDate('created_at', Carbon::today())->latest()->first();
-        $lastNumber = $lastSale ? intval(substr($lastSale->invoice_number, -4)) : 0;
-        return 'INV-' . date('Ymd') . '-' . str_pad($lastNumber + 1, 4, '0', STR_PAD_LEFT);
-    }
-
-    /**
-     * Clear draft-related caches
-     */
-    private function clearDraftCaches(): void
-    {
-        for ($i = 1; $i <= 10; $i++) {
+        // Clear sales caches
+        for ($i = 1; $i <= 5; $i++) {
+            Cache::forget('completed_sales_page_' . $i);
             Cache::forget('draft_sales_page_' . $i);
         }
-        Cache::forget('draft_statistics');
-    }
 
-    /**
-     * Clear sales-related caches
-     */
-    private function clearSalesCaches(): void
-    {
-        for ($i = 1; $i <= 10; $i++) {
-            Cache::forget('completed_sales_page_' . $i);
-            Cache::forget('credit_sales_list_page_' . $i);
+        // Clear credit sales cache if relevant
+        if ($paymentData['payment_method'] === 'credit' && $paymentData['payment_status'] !== 'paid') {
+            for ($i = 1; $i <= 5; $i++) {
+                Cache::forget('credit_sales_list_page_' . $i);
+            }
         }
+
+        Cache::forget('sale_' . $sale->id);
     }
 }

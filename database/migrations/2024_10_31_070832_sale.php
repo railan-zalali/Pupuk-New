@@ -30,6 +30,7 @@ return new class extends Migration
             $table->integer('remaining_amount')->default(0);
             $table->timestamp('due_date')->nullable();
             $table->text('notes')->nullable();
+
             $table->timestamps();
             $table->softDeletes();
         });

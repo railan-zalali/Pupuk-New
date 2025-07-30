@@ -5,6 +5,7 @@ use App\Http\Controllers\CashBookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DraftSaleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
@@ -84,6 +85,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/stock-details', [DashboardController::class, 'dailyStockDetails'])->name('stock.details');
     Route::get('/weekly-stock-details', [DashboardController::class, 'weeklyStockDetails'])->name('weekly.stock.details');
 
+
     // Profile routes
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
@@ -155,12 +157,7 @@ Route::middleware('auth')->group(function () {
 
 
     Route::middleware(['permission:manage-sales'])->group(function () {
-        Route::post('/sales/auto-save-draft', [SaleController::class, 'autoSaveDraft'])->name('sales.auto-save-draft');
         Route::get('sales/credit', [SaleController::class, 'creditSales'])->name('sales.credit');
-        Route::get('sales/drafts', [SaleController::class, 'drafts'])->name('sales.drafts');
-        Route::get('/sales/{sale}/complete-draft', [SaleController::class, 'completeDraft'])
-            ->name('sales.complete-draft');
-
 
         Route::get('/products/{product}/get', [SaleController::class, 'getProduct'])->name('products.get');
 
@@ -171,6 +168,14 @@ Route::middleware('auth')->group(function () {
 
         Route::post('/sales/{sale}/pay', [SaleController::class, 'payCredit'])->name('sales.pay');
         Route::get('/sales/{sale}/details', [SaleController::class, 'getSaleDetails'])->name('sales.details');
+
+        // Draft Sales Routes
+        Route::get('/sales/drafts', [DraftSaleController::class, 'index'])->name('drafts.index');
+        Route::get('/sales/drafts/{draft}', [DraftSaleController::class, 'show'])->name('drafts.show');
+        Route::get('/sales/drafts/{draft}/edit', [DraftSaleController::class, 'edit'])->name('drafts.edit');
+        Route::put('/sales/drafts/{draft}', [DraftSaleController::class, 'update'])->name('drafts.update');
+        Route::put('/sales/drafts/{draft}/process', [DraftSaleController::class, 'process'])->name('drafts.process');
+        Route::delete('/sales/drafts/{draft}', [DraftSaleController::class, 'destroy'])->name('drafts.destroy');
 
         Route::resource('sales', SaleController::class);
     });

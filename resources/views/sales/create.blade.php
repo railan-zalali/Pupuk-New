@@ -972,7 +972,7 @@
                             <span class="text-sm text-gray-600 dark:text-gray-400">Menyimpan draft...</span>
                         </div>
                     </div>
-                    
+
                     <div id="auto-save-success" class="fixed top-20 right-6 bg-green-50 dark:bg-green-900/50 px-4 py-2 rounded-lg shadow-lg border border-green-200 dark:border-green-800 hidden">
                         <div class="flex items-center space-x-2">
                             <svg class="h-4 w-4 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1032,35 +1032,6 @@
                     formData.draft_id = currentDraftId;
                 }
 
-                // Send AJAX request
-                $.ajax({
-                    url: '{{ route('sales.auto-save-draft') }}',
-                    method: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        if (response.success) {
-                            isDraftSaved = true;
-                            currentDraftId = response.draft_id;
-
-                            // Show success indicator
-                            $('#auto-save-indicator').addClass('hidden');
-                            $('#auto-save-success').removeClass('hidden');
-                            $('#save-time').text('pada ' + response.saved_at);
-
-                            // Hide success message after 5 seconds
-                            setTimeout(function() {
-                                $('#auto-save-success').addClass('hidden');
-                            }, 5000);
-                        }
-                    },
-                    error: function(xhr, status, error) {
-                        console.error('Auto-save error:', error);
-                        $('#auto-save-indicator').addClass('hidden');
-
-                        // Show error notification
-                        showNotification('Gagal menyimpan draft otomatis', 'error');
-                    }
-                });
             }
 
             function collectFormData() {

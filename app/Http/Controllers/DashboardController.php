@@ -8,6 +8,7 @@ use App\Models\StockMovement;
 use App\Services\ActivityLogService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
@@ -148,8 +149,17 @@ class DashboardController extends Controller
         $data['expiringDrafts'] = Sale::where('status', 'draft')
             ->where('created_at', '<=', Carbon::now()->subDays(27))
             ->count();
+        $expiringDrafts = Cache::remember('expiring_drafts', 3600, function () {
+            return Sale::drafts()
+                ->where('created_at', '<=', now()->subDays(27))
+                ->with('customer')
+                ->get();
+        });
 
-        return view('dashboard', $data);
+        return view('dashboard', [
+            'data' => $data,
+            'expiringDrafts' => $expiringDrafts,
+        ]);
     }
     public function dailyStockDetails()
     {

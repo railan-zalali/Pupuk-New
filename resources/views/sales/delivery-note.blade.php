@@ -45,13 +45,15 @@
                 </tr>
             </thead>
             <tbody>
+                @foreach($sale->saleDetails as $detail)
                 <tr>
-                    <td class="border border-black px-2 py-1">1</td>
-                    <td class="border border-black px-2 py-1">Kangkung Bangkok</td>
-                    <td class="border border-black px-2 py-1">1 bh</td>
-                    <td class="border border-black px-2 py-1">50.000</td>
-                    <td class="border border-black px-2 py-1">50.000</td>
+                    <td class="border border-black px-2 py-1">{{ $detail->quantity }}</td>
+                    <td class="border border-black px-2 py-1">{{ $detail->product->name }}</td>
+                    <td class="border border-black px-2 py-1">{{ $detail->unit_name ?? ($detail->productUnit->unit->abbreviation ?? 'N/A') }}</td>
+                    <td class="border border-black px-2 py-1">{{ number_format($detail->price, 0, ',', '.') }}</td>
+                    <td class="border border-black px-2 py-1">{{ number_format($detail->subtotal, 0, ',', '.') }}</td>
                 </tr>
+                @endforeach
             </tbody>
         </table>
 

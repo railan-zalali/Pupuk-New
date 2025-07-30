@@ -28,34 +28,11 @@
                 <i class="nav-icon ti ti-dashboard"></i>
                 <span x-show="sidebarOpen" x-transition>Dashboard</span>
             </a>
-
-            <a href="{{ route('sales.index') }}" class="nav-item {{ request()->routeIs('sales.*') ? 'active' : '' }}">
+            <a href="{{ route('sales.index') }}"
+                class="nav-item {{ request()->routeIs('sales.index') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-shopping-cart"></i>
                 <span x-show="sidebarOpen" x-transition>Penjualan</span>
             </a>
-
-
-            <a href="{{ route('sales.drafts') }}"
-                class="flex items-center px-3 py-2.5 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 
-              {{ request()->routeIs('sales.drafts') ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300' : 'text-gray-700 dark:text-gray-300' }}">
-                <i class="ti ti-file-text w-5 h-5 mr-3"></i>
-                <span class="flex-1">Draft Transaksi</span>
-                @php
-                    $draftCount = \App\Models\Sale::where('status', 'draft')->count();
-                    $expiringDrafts = \App\Models\Sale::where('status', 'draft')
-                        ->where('created_at', '<=', \Carbon\Carbon::now()->subDays(27))
-                        ->count();
-                @endphp
-                @if ($draftCount > 0)
-                    <span
-                        class="inline-flex items-center justify-center px-2 py-0.5 ml-2 text-xs font-medium rounded-full 
-                {{ $expiringDrafts > 0 ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300' }}">
-                        {{ $draftCount }}
-                    </span>
-                @endif
-            </a>
-
-
 
             <a href="{{ route('purchases.index') }}"
                 class="nav-item {{ request()->routeIs('purchases.*') ? 'active' : '' }}">

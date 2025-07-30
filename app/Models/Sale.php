@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Sale extends Model
 {
@@ -47,23 +48,15 @@ class Sale extends Model
     {
         return $this->hasMany(SaleDetail::class);
     }
+    
+    /**
+     * Scope a query to only include draft sales.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeDrafts($query)
     {
         return $query->where('status', 'draft');
-    }
-
-    public function scopeCompleted($query)
-    {
-        return $query->where('status', 'completed');
-    }
-
-    public function isDraft()
-    {
-        return $this->status === 'draft';
-    }
-
-    public function isCompleted()
-    {
-        return $this->status === 'completed';
     }
 }

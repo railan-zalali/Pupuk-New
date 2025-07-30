@@ -359,7 +359,7 @@
                         {{ $item->product->name }}
                         <span class="seed-badge">BENIH</span>
                     </td>
-                    <td class="text-center">{{ $item->productUnit->unit->abbreviation }}</td>
+                    <td class="text-center">{{ $item->unit_name ?? ($item->productUnit->unit->abbreviation ?? 'N/A') }}</td>
                     <td class="text-center">{{ $item->quantity }}</td>
                     <td class="text-right">{{ number_format($item->price, 0, ',', '.') }}</td>
                     <td class="text-right">{{ number_format($item->subtotal, 0, ',', '.') }}</td>

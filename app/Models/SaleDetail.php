@@ -39,4 +39,22 @@ class SaleDetail extends Model
     {
         return $this->belongsTo(UnitOfMeasure::class, 'unit_id');
     }
+    
+    // Get unit name safely
+    public function getUnitNameAttribute()
+    {
+        try {
+            if ($this->productUnit && $this->productUnit->unit) {
+                return $this->productUnit->unit->name;
+            } elseif ($this->unit) {
+                return $this->unit->name;
+            } elseif ($this->productUnit) {
+                return 'Unit';
+            }
+        } catch (\Exception $e) {
+            return 'Unit';
+        }
+        
+        return 'N/A';
+    }
 }

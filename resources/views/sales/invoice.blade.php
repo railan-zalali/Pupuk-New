@@ -314,7 +314,7 @@
                 <tr>
                     <td class="text-center">{{ $no++ }}</td>
                     <td>{{ $item->product->name }}</td>
-                    <td class="text-center">{{ $item->productUnit->unit->abbreviation }}</td>
+                    <td class="text-center">{{ $item->unit_name ?? ($item->productUnit->unit->abbreviation ?? 'N/A') }}</td>
                     <td class="text-center">{{ $item->quantity }}</td>
                     <td class="text-right">{{ number_format($item->price, 0, ',', '.') }}</td>
                     <td class="text-right">{{ number_format($item->subtotal, 0, ',', '.') }}</td>

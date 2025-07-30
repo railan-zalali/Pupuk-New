@@ -61,6 +61,12 @@ class Product extends Model
             ->withPivot('id', 'purchase_price', 'selling_price', 'conversion_factor', 'is_default', 'expire_date')
             ->withTimestamps();
     }
+    
+    // Relasi langsung ke ProductUnit untuk menghindari error relationship
+    public function productUnitsWithUnit()
+    {
+        return $this->hasMany(ProductUnit::class)->with('unit');
+    }
 
     public function defaultUnit()
     {

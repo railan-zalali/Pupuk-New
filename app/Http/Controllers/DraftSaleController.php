@@ -152,7 +152,30 @@ class DraftSaleController extends Controller
         try {
             DB::beginTransaction();
 
-            // Update draft sale
+            // Step 1: Restore stock for all old items in the draft
+            $oldDetails = $draft->saleDetails()->with('product')->get();
+            foreach ($oldDetails as $detail) {
+                $product = $detail->product;
+                $beforeStock = $product->stock;
+                $product->increment('stock', $detail->base_quantity);
+
+                $product->stockMovements()->create([
+                    'type' => 'in',
+                    'quantity' => $detail->base_quantity,
+                    'before_stock' => $beforeStock,
+                    'after_stock' => $product->stock,
+                    'reference_type' => 'draft_sale_update',
+                    'reference_id' => $draft->id,
+                    'notes' => 'Stok kembali dari pembaruan draf'
+                ]);
+
+                Cache::forget('product_details_' . $product->id);
+            }
+
+            // Step 2: Delete old sale details
+            $draft->saleDetails()->delete();
+
+            // Step 3: Update the main draft record
             $draft->update([
                 'date' => $request->date ?? now(),
                 'customer_id' => $customerId,
@@ -164,10 +187,7 @@ class DraftSaleController extends Controller
                 'vehicle_number' => $request->vehicle_number ?? null,
             ]);
 
-            // Delete existing sale details
-            $draft->saleDetails()->delete();
-
-            // Create new sale details
+            // Step 4: Create new sale details and deduct stock
             foreach ($request->product_id as $key => $productId) {
                 $productUnit = ProductUnit::findOrFail($request->unit_id[$key]);
                 $quantity = $request->quantity[$key];
@@ -175,15 +195,13 @@ class DraftSaleController extends Controller
                 $product = Product::findOrFail($productId);
                 $baseQuantity = $quantity * $productUnit->conversion_factor;
 
-                // Reduce stock when saving as draft
-                $beforeStock = $product->stock;
-
                 // Check if stock is sufficient
                 if ($baseQuantity > $product->stock) {
                     throw new \Exception("Stok tidak cukup untuk produk: {$product->name}");
                 }
 
                 // Decrement stock
+                $beforeStock = $product->stock;
                 $product->decrement('stock', $baseQuantity);
 
                 // Create stock movement record
@@ -194,7 +212,7 @@ class DraftSaleController extends Controller
                     'after_stock' => $product->stock,
                     'reference_type' => 'draft_sale',
                     'reference_id' => $draft->id,
-                    'notes' => 'Draft penjualan produk'
+                    'notes' => 'Draft penjualan produk (diperbarui)'
                 ]);
 
                 $draft->saleDetails()->create([
@@ -207,15 +225,22 @@ class DraftSaleController extends Controller
                     'subtotal' => $quantity * $price,
                 ]);
 
-                Cache::forget('available_products');
                 Cache::forget('product_details_' . $productId);
             }
 
             DB::commit();
 
-            // Clear relevant caches
+            // Clear general caches
             Cache::forget('draft_sales');
             Cache::forget('draft_sale_' . $draft->id);
+            Cache::forget('available_products');
+
+            // Handle redirection based on which button was clicked
+            if ($request->has('complete_transaction')) {
+                // Redirect to the process route to finalize the sale
+                return redirect()->route('drafts.show', $draft)
+                    ->with('success', 'Draft berhasil diperbarui. Silakan selesaikan pembayaran.');
+            }
 
             return redirect()->route('drafts.index')
                 ->with('success', 'Draft penjualan berhasil diperbarui');
@@ -313,8 +338,14 @@ class DraftSaleController extends Controller
 
             // Clear relevant caches
             Cache::forget('draft_sales');
-            Cache::forget('completed_sales');
             Cache::forget('draft_sale_' . $draft->id);
+            Cache::forget('available_products');
+
+            // Clear paginated completed sales cache
+            for ($i = 1; $i <= 5; $i++) { // Clear first 5 pages as a precaution
+                Cache::forget('completed_sales_page_' . $i);
+            }
+
 
             return redirect()->route('sales.show', $draft)
                 ->with('success', 'Draft berhasil diproses menjadi transaksi');

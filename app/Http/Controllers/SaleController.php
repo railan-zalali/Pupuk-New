@@ -171,12 +171,9 @@ class SaleController extends Controller
                 $product = Product::findOrFail($productId);
                 $baseQuantity = $quantity * $productUnit->conversion_factor;
 
-                // Stock validation and update only for completed transactions
-                if (!$savingAsDraft) {
-                    // Stock validation
-                    if ($baseQuantity > $product->stock) {
-                        throw new \Exception("Stok tidak cukup untuk produk: {$product->name}");
-                    }
+                // Stock validation for both drafts and completed sales
+                if ($baseQuantity > $product->stock) {
+                    throw new \Exception("Stok tidak cukup untuk produk: {$product->name}");
                 }
 
                 $sale->saleDetails()->create([
@@ -189,24 +186,22 @@ class SaleController extends Controller
                     'subtotal' => $quantity * $price,
                 ]);
 
-                // Update stock only for completed transactions
-                if (!$savingAsDraft) {
-                    $beforeStock = $product->stock;
-                    $product->decrement('stock', $baseQuantity);
+                // Update stock for both drafts and completed transactions
+                $beforeStock = $product->stock;
+                $product->decrement('stock', $baseQuantity);
 
-                    $product->stockMovements()->create([
-                        'type' => 'out',
-                        'quantity' => $baseQuantity,
-                        'before_stock' => $beforeStock,
-                        'after_stock' => $product->stock,
-                        'reference_type' => 'sale',
-                        'reference_id' => $sale->id,
-                        'notes' => 'Penjualan produk'
-                    ]);
+                $product->stockMovements()->create([
+                    'type' => 'out',
+                    'quantity' => $baseQuantity,
+                    'before_stock' => $beforeStock,
+                    'after_stock' => $product->stock,
+                    'reference_type' => $savingAsDraft ? 'draft_sale' : 'sale',
+                    'reference_id' => $sale->id,
+                    'notes' => $savingAsDraft ? 'Draft penjualan produk' : 'Penjualan produk',
+                ]);
 
-                    Cache::forget('available_products');
-                    Cache::forget('product_details_' . $productId);
-                }
+                Cache::forget('available_products');
+                Cache::forget('product_details_' . $productId);
             }
 
             DB::commit();

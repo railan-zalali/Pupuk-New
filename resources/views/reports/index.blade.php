@@ -99,6 +99,36 @@
                     </div>
                 </div>
 
+                {{-- Kartu Laporan Stok FIFO --}}
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 p-3 bg-teal-100 rounded-full">
+                                <svg class="w-6 h-6 text-teal-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Laporan Stok FIFO</h3>
+                                <p class="mt-1 text-sm text-gray-500">Valuasi stok dengan metode First In First Out</p>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <a href="{{ route('reports.fifo-stock') }}"
+                                class="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-500">
+                                Lihat Laporan
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Kartu Laporan Laba/Rugi --}}
                 <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div class="p-6">

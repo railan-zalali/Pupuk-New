@@ -3,9 +3,11 @@
 namespace App\Imports;
 
 use App\Models\Product;
+use App\Models\ProductBatch;
 use App\Models\ProductUnit;
 use App\Models\StockMovement;
 use App\Models\UnitOfMeasure;
+use App\Services\FifoService;
 use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\ToModel;
 use Maatwebsite\Excel\Concerns\WithHeadingRow;
@@ -14,6 +16,7 @@ use Maatwebsite\Excel\Concerns\SkipsOnError;
 use Maatwebsite\Excel\Concerns\SkipsErrors;
 use Maatwebsite\Excel\Concerns\WithBatchInserts;
 use Illuminate\Support\Facades\DB;
+use PhpOffice\PhpSpreadsheet\Shared\Date;
 use Throwable;
 
 class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOnError, WithBatchInserts
@@ -29,6 +32,9 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
     {
         DB::beginTransaction();
         try {
+            // Inisialisasi FifoService
+            $fifoService = new FifoService();
+
             // Periksa apakah produk dengan kode ini sudah ada
             $existingProduct = Product::where('code', $row['kode'])->first();
 
@@ -45,7 +51,45 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             $sellingPrice = $row['selling_price'] ?? 0;
             $stock = $row['stock'] ?? 0;
             $minStock = $row['min_stock'] ?? 0;
-            $expireDate = isset($row['expire_date']) ? Carbon::parse($row['expire_date']) : null;
+
+            // Validasi dan parsing tanggal kedaluwarsa
+            $expireDate = null;
+            if (isset($row['expire_date']) && !empty($row['expire_date'])) {
+                try {
+                    // Coba berbagai format tanggal yang mungkin
+                    if (is_numeric($row['expire_date'])) {
+                        // Jika berupa angka, coba konversi dari Excel date format
+                        $expireDate = Carbon::instance(Date::excelToDateTimeObject($row['expire_date']));
+                    } else {
+                        // Coba parse sebagai string tanggal
+                        $expireDate = Carbon::parse($row['expire_date']);
+                    }
+
+                    // Validasi bahwa tanggal kedaluwarsa harus di masa depan
+                    if ($expireDate->isPast()) {
+                        // Jika tanggal sudah lewat, set ke null atau tambahkan 1 tahun
+                        $expireDate = Carbon::now()->addYear();
+                    }
+                } catch (\Exception $e) {
+                    // Jika format tanggal tidak valid, coba format manual
+                    try {
+                        // Coba format DD-MM-YYYY atau YYYY-MM-DD
+                        if (preg_match('/^(\d{4})-(\d{1,2})-(\d{1,2})$/', $row['expire_date'], $matches)) {
+                            $expireDate = Carbon::createFromDate($matches[1], $matches[2], $matches[3]);
+                        } elseif (preg_match('/^(\d{1,2})-(\d{1,2})-(\d{4})$/', $row['expire_date'], $matches)) {
+                            $expireDate = Carbon::createFromDate($matches[3], $matches[2], $matches[1]);
+                        } else {
+                            $expireDate = null;
+                        }
+                    } catch (\Exception $e) {
+                        // Jika masih gagal, set ke null
+                        $expireDate = null;
+                    }
+                }
+            }
+
+            // Ambil nomor batch jika ada
+            $batchNumber = $row['batch_number'] ?? null;
 
             if ($existingProduct) {
                 // Update produk yang sudah ada
@@ -59,19 +103,30 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                     'min_stock' => $minStock,
                 ]);
 
-                // Jika ada pembaruan stok, buat catatan pergerakan stok
-                if ($stock != $existingProduct->stock) {
+                // Jika ada pembaruan stok, buat batch baru dan catat pergerakan stok
+                if ($stock > 0) {
                     $beforeStock = $existingProduct->stock;
-                    $afterStock = $stock;
+                    $afterStock = $beforeStock + $stock;
 
                     // Update stok produk
                     $existingProduct->update(['stock' => $afterStock]);
 
+                    // Buat batch baru menggunakan FifoService
+                    $batch = $fifoService->addBatch(
+                        $existingProduct->id,
+                        null, // Tidak ada purchase_id karena ini import
+                        $stock,
+                        $purchasePrice,
+                        $batchNumber,
+                        $expireDate
+                    );
+
                     // Catat pergerakan stok
                     StockMovement::create([
                         'product_id' => $existingProduct->id,
-                        'type' => $afterStock > $beforeStock ? 'in' : 'out',
-                        'quantity' => abs($afterStock - $beforeStock),
+                        'batch_id' => $batch->id,
+                        'type' => 'in',
+                        'quantity' => $stock,
                         'before_stock' => $beforeStock,
                         'after_stock' => $afterStock,
                         'reference_type' => 'import',
@@ -112,7 +167,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             // Generate kode produk jika tidak ada
             $code = $row['kode'] ?? ('PRD' . date('Ymd') . rand(1000, 9999));
 
-            // Buat produk baru
+            // Buat produk baru dengan stok awal 0 (akan ditambahkan melalui batch)
             $product = new Product([
                 'category_id' => $row['category_id'] ?? 1, // Default ke kategori pertama jika tidak ada
                 'supplier_id' => $row['supplier_id'] ?? 1, // Default ke supplier pertama jika tidak ada
@@ -121,7 +176,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                 'description' => $row['deskripsi'] ?? null,
                 'purchase_price' => $purchasePrice,
                 'selling_price' => $sellingPrice,
-                'stock' => $stock,
+                'stock' => 0, // Mulai dengan 0, akan diupdate setelah batch dibuat
                 'min_stock' => $minStock,
             ]);
 
@@ -139,17 +194,33 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                 'is_default' => true,
             ]);
 
-            // Catat pergerakan stok awal
-            StockMovement::create([
-                'product_id' => $product->id,
-                'type' => 'in',
-                'quantity' => $stock,
-                'before_stock' => 0,
-                'after_stock' => $stock,
-                'reference_type' => 'initial',
-                'reference_id' => $product->id,
-                'notes' => 'Stok awal dari import'
-            ]);
+            if ($stock > 0) {
+                // Update stok produk
+                $product->update(['stock' => $stock]);
+
+                // Buat batch baru menggunakan FifoService
+                $batch = $fifoService->addBatch(
+                    $product->id,
+                    null, // Tidak ada purchase_id karena ini import
+                    $stock,
+                    $purchasePrice,
+                    $batchNumber,
+                    $expireDate
+                );
+
+                // Catat pergerakan stok awal
+                StockMovement::create([
+                    'product_id' => $product->id,
+                    'batch_id' => $batch->id,
+                    'type' => 'in',
+                    'quantity' => $stock,
+                    'before_stock' => 0,
+                    'after_stock' => $stock,
+                    'reference_type' => 'initial',
+                    'reference_id' => $product->id,
+                    'notes' => 'Stok awal dari import'
+                ]);
+            }
 
             DB::commit();
             return $product;
@@ -174,6 +245,9 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'min_stock' => 'nullable|integer',
             'category_id' => 'nullable|integer',
             'supplier_id' => 'nullable|integer',
+            'batch_number' => 'nullable|string',
+            'expire_date' => 'nullable',
+            'unit_nama' => 'nullable|string',
         ];
     }
 
@@ -188,6 +262,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             'selling_price.numeric' => 'Harga jual harus berupa angka',
             'stock.integer' => 'Stok harus berupa angka bulat',
             'min_stock.integer' => 'Stok minimal harus berupa angka bulat',
+            'expire_date.date' => 'Tanggal kedaluwarsa harus berupa format tanggal yang valid (YYYY-MM-DD)',
         ];
     }
 

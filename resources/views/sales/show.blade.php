@@ -178,6 +178,24 @@
                     </svg>
                     Informasi Pelanggan
                 </h3>
+                
+                @if ($sale->draft_id)
+                <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-md border-l-4 border-blue-400">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0">
+                            <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                        </div>
+                        <div class="ml-3">
+                            <p class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                Transaksi ini dibuat dari draft <a href="{{ route('drafts.show', $sale->draft_id) }}" class="underline hover:text-blue-600">#{{ $sale->draft->invoice_number }}</a>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                @endif
 
                 @if ($sale->customer)
                     <div class="space-y-3">

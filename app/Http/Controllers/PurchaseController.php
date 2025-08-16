@@ -11,6 +11,7 @@ use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\UnitOfMeasure;
 use App\Models\User;
+use App\Services\FifoService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
@@ -481,7 +482,7 @@ class PurchaseController extends Controller
                     $remainingQty = $purchaseDetail->quantity - $purchaseDetail->received_quantity;
                     $receivedQty = min($item['received_quantity'], $remainingQty);
 
-                    // TAMBAHKAN BARIS INI - Hitung jumlah berdasarkan konversi
+                    // Hitung jumlah berdasarkan konversi
                     $baseQuantityReceived = $receivedQty * $purchaseDetail->conversion_factor;
 
                     // Create receipt detail
@@ -494,6 +495,17 @@ class PurchaseController extends Controller
                     // Update purchase detail received quantity
                     $purchaseDetail->received_quantity += $receivedQty;
                     $purchaseDetail->save();
+                    
+                    // Buat batch baru menggunakan FIFO Service
+                    $fifoService = new FifoService();
+                    $batch = $fifoService->addBatch(
+                        $product->id,
+                        $purchase->id,
+                        $baseQuantityReceived,
+                        $purchaseDetail->purchase_price,
+                        null, // Batch number akan digenerate otomatis
+                        null  // Expiry date bisa ditambahkan jika diperlukan
+                    );
 
                     if ($purchaseDetail->received_quantity < $purchaseDetail->quantity) {
                         $allReceived = false;

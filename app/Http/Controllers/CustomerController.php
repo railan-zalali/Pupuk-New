@@ -7,6 +7,8 @@ use App\Models\Customer;
 use Illuminate\Http\Request;
 use Maatwebsite\Excel\Facades\Excel;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Maatwebsite\Excel\Validators\ValidationException;
 
 class CustomerController extends Controller
 {
@@ -169,6 +171,12 @@ class CustomerController extends Controller
             'data' => $customers->toArray()
         ]);
     }
+    /**
+     * Import data pelanggan dari file Excel
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function import(Request $request)
     {
         $request->validate([
@@ -176,15 +184,72 @@ class CustomerController extends Controller
         ]);
 
         try {
+            // Log aktivitas import
+            Log::info('Memulai import data pelanggan', [
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name,
+                'file_name' => $request->file('excel_file')->getClientOriginalName(),
+                'file_size' => $request->file('excel_file')->getSize(),
+            ]);
+
+            // Proses import
             Excel::import(new CustomersImport, $request->file('excel_file'));
+
+            // Log sukses
+            Log::info('Import data pelanggan berhasil', [
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name,
+            ]);
+
             return redirect()->back()->with('success', 'Data pelanggan berhasil diimpor!');
+        } catch (ValidationException $e) {
+            // Tangkap error validasi secara spesifik
+            $failures = $e->failures();
+            $errorMessages = [];
+
+            foreach ($failures as $failure) {
+                // Kumpulkan pesan error untuk setiap baris yang gagal
+                $errorMessage = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+                $errorMessages[] = $errorMessage;
+
+                // Log setiap error validasi
+                Log::warning('Validasi gagal saat import data pelanggan', [
+                    'row' => $failure->row(),
+                    'errors' => $failure->errors(),
+                    'values' => $failure->values() ?? [],
+                ]);
+            }
+
+            return redirect()->back()->with('error', 'Gagal mengimpor data. <br>' . implode('<br>', $errorMessages));
         } catch (\Exception $e) {
+            // Log error umum
+            Log::error('Error saat import data pelanggan', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'user_id' => auth()->id(),
+                'user_name' => auth()->user()->name,
+            ]);
+
+            // Tangkap error umum lainnya
             return redirect()->back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
         }
     }
     public function downloadTemplate()
     {
-        return response()->download(public_path('templates/customer_import_template.xlsx'));
+        // Buat template baru menggunakan CustomersTemplateExport
+        $filename = 'customer_import_template.xlsx';
+        $path = storage_path('app/public/templates/');
+
+        // Pastikan direktori ada
+        if (!file_exists($path)) {
+            mkdir($path, 0755, true);
+        }
+
+        // Buat file template baru
+        Excel::store(new \App\Exports\CustomersTemplateExport, 'public/templates/' . $filename);
+
+        // Kembalikan file yang baru dibuat
+        return response()->download(storage_path('app/public/templates/' . $filename), $filename);
     }
 
     /**

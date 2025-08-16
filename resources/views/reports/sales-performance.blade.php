@@ -248,7 +248,7 @@
                             <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
                                 <td
                                     class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $product->product->name }} ({{ $product->product->code }})
+                                    {{ $product->product->nama }} ({{ $product->product->code }})
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ number_format($product->total_quantity) }}

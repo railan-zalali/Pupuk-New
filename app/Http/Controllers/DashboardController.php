@@ -137,13 +137,13 @@ class DashboardController extends Controller
             ->get();
 
         // Data untuk draft transaksi
-        $data['draftSales'] = Sale::where('status', 'draft')
+        $data['draftSales'] = Sale::whereIn('status', ['draft', 'processing'])
             ->with('customer')
             ->latest()
             ->limit(5)
             ->get();
 
-        $data['totalDrafts'] = Sale::where('status', 'draft')->count();
+        $data['totalDrafts'] = Sale::whereIn('status', ['draft', 'processing'])->count();
 
         // Draft yang akan expire dalam 3 hari
         $data['expiringDrafts'] = Sale::where('status', 'draft')

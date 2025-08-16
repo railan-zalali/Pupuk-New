@@ -37,6 +37,22 @@ class Product extends Model
     {
         return $this->hasMany(StockMovement::class);
     }
+    
+    /**
+     * Get the batches for this product.
+     */
+    public function batches()
+    {
+        return $this->hasMany(ProductBatch::class);
+    }
+    
+    /**
+     * Get available batches with remaining stock (FIFO order).
+     */
+    public function availableBatches()
+    {
+        return $this->batches()->hasStock()->fifo();
+    }
 
     public function saleDetails()
     {

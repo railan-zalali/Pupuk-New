@@ -33,12 +33,17 @@
                 <i class="nav-icon ti ti-shopping-cart"></i>
                 <span x-show="sidebarOpen" x-transition>Penjualan</span>
             </a>
-
+            <a href="{{ route('sales.drafts') }}"
+                class="nav-item {{ request()->routeIs('sales.drafts') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-file-invoice"></i>
+                <span x-show="sidebarOpen" x-transition>Draft Penjualan</span>
+            </a>
             <a href="{{ route('purchases.index') }}"
                 class="nav-item {{ request()->routeIs('purchases.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-truck-delivery"></i>
                 <span x-show="sidebarOpen" x-transition>Pembelian</span>
             </a>
+
 
             <a href="{{ route('products.index') }}"
                 class="nav-item {{ request()->routeIs('products.*') ? 'active' : '' }}">
@@ -125,6 +130,18 @@
                 class="nav-item {{ request()->routeIs('reports.stock') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-chart-area"></i>
                 <span x-show="sidebarOpen" x-transition>Laporan Stok</span>
+            </a>
+            
+            <a href="{{ route('reports.stock-in') }}"
+                class="nav-item {{ request()->routeIs('reports.stock-in') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-arrow-bar-to-down"></i>
+                <span x-show="sidebarOpen" x-transition>Stok Masuk</span>
+            </a>
+            
+            <a href="{{ route('reports.stock-out') }}"
+                class="nav-item {{ request()->routeIs('reports.stock-out') ? 'active' : '' }}">
+                <i class="nav-icon ti ti-arrow-bar-to-up"></i>
+                <span x-show="sidebarOpen" x-transition>Stok Keluar</span>
             </a>
 
             <a href="{{ route('reports.profit-loss') }}"

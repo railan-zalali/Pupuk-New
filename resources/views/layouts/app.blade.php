@@ -90,7 +90,7 @@
                         </button>
 
                         <!-- Page title -->
-                        <span class="text-lg font-semibold hidden md:block">{{ config('app.name', 'Laravel') }}</span>
+                        {{-- <span class="text-lg font-semibold hidden md:block">{{ config('app.name', 'Laravel') }}</span> --}}
                     </div>
 
                     <div class="flex items-center gap-3">

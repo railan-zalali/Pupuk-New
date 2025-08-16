@@ -5,7 +5,6 @@ use App\Http\Controllers\CashBookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\DraftSaleController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
@@ -112,6 +111,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/products/{product}/units', [ProductController::class, 'getUnits'])->name('products.getWithUnits');
         Route::get('/products/create-batch', [ProductController::class, 'createBatch'])->name('products.create-batch');
         Route::post('/products/store-batch', [ProductController::class, 'storeBatch'])->name('products.store-batch');
+        Route::get('/products/{product}/batches', [ProductController::class, 'showBatches'])->name('products.batches');
         Route::resource('categories', CategoryController::class);
 
         Route::post('/products/{product}/remove-image', [ProductController::class, 'deleteImage'])
@@ -158,6 +158,11 @@ Route::middleware('auth')->group(function () {
 
     Route::middleware(['permission:manage-sales'])->group(function () {
         Route::get('sales/credit', [SaleController::class, 'creditSales'])->name('sales.credit');
+        Route::get('sales/drafts', [SaleController::class, 'drafts'])->name('sales.drafts');
+        Route::get('sales/drafts/{sale}/edit', [SaleController::class, 'edit'])->name('drafts.edit');
+        Route::put('/sales/{sale}/complete-draft', [SaleController::class, 'completeDraft'])->name('sales.complete_draft');
+        Route::put('/sales/drafts/{sale}/process', [SaleController::class, 'completeDraft'])->name('drafts.process');
+        Route::patch('/sales/{sale}/update-notes', [SaleController::class, 'updateNotes'])->name('sales.update_notes');
 
         Route::get('/products/{product}/get', [SaleController::class, 'getProduct'])->name('products.get');
 
@@ -169,14 +174,6 @@ Route::middleware('auth')->group(function () {
         Route::post('/sales/{sale}/pay', [SaleController::class, 'payCredit'])->name('sales.pay');
         Route::get('/sales/{sale}/details', [SaleController::class, 'getSaleDetails'])->name('sales.details');
 
-        // Draft Sales Routes
-        Route::get('/sales/drafts', [DraftSaleController::class, 'index'])->name('drafts.index');
-        Route::get('/sales/drafts/{draft}', [DraftSaleController::class, 'show'])->name('drafts.show');
-        Route::get('/sales/drafts/{draft}/edit', [DraftSaleController::class, 'edit'])->name('drafts.edit');
-        Route::put('/sales/drafts/{draft}', [DraftSaleController::class, 'update'])->name('drafts.update');
-        Route::put('/sales/drafts/{draft}/process', [DraftSaleController::class, 'process'])->name('drafts.process');
-        Route::delete('/sales/drafts/{draft}', [DraftSaleController::class, 'destroy'])->name('drafts.destroy');
-
         Route::resource('sales', SaleController::class);
     });
 
@@ -186,14 +183,23 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/sales', [ReportController::class, 'sales'])->name('reports.sales');
         Route::get('/reports/purchases', [ReportController::class, 'purchases'])->name('reports.purchases');
         Route::get('/reports/stock', [ReportController::class, 'stock'])->name('reports.stock');
+        Route::get('/reports/stock-in', [ReportController::class, 'stockIn'])->name('reports.stock-in');
+        Route::get('/reports/stock-out', [ReportController::class, 'stockOut'])->name('reports.stock-out');
+        Route::get('/reports/fifo-stock', [ReportController::class, 'fifoStock'])->name('reports.fifo-stock');
         Route::get('/reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         Route::get('/reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
         Route::get('/reports/accounts', [ReportController::class, 'accounts'])->name('reports.accounts');
         Route::get('/reports/export/sales', [ReportController::class, 'exportSales'])->name('reports.export.sales');
     });
+    
+    // Store Settings routes
+    Route::middleware(['auth', 'role:admin'])->group(function () {
+        Route::get('/settings', [\App\Http\Controllers\StoreSettingController::class, 'index'])->name('settings.index');
+        Route::post('/settings', [\App\Http\Controllers\StoreSettingController::class, 'store'])->name('settings.store');
+    });
 
 
-    // Route::resource('cash-book', CashBookController::class);
+    Route::resource('cash-book', CashBookController::class);
 });
 require __DIR__ . '/auth.php';
 Route::get('search/products', [ProductController::class, 'search'])->name('products.search');

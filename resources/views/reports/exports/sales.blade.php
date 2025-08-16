@@ -96,7 +96,7 @@
                 <tr>
                     <td>{{ $sale->created_at->format('d/m/Y H:i') }}</td>
                     <td>{{ $sale->invoice_number }}</td>
-                    <td>{{ $sale->customer ? $sale->customer->name : '-' }}</td>
+                    <td>{{ $sale->customer ? $sale->customer->nama : '-' }}</td>
                     <td>Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
                     <td>
                         @if ($sale->payment_method == 'cash')

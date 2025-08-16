@@ -29,7 +29,7 @@
             <div
                 class="flex items-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-lg">
                 <i class="ti ti-calendar-event mr-2 text-indigo-500"></i>
-                {{ now()->format('l, d F Y') }}
+                <span id="current-datetime">{{ now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }} <span id="current-time"></span></span>
             </div>
             <div class="dashboard-controls flex items-center gap-3">
                 <button id="refresh-dashboard"
@@ -619,6 +619,12 @@
                                                 - {{ $draft->customer->nama }}
                                             </span>
                                         @endif
+                                        @if ($draft->status === 'processing')
+                                            <span
+                                                class="ml-2 px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+                                                Diproses
+                                            </span>
+                                        @endif
                                     </div>
                                     <div
                                         class="flex items-center mt-1 space-x-4 text-xs text-gray-500 dark:text-gray-400">
@@ -639,21 +645,31 @@
                                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                                         </svg>
                                     </a>
-                                    <a href="{{ route('drafts.process', $draft) }}"
-                                        class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                        </svg>
-                                    </a>
+                                    @if ($draft->status === 'processing')
+                                        <span class="text-gray-400 cursor-not-allowed">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </span>
+                                    @else
+                                        <a href="{{ route('drafts.process', $draft) }}"
+                                            class="text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-300">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                        </a>
+                                    @endif
                                 </div>
                             </div>
                         @endforeach
                     </div>
 
                     <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <a href="{{ route('drafts.index') }}"
+                        <a href="{{ route('sales.drafts') }}"
                             class="text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 font-medium">
                             Lihat semua draft ({{ $data['totalDrafts'] }}) →
                         </a>
@@ -776,7 +792,7 @@
         </div>
 
         <!-- Expiring Products Section -->
-        <div
+        <div id="expiring-products"
             class="overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
             <div class="p-6">
                 <div class="flex items-center justify-between mb-4">
@@ -788,10 +804,10 @@
                         </svg>
                         Produk yang Akan Expired
                     </h3>
-                    @if (count($data['expiringProducts']) > 0)
-                        <a href="#"
+                    @if (isset($data['expiringProducts']) && is_countable($data['expiringProducts']) && count($data['expiringProducts']) > 0)
+                        <a href="#" id="view-all-expiring-products"
                             class="text-sm text-blue-600 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-500 flex items-center">
-                            <span>Lihat semua</span>
+                            <span>Lihat Produk</span>
                             <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -887,17 +903,17 @@
                                             @elseif($daysLeft <= 7)
                                                 <span
                                                     class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900 px-3 py-0.5 text-xs font-medium text-red-800 dark:text-red-400">
-                                                    {{ $daysLeft }} hari
+                                                    {{ (int) $daysLeft }} hari
                                                 </span>
                                             @elseif($daysLeft <= 30)
                                                 <span
                                                     class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900 px-3 py-0.5 text-xs font-medium text-yellow-800 dark:text-yellow-400">
-                                                    {{ $daysLeft }} hari
+                                                    {{ (int) $daysLeft }} hari
                                                 </span>
                                             @else
                                                 <span
                                                     class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900 px-3 py-0.5 text-xs font-medium text-green-800 dark:text-green-400">
-                                                    {{ $daysLeft }} hari
+                                                    {{ (int) $daysLeft }} hari
                                                 </span>
                                             @endif
                                         </td>
@@ -1017,7 +1033,7 @@
                                 </div>
                             @endif
 
-                            @if (count($expiringProducts) > 0)
+                            @if (isset($data['expiringProducts']) && is_countable($data['expiringProducts']) && count($data['expiringProducts']) > 0)
                                 <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                                     <div class="flex">
                                         <div class="flex-shrink-0">
@@ -1038,7 +1054,7 @@
                                             </div>
                                             <div class="mt-4">
                                                 <div class="-mx-2 -my-1.5 flex">
-                                                    <a href="#expiring-products"
+                                                    <a href="#expiring-products" id="view-expiring-products"
                                                         class="px-2 py-1.5 rounded-md text-sm font-medium text-yellow-800 dark:text-yellow-300 hover:bg-yellow-100 dark:hover:bg-yellow-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 dark:focus:ring-offset-gray-800">
                                                         Lihat Produk
                                                     </a>
@@ -1082,6 +1098,66 @@
                     timeout = setTimeout(later, wait);
                 };
             }
+
+            // Update time with seconds
+            function updateTime() {
+                const now = new Date();
+                const hours = String(now.getHours()).padStart(2, '0');
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const seconds = String(now.getSeconds()).padStart(2, '0');
+                document.getElementById('current-time').textContent = hours + ':' + minutes + ':' + seconds;
+            }
+            
+            // Handle click on "Lihat Produk" buttons
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize and update time every second
+                updateTime();
+                setInterval(updateTime, 1000);
+                
+                // Handle refresh button
+                const refreshButton = document.getElementById('refresh-dashboard');
+                if (refreshButton) {
+                    refreshButton.addEventListener('click', function() {
+                        // Add spinning animation to refresh icon
+                        const refreshIcon = refreshButton.querySelector('.ti-refresh');
+                        refreshIcon.classList.add('animate-spin');
+                        
+                        // Reload the page after a short delay
+                        setTimeout(function() {
+                            window.location.reload();
+                        }, 500);
+                    });
+                }
+                
+                // Handle main alert button
+                const viewExpiringProductsBtn = document.getElementById('view-expiring-products');
+                if (viewExpiringProductsBtn) {
+                    viewExpiringProductsBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const expiringProductsSection = document.getElementById('expiring-products');
+                        if (expiringProductsSection) {
+                            expiringProductsSection.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+
+                // Handle "Lihat Produk" button in the expiring products section
+                const viewAllExpiringProductsBtn = document.getElementById('view-all-expiring-products');
+                if (viewAllExpiringProductsBtn) {
+                    viewAllExpiringProductsBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Scroll to the expiring products table
+                        const expiringProductsSection = document.getElementById('expiring-products');
+                        if (expiringProductsSection) {
+                            expiringProductsSection.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+            });
 
             // Format Rupiah
             function formatRupiah(number) {

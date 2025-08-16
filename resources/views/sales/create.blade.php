@@ -11,25 +11,63 @@
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
-                        {{ __('Buat Penjualan Baru') }}
+                        @if($draft)
+                            {{ __('Proses Draft Penjualan') }}
+                        @else
+                            {{ __('Buat Penjualan Baru') }}
+                        @endif
                     </h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
-                        Isi informasi detail untuk transaksi penjualan baru
+                        @if($draft)
+                            Anda sedang memproses draft penjualan dengan nomor invoice <span class="font-medium">{{ $draft->invoice_number }}</span>
+                        @else
+                            Isi informasi detail untuk transaksi penjualan baru
+                        @endif
                     </p>
                 </div>
-                <div class="mt-4 flex md:mt-0 md:ml-4">
-                    <a href="{{ route('sales.index') }}"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                        </svg>
-                        Kembali
-                    </a>
+                <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
+                    @if($draft)
+                        <a href="{{ route('sales.drafts') }}"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Kembali ke Daftar Draft
+                        </a>
+                    @else
+                        <a href="{{ route('sales.index') }}"
+                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                            </svg>
+                            Kembali
+                        </a>
+                    @endif
                 </div>
             </div>
         </div>
+        
+        @if($draft)
+        <!-- Draft Info Banner -->
+        <div class="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700">
+                        Anda sedang memproses draft penjualan. Periksa data dan selesaikan transaksi dengan menekan tombol <strong>Simpan Transaksi</strong>. Jika ingin tetap menyimpan sebagai draft, gunakan tombol <strong>Simpan Sebagai Draft</strong>.
+                    </p>
+                </div>
+            </div>
+        </div>
+        @endif
 
         <!-- Error Messages -->
         @if ($errors->any())
@@ -482,24 +520,50 @@
                     </svg>
                     Batal
                 </button>
-                <button type="submit" name="save_draft" value="1"
-                    class="inline-flex justify-center py-2 px-4 border border-yellow-500 dark:border-yellow-600 shadow-sm text-sm font-medium rounded-md text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg"
-                        class="-ml-1 mr-2 h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Simpan sebagai Draft
-                </button>
-                <button type="submit"
-                    class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                    </svg>
-                    Proses Transaksi
-                </button>
+                
+                <div class="relative group">
+                    <button type="submit" name="save_draft" value="1"
+                        class="inline-flex justify-center py-2 px-4 border border-yellow-500 dark:border-yellow-600 shadow-sm text-sm font-medium rounded-md text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="-ml-1 mr-2 h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        @if($draft)
+                            Perbarui Draft
+                        @else
+                            Simpan sebagai Draft
+                        @endif
+                    </button>
+                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-64 z-10">
+                        <div class="bg-gray-800 text-white text-xs rounded py-1 px-2 shadow-lg">
+                            <div class="text-center">Menyimpan transaksi sebagai draft untuk diproses nanti</div>
+                            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-2 h-2 rotate-45 bg-gray-800"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="relative group">
+                    <button type="submit"
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        @if($draft)
+                            Selesaikan Transaksi
+                        @else
+                            Proses Transaksi
+                        @endif
+                    </button>
+                    <div class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-64 z-10">
+                        <div class="bg-gray-800 text-white text-xs rounded py-1 px-2 shadow-lg">
+                            <div class="text-center">Menyelesaikan dan memproses transaksi penjualan</div>
+                            <div class="absolute bottom-0 left-1/2 transform -translate-x-1/2 translate-y-1/2 w-2 h-2 rotate-45 bg-gray-800"></div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </form>
     </div>
@@ -750,7 +814,15 @@
 
         <script>
             let isDraftSubmission = false;
+            let currentDraftId = null;
+            let autoSaveTimer;
+            let isDraftSaved = false;
             $(document).ready(function() {
+                // Check if we have a draft to load
+                @if(isset($draft) && $draft)
+                    loadDraftData();
+                @endif
+                
                 // Initialize Select2 for customer select
                 initializeCustomerSelect();
 
@@ -839,24 +911,35 @@
                         e.preventDefault();
                         isDraftSubmission = true;
                         $('#payment_method').removeAttr('required');
+                        
+                        // Ensure the save_draft parameter is included
+                        if (!$('input[name="save_draft"]').length) {
+                            $('#saleForm').append('<input type="hidden" name="save_draft" value="1">');
+                        }
+                        
                         $('button[name="save_draft"]').click();
                     }
                 });
 
                 $('button[name="save_draft"]').on('click', function(e) {
-                    isDraftSubmission = true;
-                    // Temporarily remove HTML5 validation
-                    $('#payment_method').removeAttr('required');
-                    $('#date').removeAttr('required');
-                    $('input[name="quantity[]"]').removeAttr('required');
-                    $('input[name="selling_price[]"]').removeAttr('required');
-                    $('select[name="product_id[]"]').removeAttr('required');
-                    $('select[name="unit_id[]"]').removeAttr('required');
-                });
+                     isDraftSubmission = true;
+                     // Temporarily remove HTML5 validation
+                     $('#payment_method').removeAttr('required');
+                     $('#date').removeAttr('required');
+                     $('input[name="quantity[]"]').removeAttr('required');
+                     $('input[name="selling_price[]"]').removeAttr('required');
+                     $('select[name="product_id[]"]').removeAttr('required');
+                     $('select[name="unit_id[]"]').removeAttr('required');
+                     
+                     // Ensure the save_draft parameter is included
+                     if (!$('input[name="save_draft"]').length) {
+                         $('#saleForm').append('<input type="hidden" name="save_draft" value="1">');
+                     }
+                 });
 
                 $('button[type="submit"]:not([name="save_draft"])').on('click', function(e) {
-                    isDraftSubmission = false;
-                    // Restore HTML5 validation
+                     isDraftSubmission = false;
+                     // Restore HTML5 validation
                     $('#payment_method').attr('required', true);
                     $('#date').attr('required', true);
                     $('input[name="quantity[]"]').attr('required', true);
@@ -896,10 +979,10 @@
                     showNotification('Gunakan Alt+H untuk melihat histori pembelian pelanggan', 'info');
                 }, 1000);
 
-                // Auto-save functionality
-                let autoSaveTimer;
-                let isDraftSaved = false;
-                let currentDraftId = null;
+                // Set currentDraftId if we loaded from a draft
+                @if(isset($draft) && $draft)
+                    currentDraftId = {{ $draft->id }};
+                @endif
 
                 // Initialize auto-save
                 initializeAutoSave();
@@ -943,6 +1026,26 @@
                             return false;
                         }
                     }
+                }
+
+                return true;
+            }
+            
+            function validateDraftForm() {
+                const tbody = $('#saleItems');
+                if (tbody.children('tr').length === 0) {
+                    alert('Tambahkan setidaknya satu item untuk menyimpan draft');
+                    return false;
+                }
+
+                // Check if at least one product is selected
+                const hasProductSelected = $('#saleItems select[name="product_id[]"]').filter(function() {
+                    return $(this).val();
+                }).length > 0;
+
+                if (!hasProductSelected) {
+                    alert('Pilih setidaknya satu produk untuk menyimpan draft');
+                    return false;
                 }
 
                 return true;
@@ -1032,6 +1135,52 @@
                     formData.draft_id = currentDraftId;
                 }
 
+                // Add save_draft flag
+                formData.save_draft = 1;
+                
+                // Set isDraftSubmission flag
+                isDraftSubmission = true;
+
+                // Send AJAX request to save draft
+                $.ajax({
+                    url: '/sales',
+                    type: 'POST',
+                    data: formData,
+                    success: function(response) {
+                        // Hide saving indicator
+                        $('#auto-save-indicator').addClass('hidden');
+
+                        // Show success message
+                        $('#auto-save-success').removeClass('hidden');
+                        $('#save-time').text('(' + new Date().toLocaleTimeString() + ')');
+
+                        // Set draft as saved
+                        isDraftSaved = true;
+                        
+                        // Reset isDraftSubmission flag after auto-save is complete
+                        isDraftSubmission = false;
+
+                        // Store draft ID for future updates
+                        if (response.draft_id) {
+                            currentDraftId = response.draft_id;
+                        }
+
+                        // Hide success message after 3 seconds
+                        setTimeout(function() {
+                            $('#auto-save-success').addClass('hidden');
+                        }, 3000);
+                    },
+                    error: function(xhr) {
+                        // Hide saving indicator
+                        $('#auto-save-indicator').addClass('hidden');
+                        
+                        // Reset isDraftSubmission flag even if there's an error
+                        isDraftSubmission = false;
+
+                        // Show error in console
+                        console.error('Error saving draft:', xhr.responseText);
+                    }
+                });
             }
 
             function collectFormData() {
@@ -1069,10 +1218,201 @@
 
             // Manual save draft function
             function saveAsDraft() {
+                // Use the validateDraftForm function for validation
+                if (!validateDraftForm()) {
+                    return false;
+                }
+
+                // Show confirmation if draft already exists
+                if (currentDraftId && !confirm('Draft sudah ada. Apakah Anda ingin memperbarui draft yang ada?')) {
+                    return false;
+                }
+
+                // Set form submission flag
+                isDraftSubmission = true;
+
+                // Perform auto save
                 performAutoSave();
+
+                return false; // Prevent form submission
             }
 
 
+            function loadDraftData() {
+                @if(isset($draft) && $draft)
+                    // Set currentDraftId
+                    currentDraftId = {{ $draft->id }};
+                    
+                    // Set customer if available
+                    @if($draft->customer_id)
+                        $('#customer_select').val({{ $draft->customer_id }}).trigger('change');
+                    @endif
+                    
+                    // Set payment method if available
+                    @if($draft->payment_method)
+                        $('#payment_method').val('{{ $draft->payment_method }}').trigger('change');
+                    @endif
+                    
+                    // Set other fields
+                    @if($draft->discount)
+                        $('#discount').val({{ $draft->discount }});
+                    @endif
+                    
+                    @if($draft->paid_amount)
+                        $('#paid_amount').val({{ $draft->paid_amount }});
+                    @endif
+                    
+                    @if($draft->down_payment)
+                        $('#down_payment').val({{ $draft->down_payment }});
+                    @endif
+                    
+                    @if($draft->notes)
+                        $('#notes').val('{{ $draft->notes }}');
+                    @endif
+                    
+                    // Remove any existing items
+                    $('#saleItems').empty();
+                    
+                    // Check if draft has sale details
+                    @if($draft->saleDetails && $draft->saleDetails->count() > 0)
+                        // Add items from draft
+                        @foreach($draft->saleDetails as $detail)
+                            try {
+                                let newRow = addItem();
+                                if (!newRow || newRow.length === 0) {
+                                    console.error('Failed to create new row');
+                                    return;
+                                }
+                                
+                                // Ensure product exists in dropdown
+                                const productSelect = newRow.find('select[name="product_id[]"]');
+                                if (productSelect && productSelect.length > 0) {
+                                    if (productSelect.find(`option[value="{{ $detail->product_id }}"]`).length === 0) {
+                                        // If product doesn't exist in dropdown, add it
+                                        @if($detail->product)
+                                            productSelect.append(new Option('{{ $detail->product->name }}', {{ $detail->product_id }}, true, true));
+                                        @endif
+                                    }
+                                    
+                                    // Set product and trigger change event
+                                    productSelect.val({{ $detail->product_id }}).trigger('change');
+                                    
+                                    // Log untuk debugging
+                                    console.log('Product selected:', {{ $detail->product_id }});
+                                }
+                                
+                                // Store row reference for later use in setTimeout
+                                const currentRow = newRow;
+                            
+                                // Wait for product info to load before setting other values
+                            // Increase timeout to ensure product data is fully loaded
+                            setTimeout(() => {
+                                try {
+                                    if (!currentRow || currentRow.length === 0) {
+                                        console.error('Row is no longer available in setTimeout');
+                                        return;
+                                    }
+                                    
+                                    // Log untuk debugging
+                                    console.log('Setting unit, quantity, and price for product:', {{ $detail->product_id }});
+                                    
+                                    const stockDisplay = currentRow.find('.stock-display');
+                                    if (stockDisplay && stockDisplay.length > 0) {
+                                        console.log('Current stock display:', stockDisplay.text());
+                                        
+                                        // Pastikan stok ditampilkan bahkan jika kosong
+                                        if (stockDisplay.text() === '-' || stockDisplay.text() === 'Loading...') {
+                                            @if($detail->product && isset($detail->product->stock))
+                                                stockDisplay.text('{{ $detail->product->stock }}');
+                                                // Tambahkan warna berdasarkan level stok
+                                                stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
+                                                @if($detail->product->stock > 10)
+                                                    stockDisplay.addClass('bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400');
+                                                @elseif($detail->product->stock > 0)
+                                                    stockDisplay.addClass('bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400');
+                                                @else
+                                                    stockDisplay.addClass('bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
+                                                @endif
+                                            @else
+                                                stockDisplay.text('0');
+                                                stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
+                                                stockDisplay.addClass('bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
+                                            @endif
+                                        }
+                                    }
+                                    
+                                    const unitSelect = currentRow.find('select[name="unit_id[]"]');
+                                    
+                                    if (unitSelect && unitSelect.length > 0) {
+                                        // Log unit options
+                                        console.log('Available unit options:', unitSelect.find('option').length);
+                                        
+                                        // Ensure unit exists in dropdown
+                                        if (unitSelect.find(`option[value="{{ $detail->unit_id }}"]`).length === 0) {
+                                            @if($detail->unit)
+                                                console.log('Adding missing unit option: {{ $detail->unit->name }}');
+                                                unitSelect.append(new Option('{{ $detail->unit->name }}', {{ $detail->unit_id }}, true, true));
+                                            @endif
+                                        }
+                                        
+                                        // Delay setting unit value to ensure options are loaded
+                                        setTimeout(() => {
+                                            unitSelect.val({{ $detail->unit_id }}).trigger('change');
+                                            console.log('Unit selected:', {{ $detail->unit_id }});
+                                            
+                                            // Set quantity after unit is selected
+                                            const quantityInput = currentRow.find('input[name="quantity[]"]');
+                                            if (quantityInput && quantityInput.length > 0) {
+                                                quantityInput.val({{ $detail->quantity }});
+                                                console.log('Quantity set:', {{ $detail->quantity }});
+                                                quantityInput.trigger('input'); // Trigger input event to recalculate subtotal
+                                            }
+                                            
+                                            const priceInput = currentRow.find('input[name="selling_price[]"]');
+                                            if (priceInput && priceInput.length > 0) {
+                                                priceInput.val({{ $detail->price ?? $detail->selling_price }});
+                                                console.log('Price set:', {{ $detail->price ?? $detail->selling_price }});
+                                                priceInput.trigger('input'); // Trigger input event to recalculate subtotal
+                                            }
+                                            
+                                            // Force recalculation of subtotal
+                                            calculateSubtotal(currentRow);
+                                        }, 500); // Additional delay to ensure unit options are loaded
+                                    } else {
+                                        console.error('Unit select not found');
+                                    }
+                                } catch (error) {
+                                    console.error('Error setting item values in setTimeout:', error);
+                                }
+                            }, 1500); // Increased timeout to 1500ms
+                            } catch (error) {
+                                console.error('Error adding item from draft:', error);
+                            }
+                        @endforeach
+                        
+                        // Calculate totals
+                        setTimeout(() => {
+                            try {
+                                calculateTotal();
+                                calculateFinalTotal();
+                                const paymentMethod = $('#payment_method').val();
+                                if (paymentMethod === 'cash') {
+                                    calculateChange();
+                                } else if (paymentMethod === 'credit') {
+                                    calculateRemainingAmount();
+                                }
+                                showNotification('Draft berhasil dimuat', 'success');
+                            } catch (error) {
+                                console.error('Error calculating totals:', error);
+                                showNotification('Terjadi kesalahan saat memuat draft', 'error');
+                            }
+                        }, 1000);
+                    @else
+                        showNotification('Draft tidak memiliki item produk', 'warning');
+                    @endif
+                @endif
+            }
+            
             function createItemRow() {
                 return `
                 <tr class="sale-item hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
@@ -1122,6 +1462,7 @@
                 const newRow = $(createItemRow());
                 tbody.append(newRow);
                 initializeProductSelect(newRow);
+                return newRow;
             }
 
             function removeItem(row) {
@@ -1137,8 +1478,19 @@
             }
 
             function initializeProductSelect(row) {
+                if (!row || row.length === 0) {
+                    console.error('Invalid row passed to initializeProductSelect');
+                    return;
+                }
+                
                 try {
-                    row.find('.product-select').select2({
+                    const productSelect = row.find('.product-select');
+                    if (!productSelect || productSelect.length === 0) {
+                        console.error('Product select element not found in row');
+                        return;
+                    }
+                    
+                    productSelect.select2({
                         theme: 'tailwind',
                         placeholder: 'Pilih Produk',
                         width: '100%',
@@ -1154,12 +1506,22 @@
                     });
                 } catch (e) {
                     console.error('Error initializing Select2:', e);
-                    // Fallback to native select if Select2 fails
-                    row.find('.product-select').removeClass('select2-hidden-accessible').css('display', 'block')
-                        .next('.select2-container').remove();
-                    row.find('.product-select').addClass(
-                        'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                    );
+                    try {
+                        // Fallback to native select if Select2 fails
+                        const productSelect = row.find('.product-select');
+                        if (productSelect && productSelect.length > 0) {
+                            productSelect.removeClass('select2-hidden-accessible').css('display', 'block');
+                            const container = productSelect.next('.select2-container');
+                            if (container && container.length > 0) {
+                                container.remove();
+                            }
+                            productSelect.addClass(
+                                'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                            );
+                        }
+                    } catch (fallbackError) {
+                        console.error('Error applying fallback for Select2:', fallbackError);
+                    }
                 }
             }
 
@@ -1183,6 +1545,8 @@
                         )
                         .addClass('bg-gray-100 dark:bg-gray-700');
 
+                    console.log('Fetching units for product ID:', productId);
+                    
                     // Fetch product units via Fetch API
                     fetch(`/products/${productId}/units`)
                         .then(response => {
@@ -1192,12 +1556,15 @@
                             return response.json();
                         })
                         .then(data => {
+                            console.log('Received product data:', data);
+                            
                             // Calculate already selected quantity for this product
                             const alreadySelectedQuantity = calculateAlreadySelectedQuantity(productId, row);
 
                             // Update stock display with adjusted stock
                             const adjustedStock = Math.max(0, (data.stock || 0) - alreadySelectedQuantity);
                             stockDisplay.text(adjustedStock);
+                            console.log('Stock updated to:', adjustedStock);
 
                             // Add color coding based on stock level
                             stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
@@ -1214,6 +1581,8 @@
 
                             // Populate unit options
                             if (data.units && data.units.length > 0) {
+                                console.log('Adding', data.units.length, 'unit options');
+                                
                                 data.units.forEach(unit => {
                                     const option = $('<option></option>');
                                     option.val(unit.id);
@@ -1222,16 +1591,20 @@
                                     option.data('conversionFactor', unit.conversion_factor);
                                     option.data('isDefault', unit.is_default ? "1" : "0");
                                     unitSelect.append(option);
+                                    
+                                    console.log('Added unit option:', unit.unit_name, 'ID:', unit.id);
                                 });
 
                                 // Select default unit if available
                                 const defaultUnit = unitSelect.find('option[data-is-default="1"]');
                                 if (defaultUnit.length) {
                                     defaultUnit.prop('selected', true);
+                                    console.log('Selected default unit:', defaultUnit.val());
                                     updatePrice(unitSelect);
                                 } else if (data.units.length > 0) {
                                     // Select the first unit if no default is set
                                     unitSelect.find('option:eq(1)').prop('selected', true);
+                                    console.log('Selected first unit:', unitSelect.val());
                                     updatePrice(unitSelect);
                                 }
                             } else {
@@ -1465,16 +1838,29 @@
             }
 
             function validateProductStock() {
+                // Skip stock validation for drafts
+                if (isDraftSubmission) {
+                    return true;
+                }
+                
                 let isValid = true;
                 $('#saleItems tr').each(function() {
                     const row = $(this);
                     const productSelect = row.find('select[name="product_id[]"]');
                     const quantityInput = row.find('input[name="quantity[]"]');
+                    const unitSelect = row.find('select[name="unit_id[]"]');
                     const selectedOption = productSelect.find('option:selected');
+                    const selectedUnit = unitSelect.find('option:selected');
 
                     if (selectedOption.length && selectedOption.val()) {
                         const availableStock = parseInt(selectedOption.data('stock')) || 0;
-                        const requestedQuantity = parseInt(quantityInput.val()) || 0;
+                        let requestedQuantity = parseInt(quantityInput.val()) || 0;
+                        
+                        // Apply conversion factor if unit is selected
+                        if (selectedUnit.length && selectedUnit.data('conversionFactor')) {
+                            const conversionFactor = parseFloat(selectedUnit.data('conversionFactor')) || 1;
+                            requestedQuantity = requestedQuantity * conversionFactor;
+                        }
 
                         if (requestedQuantity > availableStock) {
                             alert(

@@ -280,10 +280,10 @@
     <div class="container">
         <!-- Header -->
         <div class="header">
-            <div class="company-name">TOKO "TANI MAKMUR"</div>
+            <div class="company-name">{{ $storeSetting->store_name ?? 'TOKO "TANI MAKMUR"' }}</div>
             <div class="company-info">
-                Jl. KOPO No. 316 Telp. 6043233-6012850<br>
-                BANDUNG
+                {{ $storeSetting->store_address ?? 'Jl. KOPO No. 316' }} {{ $storeSetting->store_phone ? 'Telp. '.$storeSetting->store_phone : 'Telp. 6043233-6012850' }}<br>
+                {{ $storeSetting->store_email ?? 'BANDUNG' }}
             </div>
         </div>
 
@@ -322,6 +322,20 @@
                                 Transfer
                             @else
                                 Kredit
+                            @endif
+                        </span>
+                    </div>
+                    <div class="info-item">
+                        <span class="info-label">Status</span>
+                        <span class="info-value">
+                            @if($sale->payment_status === 'paid')
+                                Lunas
+                            @elseif($sale->payment_status === 'partial')
+                                Sebagian
+                            @elseif($sale->payment_status === 'pending')
+                                Tertunda
+                            @else
+                                {{ ucfirst($sale->payment_status) }}
                             @endif
                         </span>
                     </div>

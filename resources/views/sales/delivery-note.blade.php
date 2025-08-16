@@ -12,10 +12,10 @@
     <div class="max-w-3xl mx-auto border border-gray-300 p-8 shadow-md bg-white">
         <div class="flex justify-between mt-2 text-sm">
             <div>
-                <h1 class="text-center text-xl font-bold uppercase">Toko "Tani Makmur"</h1>
+                <h1 class="text-center text-xl font-bold uppercase">{{ $storeSetting->store_name ?? 'Toko "Tani Makmur"' }}</h1>
                 <p class="text-center text-sm">
-                    Jl. KOPO No. 316 Telp. 6043233-6012850 <br />
-                    <span class="font-semibold">Bandung</span>
+                    {{ $storeSetting->store_address ?? 'Jl. KOPO No. 316' }} {{ $storeSetting->store_phone ? 'Telp. '.$storeSetting->store_phone : 'Telp. 6043233-6012850' }} <br />
+                    <span class="font-semibold">{{ $storeSetting->store_email ?? 'Bandung' }}</span>
                 </p>
             </div>
             <div>

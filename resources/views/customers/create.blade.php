@@ -42,7 +42,7 @@
                                 dipilih</span>
                         </div>
                         <x-input-error :messages="$errors->get('excel_file')" class="mt-2" />
-                        <div class="mt-2">
+                        <div class="mt-2 space-y-2">
                             <a href="{{ route('customers.template.download') }}"
                                 class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
@@ -52,6 +52,18 @@
                                 </svg>
                                 Download Template Excel
                             </a>
+                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                <p>Format kolom yang dibutuhkan:</p>
+                                <ul class="list-disc list-inside ml-2 mt-1 space-y-0.5">
+                                    <li><span class="font-medium">NIK</span> - Nomor Induk Kependudukan (16 digit, format dengan atau tanpa tanda hubung diterima)</li>
+                                    <li><span class="font-medium">Nama</span> - Nama lengkap pelanggan</li>
+                                    <li><span class="font-medium">Alamat</span> - Alamat lengkap pelanggan</li>
+                                    <li><span class="font-medium">Desa</span> - Nama desa/kelurahan</li>
+                                    <li><span class="font-medium">Kecamatan</span> - Nama kecamatan</li>
+                                    <li><span class="font-medium">Kabupaten</span> - Nama kabupaten/kota</li>
+                                    <li><span class="font-medium">Provinsi</span> - Nama provinsi (default: JAWA BARAT)</li>
+                                </ul>
+                            </div>
                         </div>
                     </div>
 
@@ -66,6 +78,14 @@
                         </x-primary-button>
                     </div>
                 </form>
+
+                <!-- Script untuk menampilkan nama file yang dipilih -->
+                <script>
+                    document.getElementById('excel_file').addEventListener('change', function(e) {
+                        const fileName = e.target.files[0] ? e.target.files[0].name : 'Belum ada file dipilih';
+                        document.getElementById('file-name').textContent = fileName;
+                    });
+                </script>
             </div>
         </div>
 

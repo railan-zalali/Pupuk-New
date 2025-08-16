@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Product;
 use App\Models\Category;
+use App\Models\ProductBatch;
 use App\Models\ProductUnit;
 use App\Models\StockMovement;
 use App\Models\Supplier;
@@ -292,7 +293,24 @@ class ProductController extends Controller
         $product = Product::with(['category', 'stockMovements' => function ($query) {
             $query->latest();
         }])->findOrFail($product->id);
-        return view('products.show', compact('product'));
+        
+        // Ambil batch produk dengan metode FIFO (First In First Out)
+        $batches = $product->availableBatches()->get();
+        
+        return view('products.show', compact('product', 'batches'));
+    }
+
+    public function showBatches(Product $product)
+    {
+        $product->load(['category', 'supplier', 'units.unit']);
+        
+        // Ambil semua batch produk
+        $batches = $product->batches()->orderBy('created_at', 'asc')->get();
+        
+        // Ambil batch yang masih tersedia (FIFO)
+        $availableBatches = $product->availableBatches()->get();
+        
+        return view('products.batches', compact('product', 'batches', 'availableBatches'));
     }
 
     public function edit(Product $product)

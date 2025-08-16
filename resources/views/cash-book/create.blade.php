@@ -53,7 +53,7 @@
                             <div>
                                 <x-input-label for="amount" value="Jumlah" />
                                 <x-text-input id="amount" type="number" name="amount" class="mt-1 block w-full"
-                                    required step="0.01" min="0" value="{{ old('amount') }}" />
+                                    required min="0" value="{{ old('amount') }}" />
                                 <x-input-error :messages="$errors->get('amount')" class="mt-2" />
                             </div>
                         </div>

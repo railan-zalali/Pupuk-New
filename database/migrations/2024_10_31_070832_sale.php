@@ -26,11 +26,12 @@ return new class extends Migration
             $table->string('vehicle_type')->nullable();
             $table->string('vehicle_number')->nullable();
             $table->string('payment_status')->default('paid');
-            $table->enum('status', ['draft', 'completed', 'cancelled'])->default('completed');
+            $table->enum('status', ['draft', 'processing', 'completed', 'cancelled'])->default('completed');
             $table->integer('remaining_amount')->default(0);
             $table->timestamp('due_date')->nullable();
             $table->text('notes')->nullable();
-
+            $table->foreignId('draft_id')->nullable();
+            $table->boolean('is_draft_processed')->default(false);
             $table->timestamps();
             $table->softDeletes();
         });

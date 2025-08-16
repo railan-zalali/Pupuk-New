@@ -177,7 +177,7 @@
                     <tr>
                         <td>{{ $sale->created_at->format('d/m/Y') }}</td>
                         <td>{{ $sale->invoice_number }}</td>
-                        <td>{{ $sale->customer ? $sale->customer->name : '-' }}</td>
+                        <td>{{ $sale->customer ? $sale->customer->nama : '-' }}</td>
                         <td>{{ ucfirst($sale->payment_method) }}</td>
                         <td class="text-right">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</td>
                     </tr>

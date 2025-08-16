@@ -11,6 +11,7 @@ class StockMovement extends Model
 
     protected $fillable = [
         'product_id',
+        'batch_id',
         'reference_id',
         'reference_type',
         'quantity',
@@ -24,6 +25,14 @@ class StockMovement extends Model
     public function product()
     {
         return $this->belongsTo(Product::class);
+    }
+    
+    /**
+     * Get the batch associated with this stock movement.
+     */
+    public function batch()
+    {
+        return $this->belongsTo(ProductBatch::class, 'batch_id');
     }
 
     // Polymorphic relationship for reference

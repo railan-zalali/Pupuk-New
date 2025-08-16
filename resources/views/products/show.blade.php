@@ -29,6 +29,12 @@
                     </svg>
                     Duplikasi Produk
                 </a>
+                <a href="{{ route('products.batches', $product) }}" class="inline-flex items-center rounded-md bg-green-100 dark:bg-green-700 px-3 py-2 text-sm font-medium text-green-700 dark:text-green-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                    </svg>
+                    Lihat Batch (FIFO)
+                </a>
             </div>
         </div>
 
@@ -120,6 +126,11 @@
                                     {{ $product->min_stock }}</dd>
                             </div>
                             <div class="flex justify-between">
+                                <dt class="text-sm text-gray-500 dark:text-gray-400">Batch Tersedia</dt>
+                                <dd class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                    {{ $batches->count() ?? 0 }}</dd>
+                            </div>
+                            <div class="flex justify-between">
                                 <dt class="text-sm text-gray-500 dark:text-gray-400">Harga Beli</dt>
                                 <dd class="text-sm font-medium text-gray-900 dark:text-gray-100">
                                     Rp {{ number_format($product->purchase_price, 0, ',', '.') }}
@@ -197,6 +208,99 @@
                             </button>
                         </div>
                     </form>
+                </div>
+
+                <!-- Available Batches (FIFO) -->
+                <div class="mt-8 border-t border-gray-200 dark:border-gray-700 pt-6">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                        </svg>
+                        Batch Tersedia (FIFO)
+                    </h3>
+
+                    <div
+                        class="mt-2 overflow-x-auto bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-900">
+                                <tr>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                        No. Batch
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                        Tanggal Produksi
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                        Tanggal Kadaluarsa
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                        Kuantitas Awal
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                        Sisa Kuantitas
+                                    </th>
+                                    <th scope="col"
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                        Harga Beli
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                                @forelse ($batches as $batch)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
+                                        <td
+                                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $batch->batch_number }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $batch->production_date ? date('d/m/Y', strtotime($batch->production_date)) : '-' }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm">
+                                            @if($batch->expiry_date)
+                                                <span class="{{ Carbon\Carbon::parse($batch->expiry_date)->isPast() ? 'text-red-600 dark:text-red-400' : (Carbon\Carbon::parse($batch->expiry_date)->diffInDays(now()) < 30 ? 'text-yellow-600 dark:text-yellow-400' : 'text-gray-700 dark:text-gray-300') }}">
+                                                    {{ date('d/m/Y', strtotime($batch->expiry_date)) }}
+                                                </span>
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100">
+                                            {{ $batch->quantity }}</td>
+                                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                            {{ $batch->remaining_quantity }}
+                                        </td>
+                                        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+                                            Rp {{ number_format($batch->purchase_price, 0, ',', '.') }}
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6"
+                                            class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                                            <svg class="mx-auto h-10 w-10 text-gray-400 dark:text-gray-600 mb-2"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                                            </svg>
+                                            <p class="text-gray-500 dark:text-gray-400 text-lg font-medium">Belum ada
+                                                batch tersedia
+                                            </p>
+                                            <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Batch produk akan
+                                                muncul di sini</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
                 <!-- Riwayat Pergerakan Stok -->

@@ -34,14 +34,35 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
             if ($field === 'date') {
                 $row[] = $item->created_at->format('d/m/Y H:i');
             } elseif ($field === 'total_amount' || $field === 'amount') {
-                $row[] = number_format($item->$field, 0, ',', '.');
+                $row[] = number_format($this->getItemValue($item, $field), 0, ',', '.');
             } elseif ($field === 'payment_method') {
-                $row[] = $this->formatPaymentMethod($item->$field);
+                $row[] = $this->formatPaymentMethod($this->getItemValue($item, $field));
+            } elseif ($field === 'customer_name') {
+                $row[] = $item->customer ? $item->customer->nama : '-';
+            } elseif ($field === 'supplier_name') {
+                $row[] = $item->supplier ? $item->supplier->name : '-';
             } else {
-                $row[] = $item->$field;
+                $row[] = $this->getItemValue($item, $field);
             }
         }
         return $row;
+    }
+    
+    /**
+     * Safely get a value from an item, handling both object properties and array keys
+     *
+     * @param mixed $item
+     * @param string $field
+     * @return mixed
+     */
+    protected function getItemValue($item, $field)
+    {
+        if (is_object($item)) {
+            return $item->{$field} ?? null;
+        } elseif (is_array($item)) {
+            return $item[$field] ?? null;
+        }
+        return null;
     }
 
     public function styles(Worksheet $sheet)

@@ -29,7 +29,9 @@ class Sale extends Model
         'status',
         'remaining_amount',
         'due_date',
-        'notes'
+        'notes',
+        'draft_id',
+        'is_draft_processed'
     ];
 
     public function customer()
@@ -58,5 +60,15 @@ class Sale extends Model
     public function scopeDrafts($query)
     {
         return $query->where('status', 'draft');
+    }
+    
+    public function draft()
+    {
+        return $this->belongsTo(Sale::class, 'draft_id');
+    }
+    
+    public function finalSale()
+    {
+        return $this->hasOne(Sale::class, 'draft_id');
     }
 }

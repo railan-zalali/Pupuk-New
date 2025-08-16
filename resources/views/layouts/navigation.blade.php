@@ -43,6 +43,10 @@
                         <x-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')">
                             {{ __('Role') }}
                         </x-nav-link>
+                        
+                        <x-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                            {{ __('Pengaturan Toko') }}
+                        </x-nav-link>
                     @endif
 
                     {{-- @endif --}}
@@ -150,6 +154,10 @@
 
                 <x-responsive-nav-link :href="route('roles.index')" :active="request()->routeIs('roles.*')">
                     {{ __('Role') }}
+                </x-responsive-nav-link>
+                
+                <x-responsive-nav-link :href="route('settings.index')" :active="request()->routeIs('settings.*')">
+                    {{ __('Pengaturan Toko') }}
                 </x-responsive-nav-link>
             @endif
 

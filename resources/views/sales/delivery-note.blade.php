@@ -235,6 +235,12 @@
             <tbody>
                 @php $subtotal = 0; @endphp
                 @foreach ($sale->saleDetails as $detail)
+                    @php
+                        // Skip benih products in delivery note
+                        if ($detail->product->category && strtolower($detail->product->category->name) === 'benih') {
+                            continue;
+                        }
+                    @endphp
                     <tr>
                         <td class="text-center">{{ $detail->quantity }}</td>
                         <td>{{ $detail->product->name }}</td>
@@ -258,7 +264,6 @@
         </table>
 
         <div class="footer">
-            <div class="stamp">HARGA BELUM TERMASUK PPN<br />PPN DIBEBASKAN</div>
             <div>
                 <div class="text-right" style="font-weight:bold;">Total</div>
                 <div class="text-right" style="font-size:13px; font-weight:bold;">Rp

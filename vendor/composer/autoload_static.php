@@ -610,6 +610,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
     );
 
     public static $classMap = array (
+        'App\\Exports\\CustomersTemplateExport' => __DIR__ . '/../..' . '/app/Exports/CustomersTemplateExport.php',
         'App\\Exports\\ProductsTemplateExport' => __DIR__ . '/../..' . '/app/Exports/ProductsTemplateExport.php',
         'App\\Exports\\ReportExport' => __DIR__ . '/../..' . '/app/Exports/ReportExport.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
@@ -623,7 +624,6 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Controllers\\Auth\\VerifyEmailController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/VerifyEmailController.php',
         'App\\Http\\Controllers\\CashBookController' => __DIR__ . '/../..' . '/app/Http/Controllers/CashBookController.php',
         'App\\Http\\Controllers\\CategoryController' => __DIR__ . '/../..' . '/app/Http/Controllers/CategoryController.php',
-        'App\\Http\\Controllers\\ChatController' => __DIR__ . '/../..' . '/app/Http/Controllers/ChatController.php',
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\CustomerController' => __DIR__ . '/../..' . '/app/Http/Controllers/CustomerController.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
@@ -638,6 +638,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Controllers\\RoleController' => __DIR__ . '/../..' . '/app/Http/Controllers/RoleController.php',
         'App\\Http\\Controllers\\SaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/SaleController.php',
         'App\\Http\\Controllers\\StockForecastController' => __DIR__ . '/../..' . '/app/Http/Controllers/StockForecastController.php',
+        'App\\Http\\Controllers\\StoreSettingController' => __DIR__ . '/../..' . '/app/Http/Controllers/StoreSettingController.php',
         'App\\Http\\Controllers\\SupplierController' => __DIR__ . '/../..' . '/app/Http/Controllers/SupplierController.php',
         'App\\Http\\Controllers\\UnitOfMeasureController' => __DIR__ . '/../..' . '/app/Http/Controllers/UnitOfMeasureController.php',
         'App\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
@@ -667,6 +668,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Requests\\Updatepurchases_receiptsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Updatepurchases_receiptsRequest.php',
         'App\\Imports\\CustomersImport' => __DIR__ . '/../..' . '/app/Imports/CustomersImport.php',
         'App\\Imports\\ProductsImport' => __DIR__ . '/../..' . '/app/Imports/ProductsImport.php',
+        'App\\Models\\CashBook' => __DIR__ . '/../..' . '/app/Models/CashBook.php',
         'App\\Models\\Category' => __DIR__ . '/../..' . '/app/Models/Category.php',
         'App\\Models\\Customer' => __DIR__ . '/../..' . '/app/Models/Customer.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',
@@ -681,6 +683,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Models\\Sale' => __DIR__ . '/../..' . '/app/Models/Sale.php',
         'App\\Models\\SaleDetail' => __DIR__ . '/../..' . '/app/Models/SaleDetail.php',
         'App\\Models\\StockMovement' => __DIR__ . '/../..' . '/app/Models/StockMovement.php',
+        'App\\Models\\StoreSetting' => __DIR__ . '/../..' . '/app/Models/StoreSetting.php',
         'App\\Models\\Supplier' => __DIR__ . '/../..' . '/app/Models/Supplier.php',
         'App\\Models\\UnitOfMeasure' => __DIR__ . '/../..' . '/app/Models/UnitOfMeasure.php',
         'App\\Models\\User' => __DIR__ . '/../..' . '/app/Models/User.php',

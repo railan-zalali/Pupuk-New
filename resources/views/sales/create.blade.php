@@ -1,5 +1,9 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
+        <!-- Product Grid CSS -->
+        <style>
+            @import url('/build/assets/product-grid.css');
+        </style>
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -282,6 +286,31 @@
                 </div>
 
                 <div class="px-4 py-5 sm:p-6">
+                    <!-- Product Grid Component -->
+                    <div class="product-grid-wrapper mb-6">
+                        <!-- Search and Filter Section -->
+                        <div class="product-search-container">
+                            <input type="text" id="product-search" class="product-search" placeholder="Cari produk berdasarkan nama, kode, atau deskripsi...">
+                        </div>
+                        
+                        <!-- Categories -->
+                        <div id="product-categories" class="product-categories">
+                            <!-- Categories will be populated by JavaScript -->
+                        </div>
+                        
+                        <!-- Product Grid Container -->
+                        <div id="product-grid-container">
+                            <!-- Products will be populated by JavaScript -->
+                        </div>
+                        
+                        <!-- Recent Items -->
+                        <div id="recent-items" class="recent-items">
+                            <!-- Recent items will be populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <!-- Selected Products Table -->
+                    <h4 class="text-base font-medium text-gray-900 dark:text-white mb-3">Produk Terpilih</h4>
                     <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead>
@@ -2545,6 +2574,55 @@
                 // Tampilkan notifikasi
                 showNotification('Produk berhasil ditambahkan', 'success');
             }
+            
+            // Inisialisasi Product Grid
+            function initProductGrid() {
+                // Memuat script product-grid.js
+                if (typeof ProductGrid === 'undefined') {
+                    console.log('Loading ProductGrid script...');
+                    $.getScript('/build/assets/product-grid.js')
+                        .done(function() {
+                            console.log('ProductGrid script loaded successfully');
+                            setupProductGrid();
+                        })
+                        .fail(function(jqxhr, settings, exception) {
+                            console.error('Error loading ProductGrid script:', exception);
+                        });
+                } else {
+                    setupProductGrid();
+                }
+            }
+            
+            function setupProductGrid() {
+                try {
+                    // Inisialisasi komponen ProductGrid
+                    const productGrid = new ProductGrid({
+                        containerSelector: '#product-grid-container',
+                        categoriesSelector: '#product-categories',
+                        searchSelector: '#product-search',
+                        recentItemsSelector: '#recent-items',
+                        onProductSelected: function(product) {
+                            // Menambahkan produk ke tabel penjualan
+                            addProductById(product.id);
+                        }
+                    });
+                    
+                    // Memuat data produk
+                    productGrid.loadProducts();
+                    
+                    // Memuat data kategori
+                    productGrid.loadCategories();
+                    
+                    console.log('ProductGrid initialized successfully');
+                } catch (error) {
+                    console.error('Error initializing ProductGrid:', error);
+                }
+            }
+            
+            // Inisialisasi ProductGrid saat dokumen siap
+            $(document).ready(function() {
+                initProductGrid();
+            });
         </script>
     @endpush
 

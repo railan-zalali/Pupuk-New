@@ -6,6 +6,7 @@ $vendorDir = dirname(__DIR__);
 $baseDir = dirname($vendorDir);
 
 return array(
+    'App\\Exports\\CustomersTemplateExport' => $baseDir . '/app/Exports/CustomersTemplateExport.php',
     'App\\Exports\\ProductsTemplateExport' => $baseDir . '/app/Exports/ProductsTemplateExport.php',
     'App\\Exports\\ReportExport' => $baseDir . '/app/Exports/ReportExport.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
@@ -19,7 +20,6 @@ return array(
     'App\\Http\\Controllers\\Auth\\VerifyEmailController' => $baseDir . '/app/Http/Controllers/Auth/VerifyEmailController.php',
     'App\\Http\\Controllers\\CashBookController' => $baseDir . '/app/Http/Controllers/CashBookController.php',
     'App\\Http\\Controllers\\CategoryController' => $baseDir . '/app/Http/Controllers/CategoryController.php',
-    'App\\Http\\Controllers\\ChatController' => $baseDir . '/app/Http/Controllers/ChatController.php',
     'App\\Http\\Controllers\\Controller' => $baseDir . '/app/Http/Controllers/Controller.php',
     'App\\Http\\Controllers\\CustomerController' => $baseDir . '/app/Http/Controllers/CustomerController.php',
     'App\\Http\\Controllers\\DashboardController' => $baseDir . '/app/Http/Controllers/DashboardController.php',
@@ -34,6 +34,7 @@ return array(
     'App\\Http\\Controllers\\RoleController' => $baseDir . '/app/Http/Controllers/RoleController.php',
     'App\\Http\\Controllers\\SaleController' => $baseDir . '/app/Http/Controllers/SaleController.php',
     'App\\Http\\Controllers\\StockForecastController' => $baseDir . '/app/Http/Controllers/StockForecastController.php',
+    'App\\Http\\Controllers\\StoreSettingController' => $baseDir . '/app/Http/Controllers/StoreSettingController.php',
     'App\\Http\\Controllers\\SupplierController' => $baseDir . '/app/Http/Controllers/SupplierController.php',
     'App\\Http\\Controllers\\UnitOfMeasureController' => $baseDir . '/app/Http/Controllers/UnitOfMeasureController.php',
     'App\\Http\\Controllers\\UserController' => $baseDir . '/app/Http/Controllers/UserController.php',
@@ -63,6 +64,7 @@ return array(
     'App\\Http\\Requests\\Updatepurchases_receiptsRequest' => $baseDir . '/app/Http/Requests/Updatepurchases_receiptsRequest.php',
     'App\\Imports\\CustomersImport' => $baseDir . '/app/Imports/CustomersImport.php',
     'App\\Imports\\ProductsImport' => $baseDir . '/app/Imports/ProductsImport.php',
+    'App\\Models\\CashBook' => $baseDir . '/app/Models/CashBook.php',
     'App\\Models\\Category' => $baseDir . '/app/Models/Category.php',
     'App\\Models\\Customer' => $baseDir . '/app/Models/Customer.php',
     'App\\Models\\Permission' => $baseDir . '/app/Models/Permission.php',
@@ -77,6 +79,7 @@ return array(
     'App\\Models\\Sale' => $baseDir . '/app/Models/Sale.php',
     'App\\Models\\SaleDetail' => $baseDir . '/app/Models/SaleDetail.php',
     'App\\Models\\StockMovement' => $baseDir . '/app/Models/StockMovement.php',
+    'App\\Models\\StoreSetting' => $baseDir . '/app/Models/StoreSetting.php',
     'App\\Models\\Supplier' => $baseDir . '/app/Models/Supplier.php',
     'App\\Models\\UnitOfMeasure' => $baseDir . '/app/Models/UnitOfMeasure.php',
     'App\\Models\\User' => $baseDir . '/app/Models/User.php',

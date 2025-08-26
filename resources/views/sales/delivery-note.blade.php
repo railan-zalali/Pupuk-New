@@ -4,85 +4,286 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Invoice - Toko Tani Makmur</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Surat Jalan #{{ $sale->invoice_number }}</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 10mm;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
+            color: #111;
+            line-height: 1.5;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .container {
+            width: 190mm;
+            min-height: 277mm;
+            margin: 0 auto;
+            background: #fff;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
+        }
+
+        .company-name {
+            font-size: 18px;
+            font-weight: bold;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
+        }
+
+        .company-info {
+            font-size: 11px;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            text-transform: uppercase;
+            margin: 10px 0 8px;
+        }
+
+        .info-grid {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .col {
+            width: 50%;
+        }
+
+        .row {
+            display: flex;
+            margin-bottom: 4px;
+        }
+
+        .label {
+            width: 90px;
+        }
+
+        .value {
+            flex: 1;
+        }
+
+        .label::after {
+            content: ":";
+            margin: 0 8px 0 6px;
+        }
+
+        .table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 8px 0 12px;
+            table-layout: fixed;
+        }
+
+        .table th,
+        .table td {
+            border: 1px solid #000;
+            padding: 6px;
+            word-wrap: break-word;
+        }
+
+        .table th {
+            background: #f2f2f2;
+            text-align: center;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .col-qty {
+            width: 10%;
+        }
+
+        .col-name {
+            width: 50%;
+        }
+
+        .col-unit {
+            width: 12%;
+        }
+
+        .col-price {
+            width: 14%;
+        }
+
+        .col-total {
+            width: 14%;
+        }
+
+        .footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-top: 14px;
+        }
+
+        .stamp {
+            font-size: 11px;
+            font-weight: bold;
+            color: #4c51bf;
+            border: 2px solid #4c51bf;
+            padding: 6px 10px;
+            text-align: center;
+        }
+
+        .signs {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 24px;
+        }
+
+        .sign-box {
+            width: 200px;
+            text-align: center;
+        }
+
+        .sign-line {
+            margin-top: 42px;
+            border-top: 1px solid #000;
+            padding-top: 4px;
+        }
+
+        @media print {
+            body {
+                margin: 0;
+            }
+
+            .container {
+                width: 190mm;
+                min-height: auto;
+                page-break-after: always;
+            }
+        }
+    </style>
 </head>
 
-<body class="bg-white p-10">
-    <div class="max-w-3xl mx-auto border border-gray-300 p-8 shadow-md bg-white">
-        <div class="flex justify-between mt-2 text-sm">
-            <div>
-                <h1 class="text-center text-xl font-bold uppercase">{{ $storeSetting->store_name ?? 'Toko "Tani Makmur"' }}</h1>
-                <p class="text-center text-sm">
-                    {{ $storeSetting->store_address ?? 'Jl. KOPO No. 316' }} {{ $storeSetting->store_phone ? 'Telp. '.$storeSetting->store_phone : 'Telp. 6043233-6012850' }} <br />
-                    <span class="font-semibold">{{ $storeSetting->store_email ?? 'Bandung' }}</span>
-                </p>
-            </div>
-            <div>
-                <p>Bandung, 7-4-2025</p>
-                <p class="mt-2">Kepada Yth,</p>
-                <p>Oha Nudin</p>
-                <p>Babakan Ciparay</p>
-                <p>Bandung</p>
+<body>
+    <div class="container">
+        <div class="header">
+            <div class="company-name">{{ $storeSetting->store_name ?? 'TOKO "TANI MAKMUR"' }}</div>
+            <div class="company-info">{{ $storeSetting->store_address ?? 'Jl. KOPO No. 316' }}
+                {{ $storeSetting->store_phone ? 'Telp. ' . $storeSetting->store_phone : 'Telp. 6043233-6012850' }}<br>{{ $storeSetting->store_email ?? 'BANDUNG' }}
             </div>
         </div>
-        <div class="text-center mt-6 mb-2">
-            <p class="text-lg font-semibold uppercase">Surat Jalan</p>
-            <p class="text-lg font-semibold uppercase -mt-2">Faktur</p>
+
+        <div class="title">Surat Jalan</div>
+
+        <div class="info-grid">
+            <div class="col">
+                <div class="row"><span class="label">No. Faktur</span><span
+                        class="value">{{ $sale->invoice_number }}</span></div>
+                <div class="row"><span class="label">Tanggal</span><span
+                        class="value">{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</span></div>
+                @if ($sale->customer)
+                    <div class="row"><span class="label">Pelanggan</span><span
+                            class="value">{{ $sale->customer->nama }}</span></div>
+                @endif
+            </div>
+            <div class="col">
+                @if ($sale->customer && $sale->customer->alamat)
+                    <div class="row"><span class="label">Alamat</span><span
+                            class="value">{{ $sale->customer->alamat }}, {{ $sale->customer->kecamatan_nama }}</span>
+                    </div>
+                @endif
+                <div class="row"><span class="label">Pembayaran</span><span class="value">
+                        @if ($sale->payment_method === 'cash')
+                            Tunai
+                        @elseif($sale->payment_method === 'transfer')
+                            Transfer
+                        @else
+                            Kredit
+                        @endif
+                    </span></div>
+            </div>
         </div>
-        <div>
-            <span class="font-semibold">Truck Pickup No:</span> ___________________
-        </div>
-        <!-- Tabel Barang -->
-        <table class="w-full mt-6 border border-black text-sm">
-            <thead class="bg-gray-200">
-                <tr class="text-left">
-                    <th class="border border-black px-2 py-1">Banyaknya</th>
-                    <th class="border border-black px-2 py-1">Nama Barang</th>
-                    <th class="border border-black px-2 py-1">Satuan</th>
-                    <th class="border border-black px-2 py-1">Harga</th>
-                    <th class="border border-black px-2 py-1">Jumlah</th>
+
+        <table class="table">
+            <thead>
+                <tr>
+                    <th class="col-qty">Qty</th>
+                    <th class="col-name">Nama Barang</th>
+                    <th class="col-unit">Satuan</th>
+                    <th class="col-price">Harga</th>
+                    <th class="col-total">Jumlah</th>
                 </tr>
             </thead>
             <tbody>
-                @foreach($sale->saleDetails as $detail)
-                <tr>
-                    <td class="border border-black px-2 py-1">{{ $detail->quantity }}</td>
-                    <td class="border border-black px-2 py-1">{{ $detail->product->name }}</td>
-                    <td class="border border-black px-2 py-1">{{ $detail->unit_name ?? ($detail->productUnit->unit->abbreviation ?? 'N/A') }}</td>
-                    <td class="border border-black px-2 py-1">{{ number_format($detail->price, 0, ',', '.') }}</td>
-                    <td class="border border-black px-2 py-1">{{ number_format($detail->subtotal, 0, ',', '.') }}</td>
-                </tr>
+                @php $subtotal = 0; @endphp
+                @foreach ($sale->saleDetails as $detail)
+                    <tr>
+                        <td class="text-center">{{ $detail->quantity }}</td>
+                        <td>{{ $detail->product->name }}</td>
+                        <td class="text-center">
+                            {{ $detail->unit_name ?? ($detail->productUnit->unit->abbreviation ?? 'N/A') }}</td>
+                        <td class="text-right">{{ number_format($detail->price, 0, ',', '.') }}</td>
+                        <td class="text-right">{{ number_format($detail->subtotal, 0, ',', '.') }}</td>
+                    </tr>
+                    @php $subtotal += $detail->subtotal; @endphp
                 @endforeach
+                @for ($i = count($sale->saleDetails); $i < 10; $i++)
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
+                @endfor
             </tbody>
         </table>
 
-        <!-- Footer -->
-        <div class="flex justify-between mt-6">
-            <div></div>
-            <div class="mt-10 text-center">
-                <p class="text-xs font-bold border border-purple-700 text-purple-700 px-4 py-1 inline-block">
-                    HARGA BELUM TERMASUK PPN <br /> PPN DIBEBASKAN
-                </p>
-            </div>
-            <div class="text-right text-sm">
-                <p>Rp.</p>
-                <p class="text-lg font-semibold">50.000</p>
+        <div class="footer">
+            <div class="stamp">HARGA BELUM TERMASUK PPN<br />PPN DIBEBASKAN</div>
+            <div>
+                <div class="text-right" style="font-weight:bold;">Total</div>
+                <div class="text-right" style="font-size:13px; font-weight:bold;">Rp
+                    {{ number_format($subtotal - ($sale->discount ?? 0), 0, ',', '.') }}</div>
             </div>
         </div>
 
-        <!-- Cap PPN (Tengah) -->
-        <div class="flex justify-between mt-6">
-            <div>
-                <p class="mt-8">Tanda terima,</p>
+        <div class="signs">
+            <div class="sign-box">
+                <div>Tanda terima,</div>
+                <div class="sign-line">
+                    (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                </div>
             </div>
-            <!-- Hormat Kami -->
-            <div class="mt-12 text-right">
-                <p>Hormat kami,</p>
-                <p class="mt-8">____________________</p>
+            <div class="sign-box">
+                <div>Hormat kami,</div>
+                <div class="sign-line">{{ $sale->user->name }}</div>
             </div>
         </div>
     </div>
+    <script>
+        window.onload = function() {
+            window.print();
+        }
+    </script>
 </body>
 
 </html>

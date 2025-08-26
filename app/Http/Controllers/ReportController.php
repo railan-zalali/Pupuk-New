@@ -30,17 +30,39 @@ class ReportController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
         $suppliers = \App\Models\Supplier::orderBy('name')->get();
+        $search = $request->get('search', '');
 
-        $purchases = Purchase::with(['supplier'])
-            ->whereBetween('created_at', [$startDate, $endDate])
-            ->latest()
-            ->paginate(15);
+        $purchasesQuery = Purchase::with(['supplier'])
+            ->whereBetween('created_at', [$startDate, $endDate]);
+            
+        // Add search functionality
+        if ($search) {
+            $purchasesQuery->where(function($query) use ($search) {
+                $query->where('invoice_number', 'like', "%{$search}%")
+                    ->orWhereHas('supplier', function($q) use ($search) {
+                        $q->where('name', 'like', "%{$search}%");
+                    });
+            });
+        }
+        
+        // Filter by supplier if provided
+        if ($request->supplier_id) {
+            $purchasesQuery->where('supplier_id', $request->supplier_id);
+        }
+        
+        // Filter by status if provided
+        if ($request->status) {
+            $purchasesQuery->where('status', $request->status);
+        }
+        
+        $purchases = $purchasesQuery->latest()->paginate(15);
 
         $data = [
             'purchases' => $purchases,
             'suppliers' => $suppliers,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'search' => $search,
             'summary' => [
                 'total_purchases' => $purchases->count(),
                 'total_amount' => $purchases->sum('total_amount'),
@@ -54,11 +76,12 @@ class ReportController extends Controller
                 'Amount' => 'total_amount',
                 'Status' => 'status'
             ],
-            'items' => $purchases
+            'items' => $purchases->getCollection(),
+            'date' => now()
         ];
 
         // Handle export atau tampilkan view
-        if ($request->get('type') === 'pdf' || $request->get('type') === 'excel') {
+        if ($request->get('type') === 'pdf' || $request->get('type') === 'excel' || $request->get('type') === 'print') {
             return $this->handleExport(
                 $data,
                 'purchases',
@@ -336,7 +359,7 @@ class ReportController extends Controller
         return view('reports.accounts', $data);
     }
 
-    public function stock()
+    public function stock(Request $request)
     {
         // $products = Product::with('category')
         //     ->withSum('purchaseDetails as total_purchased', 'quantity')
@@ -346,9 +369,15 @@ class ReportController extends Controller
         //         $product->stock_value = $product->stock * $product->purchase_price;
         //         return $product;
         //     });
+        $search = $request->get('search', '');
+        
         $products = Product::with('category')
             ->withSum('purchaseDetails as total_purchased', 'quantity')
             ->withSum('saleDetails as total_sold', 'quantity')
+            ->when($search, function($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            })
             ->paginate(20); // Add pagination here
 
         $productsCollection = $products->getCollection()->map(function ($product) {
@@ -361,6 +390,7 @@ class ReportController extends Controller
 
         $data = [
             'products' => $products,
+            'search' => $search,
             'summary' => [
                 'total_products' => $products->count(),
                 'total_stock_value' => $products->sum('stock_value'),
@@ -378,20 +408,36 @@ class ReportController extends Controller
             'date' => now()
         ];
 
-        return $this->handleExport(
-            $data,
-            'stock',
-            'stock_report_' . now()->format('Y-m-d')
-        );
+        // Handle export atau tampilkan view
+        if ($request->get('type') === 'pdf' || $request->get('type') === 'excel' || $request->get('type') === 'print') {
+            // Untuk export Excel, kita perlu menggunakan collection yang sudah dimodifikasi
+            if ($request->get('type') === 'excel') {
+                $data['items'] = $productsCollection;
+            }
+            
+            return $this->handleExport(
+                $data,
+                'stock',
+                'stock_report_' . now()->format('Y-m-d')
+            );
+        }
+
+        return view('reports.stock', $data);
     }
 
     public function fifoStock(Request $request)
     {
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+        $search = $request->get('search', '');
 
         // Ambil semua produk dengan batch yang tersedia
-        $products = Product::with(['category', 'supplier', 'availableBatches'])->paginate(20);
+        $products = Product::with(['category', 'supplier', 'availableBatches'])
+            ->when($search, function($query) use ($search) {
+                return $query->where('name', 'like', "%{$search}%")
+                    ->orWhere('code', 'like', "%{$search}%");
+            })
+            ->paginate(20);
 
         // Hitung nilai persediaan berdasarkan FIFO untuk setiap produk
         $productsCollection = $products->getCollection()->map(function ($product) {
@@ -406,6 +452,10 @@ class ReportController extends Controller
 
             return $product;
         });
+        
+        // Hitung total nilai persediaan FIFO
+        $totalFifoValue = $productsCollection->sum('fifo_value');
+        $totalActiveBatches = ProductBatch::whereHas('product')->where('remaining_quantity', '>', 0)->count();
 
         // Replace the collection in the paginator with our modified collection
         $products->setCollection($productsCollection);
@@ -419,6 +469,7 @@ class ReportController extends Controller
             'products' => $products,
             'startDate' => $startDate,
             'endDate' => $endDate,
+            'search' => $search,
             'summary' => [
                 'total_products' => Product::count(),
                 'total_fifo_value' => $totalFifoValue,
@@ -438,11 +489,21 @@ class ReportController extends Controller
             'date' => now()
         ];
 
-        return $this->handleExport(
-            $data,
-            'fifo-stock',
-            'fifo_stock_report_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d')
-        );
+        // Handle export atau tampilkan view
+        if ($request->get('type') === 'pdf' || $request->get('type') === 'excel' || $request->get('type') === 'print') {
+            // Untuk export Excel, kita perlu menggunakan collection yang sudah dimodifikasi
+            if ($request->get('type') === 'excel') {
+                $data['items'] = $productsCollection;
+            }
+            
+            return $this->handleExport(
+                $data,
+                'fifo-stock',
+                'fifo_stock_report_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d')
+            );
+        }
+
+        return view('reports.fifo-stock', $data);
     }
 
     /**

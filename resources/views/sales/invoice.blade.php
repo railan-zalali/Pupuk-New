@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,243 +8,252 @@
     <style>
         @page {
             size: A4;
-            margin: 0;
+            margin: 10mm;
         }
-        
+
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
-        
+
         body {
-            font-family: Arial, sans-serif;
-            font-size: 12px;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 11px;
             line-height: 1.5;
-            color: #333;
+            color: #111;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
-        
+
         .container {
-            width: 210mm;
-            min-height: 297mm;
-            padding: 15mm;
+            width: 190mm;
+            /* 210mm - 2x10mm margins */
+            min-height: 277mm;
+            /* 297mm - 2x10mm margins */
             margin: 0 auto;
             background: white;
         }
-        
+
         /* Header Styles */
         .header {
             text-align: center;
-            margin-bottom: 20px;
-            border-bottom: 3px double #000;
-            padding-bottom: 15px;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #000;
+            padding-bottom: 10px;
         }
-        
+
         .company-name {
-            font-size: 20px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .company-info {
-            font-size: 12px;
-            line-height: 1.4;
-        }
-        
-        /* Invoice Info */
-        .invoice-info {
-            margin: 20px 0;
-        }
-        
-        .invoice-title {
-            text-align: center;
             font-size: 18px;
             font-weight: bold;
-            text-decoration: underline;
-            margin-bottom: 20px;
+            letter-spacing: .5px;
+            margin-bottom: 4px;
         }
-        
+
+        .company-info {
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
+        /* Invoice Info */
+        .invoice-info {
+            margin: 14px 0 6px 0;
+        }
+
+        .invoice-title {
+            text-align: center;
+            font-size: 15px;
+            font-weight: bold;
+            letter-spacing: .8px;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+        }
+
         .info-row {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 15px;
+            gap: 12px;
+            margin-bottom: 6px;
         }
-        
-        .info-left, .info-right {
-            width: 48%;
+
+        .info-left,
+        .info-right {
+            width: 50%;
         }
-        
+
         .info-item {
-            margin-bottom: 5px;
+            margin-bottom: 4px;
             display: flex;
         }
-        
+
         .info-label {
-            width: 100px;
-            font-weight: normal;
+            width: 90px;
+            color: #000;
         }
-        
+
         .info-value {
             flex: 1;
+            color: #000;
         }
-        
+
         .info-label::after {
             content: ":";
-            margin-right: 10px;
+            margin: 0 8px 0 6px;
         }
-        
+
         /* Table Styles */
         .items-table {
             width: 100%;
             border-collapse: collapse;
-            margin: 20px 0;
+            margin: 8px 0 12px 0;
+            table-layout: fixed;
         }
-        
+
         .items-table th,
         .items-table td {
             border: 1px solid #000;
-            padding: 8px;
+            padding: 6px 6px;
             text-align: left;
+            word-wrap: break-word;
         }
-        
+
         .items-table th {
-            background-color: #f0f0f0;
+            background-color: #f2f2f2;
             font-weight: bold;
             text-align: center;
         }
-        
+
         .items-table td {
             vertical-align: top;
         }
-        
+
         .text-center {
             text-align: center;
         }
-        
+
         .text-right {
             text-align: right;
         }
-        
+
         .item-no {
-            width: 5%;
+            width: 7%;
         }
-        
+
         .item-name {
-            width: 40%;
+            width: 43%;
         }
-        
+
         .item-unit {
             width: 10%;
         }
-        
+
         .item-qty {
             width: 10%;
         }
-        
+
         .item-price {
             width: 15%;
         }
-        
+
         .item-total {
-            width: 20%;
+            width: 15%;
         }
-        
-        /* Footer Styles */
+
+        /* Summary */
         .summary {
-            margin-top: 20px;
+            margin-top: 8px;
         }
-        
+
         .summary-row {
             display: flex;
             justify-content: flex-end;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
-        
+
         .summary-label {
-            width: 150px;
+            width: 140px;
             text-align: right;
-            padding-right: 20px;
+            padding-right: 14px;
         }
-        
+
         .summary-value {
-            width: 150px;
+            width: 140px;
             text-align: right;
-            padding-right: 10px;
+            padding-right: 6px;
         }
-        
+
         .total-row {
             font-weight: bold;
-            font-size: 14px;
+            font-size: 12px;
             border-top: 2px solid #000;
-            padding-top: 5px;
+            padding-top: 4px;
         }
-        
+
         /* Signature Section */
         .signature-section {
-            margin-top: 50px;
+            margin-top: 30px;
             display: flex;
             justify-content: space-between;
         }
-        
+
         .signature-box {
             width: 200px;
             text-align: center;
         }
-        
+
         .signature-line {
-            margin-top: 60px;
+            margin-top: 46px;
             border-top: 1px solid #000;
-            padding-top: 5px;
+            padding-top: 4px;
         }
-        
+
         /* Notes */
         .notes {
-            margin-top: 30px;
-            padding: 10px;
+            margin-top: 16px;
+            padding: 8px;
             border: 1px solid #ddd;
-            background-color: #f9f9f9;
+            background-color: #fafafa;
         }
-        
+
         .notes-title {
             font-weight: bold;
-            margin-bottom: 5px;
+            margin-bottom: 4px;
         }
-        
+
         /* Print Styles */
         @media print {
             body {
                 margin: 0;
             }
-            
+
             .container {
                 margin: 0;
-                border: initial;
-                border-radius: initial;
-                width: initial;
-                min-height: initial;
-                box-shadow: initial;
+                width: 190mm;
+                min-height: auto;
                 background: initial;
                 page-break-after: always;
             }
         }
-        
-        /* Utility Classes */
+
+        /* Utility */
         .bold {
             font-weight: bold;
         }
-        
+
         .uppercase {
             text-transform: uppercase;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <!-- Header -->
         <div class="header">
             <div class="company-name">{{ $storeSetting->store_name ?? 'TOKO "TANI MAKMUR"' }}</div>
             <div class="company-info">
-                {{ $storeSetting->store_address ?? 'Jl. KOPO No. 316' }} {{ $storeSetting->store_phone ? 'Telp. '.$storeSetting->store_phone : 'Telp. 6043233-6012850' }}<br>
+                {{ $storeSetting->store_address ?? 'Jl. KOPO No. 316' }}
+                {{ $storeSetting->store_phone ? 'Telp. ' . $storeSetting->store_phone : 'Telp. 6043233-6012850' }}<br>
                 {{ $storeSetting->store_email ?? 'BANDUNG' }}
             </div>
         </div>
@@ -263,18 +273,18 @@
                         <span class="info-label">Tanggal</span>
                         <span class="info-value">{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</span>
                     </div>
-                    @if($sale->customer)
-                    <div class="info-item">
-                        <span class="info-label">Pelanggan</span>
-                        <span class="info-value">{{ $sale->customer->nama }}</span>
-                    </div>
+                    @if ($sale->customer)
+                        <div class="info-item">
+                            <span class="info-label">Pelanggan</span>
+                            <span class="info-value">{{ $sale->customer->nama }}</span>
+                        </div>
                     @endif
                 </div>
                 <div class="info-right">
                     <div class="info-item">
                         <span class="info-label">Pembayaran</span>
                         <span class="info-value">
-                            @if($sale->payment_method === 'cash')
+                            @if ($sale->payment_method === 'cash')
                                 Tunai
                             @elseif($sale->payment_method === 'transfer')
                                 Transfer
@@ -286,7 +296,7 @@
                     <div class="info-item">
                         <span class="info-label">Status</span>
                         <span class="info-value">
-                            @if($sale->payment_status === 'paid')
+                            @if ($sale->payment_status === 'paid')
                                 Lunas
                             @elseif($sale->payment_status === 'partial')
                                 Sebagian
@@ -297,14 +307,13 @@
                             @endif
                         </span>
                     </div>
-                    @if($sale->customer && $sale->customer->alamat)
-                    <div class="info-item">
-                        <span class="info-label">Alamat</span>
-                        <span class="info-value">
-                            {{ $sale->customer->alamat }},
-                            {{ $sale->customer->kecamatan_nama }}
-                        </span>
-                    </div>
+                    @if ($sale->customer && $sale->customer->alamat)
+                        <div class="info-item">
+                            <span class="info-label">Alamat</span>
+                            <span class="info-value">
+                                {{ $sale->customer->alamat }}, {{ $sale->customer->kecamatan_nama }}
+                            </span>
+                        </div>
                     @endif
                 </div>
             </div>
@@ -323,29 +332,33 @@
                 </tr>
             </thead>
             <tbody>
-                @php $no = 1; $subtotal = 0; @endphp
-                @foreach($nonSeedItems as $item)
-                <tr>
-                    <td class="text-center">{{ $no++ }}</td>
-                    <td>{{ $item->product->name }}</td>
-                    <td class="text-center">{{ $item->unit_name ?? ($item->productUnit->unit->abbreviation ?? 'N/A') }}</td>
-                    <td class="text-center">{{ $item->quantity }}</td>
-                    <td class="text-right">{{ number_format($item->price, 0, ',', '.') }}</td>
-                    <td class="text-right">{{ number_format($item->subtotal, 0, ',', '.') }}</td>
-                </tr>
-                @php $subtotal += $item->subtotal; @endphp
+                @php
+                    $no = 1;
+                    $subtotal = 0;
+                @endphp
+                @foreach ($nonSeedItems as $item)
+                    <tr>
+                        <td class="text-center">{{ $no++ }}</td>
+                        <td>{{ $item->product->name }}</td>
+                        <td class="text-center">
+                            {{ $item->unit_name ?? ($item->productUnit->unit->abbreviation ?? 'N/A') }}</td>
+                        <td class="text-center">{{ $item->quantity }}</td>
+                        <td class="text-right">{{ number_format($item->price, 0, ',', '.') }}</td>
+                        <td class="text-right">{{ number_format($item->subtotal, 0, ',', '.') }}</td>
+                    </tr>
+                    @php $subtotal += $item->subtotal; @endphp
                 @endforeach
-                
-                <!-- Empty rows to fill the page -->
-                @for($i = count($nonSeedItems); $i < 10; $i++)
-                <tr>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                    <td>&nbsp;</td>
-                </tr>
+
+                <!-- Empty rows to keep the table height consistent for dot-matrix printing -->
+                @for ($i = count($nonSeedItems); $i < 10; $i++)
+                    <tr>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                        <td>&nbsp;</td>
+                    </tr>
                 @endfor
             </tbody>
         </table>
@@ -356,11 +369,11 @@
                 <div class="summary-label">Subtotal:</div>
                 <div class="summary-value">Rp {{ number_format($subtotal, 0, ',', '.') }}</div>
             </div>
-            @if($sale->discount > 0)
-            <div class="summary-row">
-                <div class="summary-label">Potongan:</div>
-                <div class="summary-value">Rp {{ number_format($sale->discount, 0, ',', '.') }}</div>
-            </div>
+            @if ($sale->discount > 0)
+                <div class="summary-row">
+                    <div class="summary-label">Potongan:</div>
+                    <div class="summary-value">Rp {{ number_format($sale->discount, 0, ',', '.') }}</div>
+                </div>
             @endif
             <div class="summary-row total-row">
                 <div class="summary-label">Total:</div>
@@ -369,18 +382,20 @@
         </div>
 
         <!-- Notes -->
-        @if($sale->notes)
-        <div class="notes">
-            <div class="notes-title">Catatan:</div>
-            <div>{{ $sale->notes }}</div>
-        </div>
+        @if ($sale->notes)
+            <div class="notes">
+                <div class="notes-title">Catatan:</div>
+                <div>{{ $sale->notes }}</div>
+            </div>
         @endif
 
         <!-- Signature Section -->
         <div class="signature-section">
             <div class="signature-box">
                 <div>Tanda terima,</div>
-                <div class="signature-line">(&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)</div>
+                <div class="signature-line">
+                    (&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;)
+                </div>
             </div>
             <div class="signature-box">
                 <div>Hormat kami,</div>
@@ -396,4 +411,5 @@
         }
     </script>
 </body>
+
 </html>

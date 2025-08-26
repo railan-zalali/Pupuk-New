@@ -25,14 +25,10 @@ trait ReportExport
 
         switch ($type) {
             case 'excel':
-                return Excel::download(
-                    new \App\Exports\ReportExport($data),
-                    $filename . '.xlsx'
-                );
+                return $this->exportToExcel($data, $filename);
 
             case 'pdf':
-                $pdf = PDF::loadView('reports.exports.' . $view, $data);
-                return $pdf->download($filename . '.pdf');
+                return $this->exportToPdf($data, $view, $filename);
 
             case 'print':
                 return view('reports.print.' . $view, $data);
@@ -44,22 +40,10 @@ trait ReportExport
 
     protected function exportToExcel($data, $filename)
     {
-        return response()->streamDownload(function () use ($data) {
-            $output = fopen('php://output', 'w');
-
-            // Header
-            fputcsv($output, array_keys($data['headers']));
-
-            // Data
-            foreach ($data['items'] as $item) {
-                fputcsv($output, $this->formatForCsv($item));
-            }
-
-            fclose($output);
-        }, "{$filename}.csv", [
-            'Content-Type' => 'text/csv',
-            'Content-Disposition' => 'attachment; filename="' . $filename . '.csv"'
-        ]);
+        return Excel::download(
+            new \App\Exports\ReportExport($data),
+            $filename . '.xlsx'
+        );
     }
 
     protected function exportToPdf($data, $view, $filename)

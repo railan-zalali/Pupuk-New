@@ -32,15 +32,30 @@ class ReportExport implements FromCollection, WithHeadings, WithMapping, WithSty
         $row = [];
         foreach ($this->data['headers'] as $header => $field) {
             if ($field === 'date') {
-                $row[] = $item->created_at->format('d/m/Y H:i');
+                // Check if created_at is an object before calling format
+                if (is_object($item) && isset($item->created_at) && is_object($item->created_at)) {
+                    $row[] = $item->created_at->format('d/m/Y H:i');
+                } elseif (is_array($item) && isset($item['created_at']) && is_object($item['created_at'])) {
+                    $row[] = $item['created_at']->format('d/m/Y H:i');
+                } else {
+                    $row[] = '-';
+                }
             } elseif ($field === 'total_amount' || $field === 'amount') {
                 $row[] = number_format($this->getItemValue($item, $field), 0, ',', '.');
             } elseif ($field === 'payment_method') {
                 $row[] = $this->formatPaymentMethod($this->getItemValue($item, $field));
             } elseif ($field === 'customer_name') {
-                $row[] = $item->customer ? $item->customer->nama : '-';
+                if (is_object($item) && isset($item->customer) && is_object($item->customer)) {
+                    $row[] = $item->customer->nama ?? '-';
+                } else {
+                    $row[] = '-';
+                }
             } elseif ($field === 'supplier_name') {
-                $row[] = $item->supplier ? $item->supplier->name : '-';
+                if (is_object($item) && isset($item->supplier) && is_object($item->supplier)) {
+                    $row[] = $item->supplier->name ?? '-';
+                } else {
+                    $row[] = '-';
+                }
             } else {
                 $row[] = $this->getItemValue($item, $field);
             }

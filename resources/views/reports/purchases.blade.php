@@ -66,6 +66,20 @@
                         <option value="completed" {{ request('status') === 'completed' ? 'selected' : '' }}>Selesai</option>
                     </select>
                 </div>
+                
+                <div class="md:col-span-4">
+                    <x-input-label for="search" value="Cari" />
+                    <div class="mt-1 flex rounded-md shadow-sm">
+                        <x-text-input type="text" name="search" id="search"
+                            value="{{ request('search', '') }}" placeholder="Cari invoice atau supplier..."
+                            class="block w-full rounded-none rounded-l-md" />
+                        <x-primary-button type="submit" class="rounded-l-none">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </x-primary-button>
+                    </div>
+                </div>
 
                 <div class="flex items-end md:col-span-4">
                     <x-primary-button type="submit" class="w-full justify-center">

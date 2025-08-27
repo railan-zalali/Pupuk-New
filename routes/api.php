@@ -29,13 +29,13 @@ Route::get('/products', function () {
     });
 
     return response()->json($products);
-});
+})->middleware('web');
 
 // API endpoint untuk mendapatkan semua kategori
 Route::get('/categories', function () {
     $categories = Category::all();
     return response()->json($categories);
-});
+})->middleware('web');
 
 // API endpoint untuk mencari produk berdasarkan barcode
 Route::get('/products/find-by-barcode/{barcode}', function ($barcode) {
@@ -60,7 +60,7 @@ Route::get('/products/find-by-barcode/{barcode}', function ($barcode) {
         'stock' => $product->stock,
         'selling_price' => $defaultUnit ? $defaultUnit->selling_price : 0,
     ]);
-});
+})->middleware('web');
 
 // Route::get('/products/{product}/units', function (Product $product) {
 //     return response()->json([

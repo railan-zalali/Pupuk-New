@@ -51,23 +51,26 @@
                 <span x-show="sidebarOpen" x-transition>Produk</span>
             </a>
 
-            <a href="{{ route('categories.index') }}"
-                class="nav-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
-                <i class="nav-icon ti ti-category"></i>
-                <span x-show="sidebarOpen" x-transition>Kategori</span>
-            </a>
-
             <a href="{{ route('customers.index') }}"
                 class="nav-item {{ request()->routeIs('customers.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-users"></i>
                 <span x-show="sidebarOpen" x-transition>Pelanggan</span>
             </a>
 
-            <a href="{{ route('suppliers.index') }}"
-                class="nav-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
-                <i class="nav-icon ti ti-building-factory"></i>
-                <span x-show="sidebarOpen" x-transition>Pemasok</span>
-            </a>
+            @if (auth()->user()->hasRole('admin'))
+                <a href="{{ route('categories.index') }}"
+                    class="nav-item {{ request()->routeIs('categories.*') ? 'active' : '' }}">
+                    <i class="nav-icon ti ti-category"></i>
+                    <span x-show="sidebarOpen" x-transition>Kategori</span>
+                </a>
+
+
+                <a href="{{ route('suppliers.index') }}"
+                    class="nav-item {{ request()->routeIs('suppliers.*') ? 'active' : '' }}">
+                    <i class="nav-icon ti ti-building-factory"></i>
+                    <span x-show="sidebarOpen" x-transition>Pemasok</span>
+                </a>
+            @endif
             {{-- <a href="{{ route('cash-book.index') }}"
                 class="nav-item {{ request()->routeIs('cash-book.*') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-book"></i>
@@ -96,17 +99,12 @@
             <div class="nav-group">
                 <div x-show="sidebarOpen" x-transition class="nav-title">Sistem</div>
 
-                {{-- <a href="{{ route('settings.index') }}" --}}
-                <a href="" class="nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
+                <a href="{{ route('settings.index') }}"
+                    class="nav-item {{ request()->routeIs('settings.*') ? 'active' : '' }}">
                     <i class="nav-icon ti ti-settings"></i>
                     <span x-show="sidebarOpen" x-transition>Pengaturan</span>
                 </a>
 
-                <a href="" {{-- <a href="{{ route('activity-logs.index') }}" --}}
-                    class="nav-item {{ request()->routeIs('activity-logs.*') ? 'active' : '' }}">
-                    <i class="nav-icon ti ti-history"></i>
-                    <span x-show="sidebarOpen" x-transition>Log Aktivitas</span>
-                </a>
             </div>
         @endif
 
@@ -131,13 +129,13 @@
                 <i class="nav-icon ti ti-chart-area"></i>
                 <span x-show="sidebarOpen" x-transition>Laporan Stok</span>
             </a>
-            
+
             <a href="{{ route('reports.stock-in') }}"
                 class="nav-item {{ request()->routeIs('reports.stock-in') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-arrow-bar-to-down"></i>
                 <span x-show="sidebarOpen" x-transition>Stok Masuk</span>
             </a>
-            
+
             <a href="{{ route('reports.stock-out') }}"
                 class="nav-item {{ request()->routeIs('reports.stock-out') ? 'active' : '' }}">
                 <i class="nav-icon ti ti-arrow-bar-to-up"></i>

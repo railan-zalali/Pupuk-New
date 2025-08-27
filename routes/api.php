@@ -27,7 +27,7 @@ Route::get('/products', function () {
             'selling_price' => $defaultUnit ? $defaultUnit->selling_price : 0,
         ];
     });
-    
+
     return response()->json($products);
 });
 
@@ -42,13 +42,13 @@ Route::get('/products/find-by-barcode/{barcode}', function ($barcode) {
     $product = Product::where('code', $barcode)
         ->with(['category', 'productUnits'])
         ->first();
-    
+
     if (!$product) {
         return response()->json(['error' => 'Produk tidak ditemukan'], 404);
     }
-    
+
     $defaultUnit = $product->productUnits->where('is_default', 1)->first();
-    
+
     return response()->json([
         'id' => $product->id,
         'name' => $product->name,

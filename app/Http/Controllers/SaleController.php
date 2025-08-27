@@ -386,14 +386,12 @@ class SaleController extends Controller
             // Tandai draft sebagai diproses untuk mencegah pemrosesan duplikat
             $sale->update(['is_draft_processed' => true, 'status' => 'completed']);
 
-            // Simpan detail draft dalam sesi untuk memastikan tersedia saat dialihkan
-            session(['draft_details' => $sale->saleDetails]);
-
             DB::commit();
 
-            // Redirect ke form create dengan data draft yang sudah diisi
+            // Redirect ke halaman index tanpa membuat transaksi baru
+            // Ini mencegah duplikasi transaksi karena draft sudah diubah menjadi transaksi selesai
             return redirect()->route('sales.index')
-                ->with('success', 'Transaksi berhasil.');
+                ->with('success', 'Transaksi berhasil diselesaikan.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Draft Processing Error: ' . $e->getMessage(), [

@@ -34,7 +34,7 @@ class ReportController extends Controller
 
         $purchasesQuery = Purchase::with(['supplier'])
             ->whereBetween('created_at', [$startDate, $endDate]);
-            
+
         // Add search functionality
         if ($search) {
             $purchasesQuery->where(function($query) use ($search) {
@@ -44,17 +44,17 @@ class ReportController extends Controller
                     });
             });
         }
-        
+
         // Filter by supplier if provided
         if ($request->supplier_id) {
             $purchasesQuery->where('supplier_id', $request->supplier_id);
         }
-        
+
         // Filter by status if provided
         if ($request->status) {
             $purchasesQuery->where('status', $request->status);
         }
-        
+
         $purchases = $purchasesQuery->latest()->paginate(15);
 
         $data = [
@@ -370,7 +370,7 @@ class ReportController extends Controller
         //         return $product;
         //     });
         $search = $request->get('search', '');
-        
+
         $products = Product::with('category')
             ->withSum('purchaseDetails as total_purchased', 'quantity')
             ->withSum('saleDetails as total_sold', 'quantity')
@@ -414,7 +414,7 @@ class ReportController extends Controller
             if ($request->get('type') === 'excel') {
                 $data['items'] = $productsCollection;
             }
-            
+
             return $this->handleExport(
                 $data,
                 'stock',
@@ -452,7 +452,7 @@ class ReportController extends Controller
 
             return $product;
         });
-        
+
         // Hitung total nilai persediaan FIFO
         $totalFifoValue = $productsCollection->sum('fifo_value');
         $totalActiveBatches = ProductBatch::whereHas('product')->where('remaining_quantity', '>', 0)->count();
@@ -495,7 +495,7 @@ class ReportController extends Controller
             if ($request->get('type') === 'excel') {
                 $data['items'] = $productsCollection;
             }
-            
+
             return $this->handleExport(
                 $data,
                 'fifo-stock',
@@ -514,7 +514,7 @@ class ReportController extends Controller
         $period = $request->get('period', 'daily');
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
-        
+
         // Validasi range tanggal
         if ($startDate > $endDate) {
             return back()->with('error', 'Tanggal mulai tidak boleh lebih besar dari tanggal akhir');
@@ -527,7 +527,7 @@ class ReportController extends Controller
                 'products.code as product_code',
                 'categories.name as category_name',
                 DB::raw('SUM(purchase_details.quantity) as total_quantity'),
-                DB::raw('SUM(purchase_details.quantity * purchase_details.price) as total_value')
+                DB::raw('SUM(purchase_details.quantity * purchase_details.purchase_price) as total_value')
             )
             ->join('products', 'purchase_details.product_id', '=', 'products.id')
             ->join('categories', 'products.category_id', '=', 'categories.id')
@@ -538,15 +538,15 @@ class ReportController extends Controller
         // Berdasarkan periode yang dipilih
         switch ($period) {
             case 'weekly':
-                $stockInData = $this->getWeeklyStockData($stockInQuery, $startDate, $endDate, 'purchases.created_at');
+                $stockInData = $this->getWeeklyStockData($stockInQuery->clone(), $startDate, $endDate, 'purchases.created_at');
                 $chartTitle = 'Stok Masuk Mingguan';
                 break;
             case 'monthly':
-                $stockInData = $this->getMonthlyStockData($stockInQuery, $startDate, $endDate, 'purchases.created_at');
+                $stockInData = $this->getMonthlyStockData($stockInQuery->clone(), $startDate, $endDate, 'purchases.created_at');
                 $chartTitle = 'Stok Masuk Bulanan';
                 break;
             default: // daily
-                $stockInData = $this->getDailyStockData($stockInQuery, $startDate, $endDate, 'purchases.created_at');
+                $stockInData = $this->getDailyStockData($stockInQuery->clone(), $startDate, $endDate, 'purchases.created_at');
                 $chartTitle = 'Stok Masuk Harian';
                 break;
         }
@@ -602,7 +602,7 @@ class ReportController extends Controller
         $period = $request->get('period', 'daily');
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
-        
+
         // Validasi range tanggal
         if ($startDate > $endDate) {
             return back()->with('error', 'Tanggal mulai tidak boleh lebih besar dari tanggal akhir');
@@ -626,21 +626,31 @@ class ReportController extends Controller
         // Berdasarkan periode yang dipilih
         switch ($period) {
             case 'weekly':
-                $stockOutData = $this->getWeeklyStockData($stockOutQuery, $startDate, $endDate, 'sales.created_at');
+                $stockOutData = $this->getWeeklyStockData($stockOutQuery->clone(), $startDate, $endDate, 'sales.created_at');
                 $chartTitle = 'Stok Keluar Mingguan';
                 break;
             case 'monthly':
-                $stockOutData = $this->getMonthlyStockData($stockOutQuery, $startDate, $endDate, 'sales.created_at');
+                $stockOutData = $this->getMonthlyStockData($stockOutQuery->clone(), $startDate, $endDate, 'sales.created_at');
                 $chartTitle = 'Stok Keluar Bulanan';
                 break;
             default: // daily
-                $stockOutData = $this->getDailyStockData($stockOutQuery, $startDate, $endDate, 'sales.created_at');
+                $stockOutData = $this->getDailyStockData($stockOutQuery->clone(), $startDate, $endDate, 'sales.created_at');
                 $chartTitle = 'Stok Keluar Harian';
                 break;
         }
 
-        // Ambil data produk untuk tabel
-        $products = $stockOutQuery->paginate(20);
+        // Ambil data produk untuk tabel dengan menambahkan semua kolom yang digunakan dalam GROUP BY
+        // untuk mengatasi error ONLY_FULL_GROUP_BY
+        $products = $stockOutQuery->select(
+                'products.id as product_id',
+                'products.name as product_name',
+                'products.code as product_code',
+                'categories.name as category_name',
+                DB::raw('SUM(sale_details.quantity) as total_quantity'),
+                DB::raw('SUM(sale_details.quantity * sale_details.price) as total_value')
+            )
+            ->groupBy('products.id', 'products.name', 'products.code', 'categories.name')
+            ->paginate(20);
 
         // Hitung total
         $totalQuantity = $products->sum('total_quantity');
@@ -687,18 +697,17 @@ class ReportController extends Controller
      */
     private function getDailyStockData($query, $startDate, $endDate, $dateColumn)
     {
-        $dailyData = clone $query;
-        
         // Tentukan nama tabel berdasarkan dateColumn
         $detailsTable = strpos($dateColumn, 'purchases') !== false ? 'purchase_details' : 'sale_details';
-        
-        $dailyData = $dailyData->select(
+        $priceColumn = strpos($dateColumn, 'purchases') !== false ? 'purchase_price' : 'price';
+
+        $dailyData = $query->select(
                 DB::raw("DATE_FORMAT({$dateColumn}, '%d/%m/%Y') as date"),
                 DB::raw("SUM({$detailsTable}.quantity) as total_quantity"),
-                DB::raw("SUM({$detailsTable}.quantity * {$detailsTable}.price) as total_value")
+                DB::raw("SUM({$detailsTable}.quantity * {$detailsTable}.{$priceColumn}) as total_value")
             )
             ->groupBy(DB::raw("DATE_FORMAT({$dateColumn}, '%d/%m/%Y')"))
-            ->orderBy(DB::raw("DATE_FORMAT({$dateColumn}, '%Y-%m-%d')"))
+            ->orderBy(DB::raw("DATE(MIN({$dateColumn}))"), 'asc')
             ->get();
 
         return [
@@ -713,18 +722,18 @@ class ReportController extends Controller
      */
     private function getWeeklyStockData($query, $startDate, $endDate, $dateColumn)
     {
-        $weeklyData = clone $query;
-        
         // Tentukan nama tabel berdasarkan dateColumn
         $detailsTable = strpos($dateColumn, 'purchases') !== false ? 'purchase_details' : 'sale_details';
-        
-        $weeklyData = $weeklyData->select(
+        $priceColumn = strpos($dateColumn, 'purchases') !== false ? 'purchase_price' : 'price';
+
+        $weeklyData = $query->select(
                 DB::raw("CONCAT('Minggu ', WEEK({$dateColumn})) as week"),
+                DB::raw("WEEK({$dateColumn}) as week_number"),
                 DB::raw("SUM({$detailsTable}.quantity) as total_quantity"),
-                DB::raw("SUM({$detailsTable}.quantity * {$detailsTable}.price) as total_value")
+                DB::raw("SUM({$detailsTable}.quantity * {$detailsTable}.{$priceColumn}) as total_value")
             )
-            ->groupBy(DB::raw("WEEK({$dateColumn})"))
-            ->orderBy(DB::raw("WEEK({$dateColumn})"))
+            ->groupBy(DB::raw("WEEK({$dateColumn})"), DB::raw("CONCAT('Minggu ', WEEK({$dateColumn}))"))
+            ->orderBy('week_number', 'asc')
             ->get();
 
         return [
@@ -739,18 +748,18 @@ class ReportController extends Controller
      */
     private function getMonthlyStockData($query, $startDate, $endDate, $dateColumn)
     {
-        $monthlyData = clone $query;
-        
         // Tentukan nama tabel berdasarkan dateColumn
         $detailsTable = strpos($dateColumn, 'purchases') !== false ? 'purchase_details' : 'sale_details';
-        
-        $monthlyData = $monthlyData->select(
+        $priceColumn = strpos($dateColumn, 'purchases') !== false ? 'purchase_price' : 'price';
+
+        $monthlyData = $query->select(
                 DB::raw("DATE_FORMAT({$dateColumn}, '%m/%Y') as month"),
+                DB::raw("DATE_FORMAT({$dateColumn}, '%Y-%m') as month_sort"),
                 DB::raw("SUM({$detailsTable}.quantity) as total_quantity"),
-                DB::raw("SUM({$detailsTable}.quantity * {$detailsTable}.price) as total_value")
+                DB::raw("SUM({$detailsTable}.quantity * {$detailsTable}.{$priceColumn}) as total_value")
             )
-            ->groupBy(DB::raw("DATE_FORMAT({$dateColumn}, '%m/%Y')"))
-            ->orderBy(DB::raw("DATE_FORMAT({$dateColumn}, '%Y-%m')"))
+            ->groupBy(DB::raw("DATE_FORMAT({$dateColumn}, '%m/%Y')"), DB::raw("DATE_FORMAT({$dateColumn}, '%Y-%m')"))
+            ->orderBy('month_sort', 'asc')
             ->get();
 
         return [
@@ -759,6 +768,7 @@ class ReportController extends Controller
             'value' => $monthlyData->pluck('total_value')->toArray()
         ];
     }
+
 
     public function profitLoss(Request $request)
     {

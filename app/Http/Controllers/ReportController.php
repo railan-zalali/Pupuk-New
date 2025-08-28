@@ -112,6 +112,7 @@ class ReportController extends Controller
                 'payment_method',
                 'customer_id',
                 'user_id',
+                'status',
                 'deleted_at'
             ])
                 ->with([
@@ -120,6 +121,7 @@ class ReportController extends Controller
                     'saleDetails:id,sale_id,product_id,quantity,price,subtotal',
                     'saleDetails.product:id,name'
                 ])
+                ->where('status', 'completed') // Hanya tampilkan transaksi dengan status completed
                 ->whereBetween('created_at', [$startDate, $endDate])
                 ->when($request->payment_method, function ($query, $method) {
                     $query->where('payment_method', $method);

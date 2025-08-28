@@ -29,13 +29,13 @@ Route::get('/products', function () {
     });
 
     return response()->json($products);
-})->middleware('web');
+});
 
 // API endpoint untuk mendapatkan semua kategori
 Route::get('/categories', function () {
     $categories = Category::all();
     return response()->json($categories);
-})->middleware('web');
+});
 
 // API endpoint untuk mencari produk berdasarkan barcode
 Route::get('/products/find-by-barcode/{barcode}', function ($barcode) {

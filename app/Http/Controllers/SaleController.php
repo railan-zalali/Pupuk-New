@@ -219,15 +219,14 @@ class SaleController extends Controller
                         'Penjualan produk'
                     );
                 } else {
-                    // Untuk draft, tetap gunakan cara lama
-                    $beforeStock = $product->stock;
-                    $product->decrement('stock', $baseQuantity);
-
+                    // Untuk draft, kita tidak mengurangi stok fisik
+                    // Hanya catat pergerakan stok untuk referensi
                     $product->stockMovements()->create([
-                        'type' => 'out',
+                        'type' => 'draft_out',
                         'quantity' => $baseQuantity,
-                        'before_stock' => $beforeStock,
-                        'after_stock' => $product->stock,
+                        'before_stock' => $product->stock,
+                        'after_stock' => $product->stock, // Tidak mengurangi stok fisik
+
                         'reference_type' => 'draft_sale',
                         'reference_id' => $sale->id,
                         'notes' => 'Draft penjualan produk'
@@ -385,6 +384,22 @@ class SaleController extends Controller
 
             // Tandai draft sebagai diproses untuk mencegah pemrosesan duplikat
             $sale->update(['is_draft_processed' => true, 'status' => 'completed']);
+            
+            // Perbarui stok menggunakan FIFO untuk setiap produk dalam draft
+            foreach ($sale->saleDetails as $detail) {
+                $product = $detail->product;
+                $baseQuantity = $detail->base_quantity;
+                
+                // Gunakan FIFO Service untuk mengurangi stok
+                $fifoService = new FifoService();
+                $usedBatches = $fifoService->reduceStock(
+                    $detail->product_id,
+                    $baseQuantity,
+                    'sale',
+                    $sale->id,
+                    'Penjualan produk dari draft'
+                );
+            }
 
             DB::commit();
 

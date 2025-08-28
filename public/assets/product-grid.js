@@ -635,8 +635,8 @@ class ProductGrid {
     
     // Load categories from API
     loadCategories() {
-        // Use the categories endpoint
-        const endpoint = '/api/categories';
+        // Use the categories endpoint from options or default
+        const endpoint = this.options.categoriesEndpoint || '/api/categories';
         
         // Show loading state
         if (this.categoriesContainer) {

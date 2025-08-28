@@ -1,9 +1,8 @@
 <x-app-layout>
-    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8">
-        <!-- Product Grid CSS -->
-        <style>
-            @import url('/assets/product-grid.css');
-        </style>
+    <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" x-data="{
+        showShortcuts: false,
+        ...salesForm()
+    }">
         <!-- Page Header -->
         <div class="mb-8">
             <div class="flex flex-col md:flex-row md:items-center md:justify-between">
@@ -292,57 +291,6 @@
                 </div>
 
                 <div class="px-4 py-5 sm:p-6">
-                    <!-- Simple Product Selector Component -->
-                    <div class="simple-product-selector mb-6">
-                        <!-- Search and Filter Section -->
-                        <div class="sps-search-container">
-                            <div class="sps-search-input-wrapper">
-                                <input type="text" id="sps-search" class="sps-search" 
-                                    placeholder="Cari produk berdasarkan nama, kode, atau deskripsi...">
-                                <button type="button" id="sps-search-clear" class="sps-search-clear">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                                        <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
-                                        <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
-                                    </svg>
-                                </button>
-                            </div>
-                            <div class="sps-category-filter">
-                                <select id="sps-category-select" class="sps-category-select">
-                                    <option value="">Semua Kategori</option>
-                                    @foreach(\App\Models\Category::orderBy('name')->get() as $category)
-                                        <option value="{{ $category->id }}">{{ $category->name }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-
-                        <!-- Product Grid Container -->
-                        <div id="sps-product-grid" class="sps-product-grid">
-                            @foreach($products as $product)
-                                <div class="sps-product-item" data-id="{{ $product->id }}" data-category="{{ $product->category_id }}" data-name="{{ $product->name }}" data-code="{{ $product->code }}">
-                                    <div class="sps-product-content">
-                                        <h4 class="sps-product-name">{{ $product->name }}</h4>
-                                        <p class="sps-product-code">{{ $product->code }}</p>
-                                        <div class="sps-product-details">
-                                            <span class="sps-product-stock">Stok: {{ $product->stock }}</span>
-                                            <span class="sps-product-price">{{ number_format($product->selling_price, 0, ',', '.') }}</span>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        <!-- Recent Products -->
-                        <div id="sps-recent-products" class="sps-recent-products">
-                            <h3 class="sps-section-title">Produk Terakhir Dipilih</h3>
-                            <div id="sps-recent-items" class="sps-recent-items">
-                                <!-- Recent items will be populated by JavaScript -->
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Selected Products Table -->
-                    <h4 class="text-base font-medium text-gray-900 dark:text-white mb-3">Produk Terpilih</h4>
                     <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead>
@@ -1399,22 +1347,22 @@
                                                     @if ($detail->product->stock > 10)
                                                         stockDisplay.addClass(
                                                             'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                            );
+                                                        );
                                                     @elseif ($detail->product->stock > 0)
                                                         stockDisplay.addClass(
                                                             'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                                            );
+                                                        );
                                                     @else
                                                         stockDisplay.addClass(
                                                             'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                            );
+                                                        );
                                                     @endif
                                                 @else
                                                     stockDisplay.text('0');
                                                     stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
                                                     stockDisplay.addClass(
                                                         'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                        );
+                                                    );
                                                 @endif
                                             }
                                         }
@@ -1448,7 +1396,7 @@
                                                     quantityInput.val({{ $detail->quantity }});
                                                     console.log('Quantity set:', {{ $detail->quantity }});
                                                     quantityInput.trigger(
-                                                    'input'); // Trigger input event to recalculate subtotal
+                                                        'input'); // Trigger input event to recalculate subtotal
                                                 }
 
                                                 const priceInput = currentRow.find(
@@ -1459,7 +1407,7 @@
                                                     console.log('Price set:',
                                                         {{ $detail->price ?? $detail->selling_price }});
                                                     priceInput.trigger(
-                                                    'input'); // Trigger input event to recalculate subtotal
+                                                        'input'); // Trigger input event to recalculate subtotal
                                                 }
 
                                                 // Force recalculation of subtotal
@@ -2632,60 +2580,6 @@
                 // Tampilkan notifikasi
                 showNotification('Produk berhasil ditambahkan', 'success');
             }
-
-            // Inisialisasi Simple Product Selector
-            function initSimpleProductSelector() {
-                // Memuat script simple-product-selector.js
-                if (typeof SimpleProductSelector === 'undefined') {
-                    console.log('Loading SimpleProductSelector script...');
-                    
-                    // Memuat CSS terlebih dahulu
-                    $('<link>')
-                        .attr({
-                            rel: 'stylesheet',
-                            type: 'text/css',
-                            href: '/assets/simple-product-selector.css'
-                        })
-                        .appendTo('head');
-                    
-                    $.getScript('/assets/simple-product-selector.js')
-                        .done(function() {
-                            console.log('SimpleProductSelector script loaded successfully');
-                            setupSimpleProductSelector();
-                        })
-                        .fail(function(jqxhr, settings, exception) {
-                            console.error('Error loading SimpleProductSelector script:', exception);
-                        });
-                } else {
-                    setupSimpleProductSelector();
-                }
-            }
-
-            function setupSimpleProductSelector() {
-                try {
-                    // Inisialisasi komponen SimpleProductSelector
-                    const productSelector = new SimpleProductSelector({
-                        productGridSelector: '#sps-product-grid',
-                        searchInputSelector: '#sps-search',
-                        searchClearSelector: '#sps-search-clear',
-                        categorySelectSelector: '#sps-category-select',
-                        recentItemsSelector: '#sps-recent-items',
-                        onProductSelected: function(productId) {
-                            // Menambahkan produk ke tabel penjualan
-                            addProductById(productId);
-                        }
-                    });
-
-                    console.log('SimpleProductSelector initialized successfully');
-                } catch (error) {
-                    console.error('Error initializing SimpleProductSelector:', error);
-                }
-            }
-
-            // Inisialisasi SimpleProductSelector saat dokumen siap
-            $(document).ready(function() {
-                initSimpleProductSelector();
-            });
         </script>
     @endpush
 

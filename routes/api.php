@@ -6,10 +6,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
+use App\Http\Controllers\API\SaleController;
 
 Route::get('/user', function (Request $request) {
     return $request->user();
 })->middleware('auth:sanctum');
+
+// Sales API Routes
+Route::prefix('sales')->group(function () {
+    Route::get('products', [SaleController::class, 'products']);
+    Route::post('/', [SaleController::class, 'store']);
+});
 
 // API endpoint untuk mendapatkan semua produk
 Route::get('/products', function () {

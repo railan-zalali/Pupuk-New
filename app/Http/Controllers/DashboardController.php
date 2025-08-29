@@ -123,6 +123,7 @@ class DashboardController extends Controller
             ->sum('quantity');
 
         // Get products that will expire in the next 30 days
+        // Tidak perlu memeriksa stok rendah untuk produk yang akan kadaluarsa
         $data['expiringProducts'] = Product::whereHas('productUnits', function ($query) {
             $query->whereNotNull('expire_date')
                 ->where('expire_date', '>=', now())
@@ -135,6 +136,8 @@ class DashboardController extends Controller
                     ->orderBy('expire_date');
             }])
             ->get();
+
+        // Pastikan produk yang akan kadaluarsa ditampilkan terlepas dari status stok
 
         // Data untuk draft transaksi
         $data['draftSales'] = Sale::whereIn('status', ['draft', 'processing'])

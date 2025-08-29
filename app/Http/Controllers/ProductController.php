@@ -483,7 +483,8 @@ class ProductController extends Controller
         $validated = $request->validate([
             'adjustment_type' => 'required|in:add,subtract',
             'quantity' => 'required|integer|min:1',
-            'notes' => 'nullable|string'
+            'notes' => 'nullable|string',
+            'expire_date' => 'nullable|date'
         ]);
 
         $beforeStock = $product->stock;
@@ -492,6 +493,32 @@ class ProductController extends Controller
         if ($validated['adjustment_type'] === 'add') {
             $product->increment('stock', $quantity);
             $type = 'in';
+            
+            // Jika menambah stok dan ada tanggal kadaluarsa, perbarui atau tambahkan di ProductUnit
+            if (isset($validated['expire_date'])) {
+                // Cari ProductUnit default untuk produk ini
+                $productUnit = $product->productUnits()->where('is_default', true)->first();
+                
+                if ($productUnit) {
+                    // Update tanggal kadaluarsa pada unit default
+                    $productUnit->update([
+                        'expire_date' => $validated['expire_date']
+                    ]);
+                }
+            }
+            
+            // Jika menggunakan FIFO, tambahkan batch baru dengan tanggal kadaluarsa
+            if (class_exists('\App\Services\FifoService')) {
+                $fifoService = new \App\Services\FifoService();
+                $fifoService->addBatch(
+                    $product->id,
+                    null, // tidak ada purchase_id untuk adjustment
+                    $quantity,
+                    $product->purchase_price,
+                    null, // generate batch number otomatis
+                    $validated['expire_date'] ?? null
+                );
+            }
         } else {
             if ($product->stock < $quantity) {
                 return back()->with('error', 'Insufficient stock');

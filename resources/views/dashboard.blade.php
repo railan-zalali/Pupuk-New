@@ -29,7 +29,8 @@
             <div
                 class="flex items-center text-sm text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 px-3 py-2 rounded-lg">
                 <i class="ti ti-calendar-event mr-2 text-indigo-500"></i>
-                <span id="current-datetime">{{ now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }} <span id="current-time"></span></span>
+                <span id="current-datetime">{{ now()->locale('id')->isoFormat('dddd, D MMMM YYYY') }} <span
+                        id="current-time"></span></span>
             </div>
             <div class="dashboard-controls flex items-center gap-3">
                 <button id="refresh-dashboard"
@@ -918,7 +919,7 @@
                                             @endif
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                            <a href="{{ route('products.edit', $product) }}"
+                                            <a href="{{ route('products.show', $product) }}"
                                                 class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">
                                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
                                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -1107,13 +1108,13 @@
                 const seconds = String(now.getSeconds()).padStart(2, '0');
                 document.getElementById('current-time').textContent = hours + ':' + minutes + ':' + seconds;
             }
-            
+
             // Handle click on "Lihat Produk" buttons
             document.addEventListener('DOMContentLoaded', function() {
                 // Initialize and update time every second
                 updateTime();
                 setInterval(updateTime, 1000);
-                
+
                 // Handle refresh button
                 const refreshButton = document.getElementById('refresh-dashboard');
                 if (refreshButton) {
@@ -1121,14 +1122,14 @@
                         // Add spinning animation to refresh icon
                         const refreshIcon = refreshButton.querySelector('.ti-refresh');
                         refreshIcon.classList.add('animate-spin');
-                        
+
                         // Reload the page after a short delay
                         setTimeout(function() {
                             window.location.reload();
                         }, 500);
                     });
                 }
-                
+
                 // Handle main alert button
                 const viewExpiringProductsBtn = document.getElementById('view-expiring-products');
                 if (viewExpiringProductsBtn) {

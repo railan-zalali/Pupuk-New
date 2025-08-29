@@ -187,7 +187,14 @@
                                 </div>
                             </div>
 
-                            <div class="sm:col-span-2">
+                            <div id="expire_date_container">
+                                <x-input-label for="expire_date" value="Tanggal Kadaluarsa"
+                                    class="font-medium text-gray-700 dark:text-gray-300" />
+                                <x-text-input id="expire_date" name="expire_date" type="date"
+                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-700 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300" />
+                            </div>
+
+                            <div>
                                 <x-input-label for="notes" value="Catatan"
                                     class="font-medium text-gray-700 dark:text-gray-300" />
                                 <x-text-input id="notes" name="notes" type="text"
@@ -207,6 +214,28 @@
                                 Sesuaikan Stok
                             </button>
                         </div>
+
+                        <script>
+                            document.addEventListener('DOMContentLoaded', function() {
+                                const adjustmentTypeSelect = document.getElementById('adjustment_type');
+                                const expireDateContainer = document.getElementById('expire_date_container');
+                                
+                                // Function to toggle expire date field visibility
+                                function toggleExpireDate() {
+                                    if (adjustmentTypeSelect.value === 'add') {
+                                        expireDateContainer.style.display = 'block';
+                                    } else {
+                                        expireDateContainer.style.display = 'none';
+                                    }
+                                }
+                                
+                                // Set initial state
+                                toggleExpireDate();
+                                
+                                // Add event listener for changes
+                                adjustmentTypeSelect.addEventListener('change', toggleExpireDate);
+                            });
+                        </script>
                     </form>
                 </div>
 

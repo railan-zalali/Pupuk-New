@@ -109,9 +109,9 @@
 
             <!-- Card: Informasi Penjualan -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
                 <div
-                    class="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
+                    class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg leading-6 font-semibold text-gray-900 dark:text-white flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
@@ -248,9 +248,9 @@
 
             <!-- Card: Item Penjualan -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
                 <div
-                    class="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
+                    class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
                     <div>
                         <h3 class="text-lg leading-6 font-semibold text-gray-900 dark:text-white flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg"
@@ -268,7 +268,7 @@
                     <div class="flex items-center space-x-2">
                         <div class="relative mr-2">
                             <input type="text" id="quick-search" placeholder="Cari produk..."
-                                class="w-40 md:w-60 pl-8 pr-3 py-1.5 text-sm rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                                class="w-40 md:w-60 pl-8 pr-3 py-1.5 text-sm rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 transition-colors">
                             <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
                                 <svg class="h-4 w-4 text-gray-400 dark:text-gray-500"
                                     xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
@@ -279,7 +279,7 @@
                             </div>
                         </div>
                         <button type="button" onclick="addItem()"
-                            class="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
+                            class="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 transform hover:scale-105">
                             <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-2 h-4 w-4" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -291,36 +291,36 @@
                 </div>
 
                 <div class="px-4 py-5 sm:p-6">
-                    <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md">
+                    <div class="overflow-x-auto border border-gray-200 dark:border-gray-700 rounded-md shadow-sm">
                         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
                             <thead>
                                 <tr>
                                     <th scope="col"
-                                        class="sticky top-0 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700">
+                                        class="sticky top-0 px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                         Produk
                                     </th>
                                     <th scope="col"
-                                        class="sticky top-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700 w-20 text-center">
+                                        class="sticky top-0 px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750 w-20 text-center">
                                         Stok
                                     </th>
                                     <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700/50">
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                         Satuan
                                     </th>
                                     <th scope="col"
-                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700/50">
+                                        class="px-3 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                         Jumlah
                                     </th>
                                     <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700/50">
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                         Harga
                                     </th>
                                     <th scope="col"
-                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700/50">
+                                        class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                         Subtotal
                                     </th>
                                     <th scope="col"
-                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gray-50 dark:bg-gray-700/50">
+                                        class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                         Aksi
                                     </th>
                                 </tr>
@@ -329,11 +329,11 @@
                                 class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                                 <!-- Dynamic item rows will be added here -->
                             </tbody>
-                            <tfoot class="bg-gray-50 dark:bg-gray-700/50">
+                            <tfoot class="bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-750">
                                 <tr>
                                     <td colspan="7" class="px-4 py-3 text-right">
                                         <button type="button" onclick="addItem()"
-                                            class="inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors duration-150">
+                                            class="inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 transform hover:scale-105">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-2 h-4 w-4"
                                                 fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -346,14 +346,15 @@
                             </tfoot>
                         </table>
                     </div>
+                    <p class="mt-2 text-xs text-gray-500 dark:text-gray-400 italic">Tip: Gunakan Alt+A untuk menambahkan item baru dengan cepat</p>
                 </div>
             </div>
 
             <!-- Card: Detail Pembayaran -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md overflow-hidden border border-gray-200 dark:border-gray-700 transition-all hover:shadow-lg">
                 <div
-                    class="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
+                    class="px-4 py-5 sm:px-6 bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-gray-800 dark:to-gray-750 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg leading-6 font-semibold text-gray-900 dark:text-white flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
@@ -411,8 +412,12 @@
                         <div class="space-y-4">
                             <!-- Pembayaran Kredit -->
                             <div id="dp_container"
-                                class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Pembayaran Kredit
+                                class="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-600 p-4 shadow-sm transition-all hover:shadow">
+                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    Pembayaran Kredit
                                 </h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
@@ -425,17 +430,17 @@
                                                     <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
                                                 </div>
                                                 <input type="number" name="down_payment" id="down_payment"
-                                                    class="pl-10 w-32 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                                                    class="pl-10 w-32 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
                                                     value="0" min="0"
                                                     onchange="calculateRemainingAmount()">
                                             </div>
                                             <div class="flex space-x-1">
                                                 <button type="button" onclick="setDownPayment(50)"
-                                                    class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                                    class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-150 transform hover:scale-105">
                                                     50%
                                                 </button>
                                                 <button type="button" onclick="setDownPayment(75)"
-                                                    class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
+                                                    class="inline-flex items-center px-2 py-1 border border-transparent text-xs font-medium rounded text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-150 transform hover:scale-105">
                                                     75%
                                                 </button>
                                             </div>
@@ -454,9 +459,13 @@
 
                             <!-- Pembayaran Tunai -->
                             <div id="cash-payment-section"
-                                class="bg-gray-50 dark:bg-gray-700/50 rounded-lg border border-gray-200 dark:border-gray-600 p-4">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3">Pembayaran
-                                    Tunai/Transfer</h4>
+                                class="bg-gradient-to-r from-gray-50 to-white dark:from-gray-700/50 dark:to-gray-700/30 rounded-lg border border-gray-200 dark:border-gray-600 p-4 shadow-sm transition-all hover:shadow">
+                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
+                                    </svg>
+                                    Pembayaran Tunai/Transfer
+                                </h4>
                                 <div class="space-y-4">
                                     <div class="flex items-center justify-between">
                                         <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Jumlah
@@ -468,11 +477,11 @@
                                                     <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
                                                 </div>
                                                 <input type="number" name="paid_amount" id="paid_amount"
-                                                    class="pl-10 w-32 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500"
+                                                    class="pl-10 w-32 rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-indigo-500 focus:ring-indigo-500 transition-colors"
                                                     value="0" min="0" onchange="calculateChange()">
                                             </div>
                                             <button type="button" onclick="setExactAmount()"
-                                                class="inline-flex items-center px-3 py-1 border border-gray-300 dark:border-gray-600 text-xs font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                                                class="inline-flex items-center px-3 py-1 border border-transparent text-xs font-medium rounded text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-150 transform hover:scale-105">
                                                 Uang Pas
                                             </button>
                                         </div>
@@ -494,9 +503,9 @@
 
             <!-- Card: Catatan -->
             <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden border border-gray-200 dark:border-gray-700">
+                class="bg-white dark:bg-gray-800 rounded-lg shadow-md transition-all hover:shadow-lg overflow-hidden border border-gray-200 dark:border-gray-700">
                 <div
-                    class="px-4 py-5 sm:px-6 bg-gray-50 dark:bg-gray-800/80 border-b border-gray-200 dark:border-gray-700">
+                    class="px-4 py-5 sm:px-6 bg-gradient-to-r from-gray-50 to-white dark:from-gray-800/80 dark:to-gray-800/60 border-b border-gray-200 dark:border-gray-700">
                     <h3 class="text-lg leading-6 font-semibold text-gray-900 dark:text-white flex items-center">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
@@ -512,7 +521,7 @@
 
                 <div class="px-4 py-5 sm:p-6">
                     <textarea id="notes" name="notes" rows="3"
-                        class="shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md"
+                        class="shadow-sm block w-full focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 rounded-md transition-colors"
                         placeholder="Tambahkan catatan transaksi jika diperlukan...">{{ old('notes') }}</textarea>
                 </div>
             </div>
@@ -520,30 +529,32 @@
             <!-- Form Actions -->
             <div class="flex justify-end space-x-3 py-4">
                 <button type="button" onclick="window.history.back()"
-                    class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                    class="inline-flex justify-center py-2 px-4 border border-gray-300 dark:border-gray-600 shadow-sm text-sm font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 transform hover:scale-105">
                     <svg xmlns="http://www.w3.org/2000/svg"
                         class="-ml-1 mr-2 h-5 w-5 text-gray-500 dark:text-gray-400" fill="none"
                         viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M6 18L18 6M6 6l12 12" />
                     </svg>
-                    Batal
+                    <span>Batal</span>
                 </button>
 
                 <div class="relative group">
                     <button type="submit" name="save_draft" value="1"
-                        class="inline-flex justify-center py-2 px-4 border border-yellow-500 dark:border-yellow-600 shadow-sm text-sm font-medium rounded-md text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-colors">
+                        class="inline-flex justify-center py-2 px-4 border border-yellow-500 dark:border-yellow-600 shadow-sm text-sm font-medium rounded-md text-yellow-700 dark:text-yellow-300 bg-yellow-50 dark:bg-yellow-900/20 hover:bg-yellow-100 dark:hover:bg-yellow-900/40 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500 transition-all duration-150 transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg"
                             class="-ml-1 mr-2 h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
+                        <span>
                         @if ($draft)
                             Perbarui Draft
                         @else
                             Simpan sebagai Draft
                         @endif
+                        </span>
                     </button>
                     <div
                         class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-64 z-10">
@@ -558,17 +569,19 @@
 
                 <div class="relative group">
                     <button type="submit"
-                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors">
+                        class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 transform hover:scale-105">
                         <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                 d="M5 13l4 4L19 7" />
                         </svg>
+                        <span>
                         @if ($draft)
                             Selesaikan Transaksi
                         @else
                             Proses Transaksi
                         @endif
+                        </span>
                     </button>
                     <div
                         class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 hidden group-hover:block w-64 z-10">

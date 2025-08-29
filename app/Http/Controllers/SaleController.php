@@ -15,12 +15,51 @@ use Illuminate\Support\Facades\Cache;
 
 class SaleController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $sales = Sale::where('status', 'completed')
-            ->with(['user', 'customer'])
+        $query = Sale::query();
+
+        // Filter berdasarkan status jika ada
+        if ($request->has('status') && $request->status) {
+            $query->where('status', $request->status);
+        } else {
+            // Default tampilkan yang completed jika tidak ada filter
+            $query->where('status', 'completed');
+        }
+
+        // Filter berdasarkan metode pembayaran jika ada
+        if ($request->has('payment_method') && $request->payment_method) {
+            $query->where('payment_method', $request->payment_method);
+        }
+
+        // Filter berdasarkan tanggal jika ada
+        if ($request->has('start_date') && $request->start_date) {
+            $startDate = Carbon::parse($request->start_date)->startOfDay();
+            $endDate = $request->has('end_date') && $request->end_date
+                ? Carbon::parse($request->end_date)->endOfDay()
+                : Carbon::now()->endOfDay();
+
+            $query->whereBetween('created_at', [$startDate, $endDate]);
+        }
+
+        // Pencarian berdasarkan invoice atau customer
+        if ($request->has('search') && $request->search) {
+            $searchTerm = $request->search;
+            $query->where(function($q) use ($searchTerm) {
+                $q->where('invoice_number', 'like', "%{$searchTerm}%")
+                  ->orWhereHas('customer', function($q2) use ($searchTerm) {
+                      $q2->where('nama', 'like', "%{$searchTerm}%");
+                  });
+            });
+        }
+
+        $sales = $query->with(['user', 'customer'])
             ->latest()
             ->paginate(10);
+
+        if ($request->ajax()) {
+            return view('sales.partials.sales_table', compact('sales'))->render();
+        }
 
         return view('sales.index', compact('sales'));
     }
@@ -133,7 +172,7 @@ class SaleController extends Controller
             } else if ($downPayment > 0) {
                 $paymentStatus = 'partial';
             }
-            
+
             // Jika pembayaran kredit belum lunas, set status transaksi menjadi 'pending'
             if ($remainingAmount > 0) {
                 $status = 'pending';
@@ -384,12 +423,12 @@ class SaleController extends Controller
 
             // Tandai draft sebagai diproses untuk mencegah pemrosesan duplikat
             $sale->update(['is_draft_processed' => true, 'status' => 'completed']);
-            
+
             // Perbarui stok menggunakan FIFO untuk setiap produk dalam draft
             foreach ($sale->saleDetails as $detail) {
                 $product = $detail->product;
                 $baseQuantity = $detail->base_quantity;
-                
+
                 // Gunakan FIFO Service untuk mengurangi stok
                 $fifoService = new FifoService();
                 $usedBatches = $fifoService->reduceStock(
@@ -428,24 +467,22 @@ class SaleController extends Controller
             // Restore stock for both completed sales and drafts
             $sale->load(['saleDetails.product']);
             $productIds = [];
+            $fifoService = app(FifoService::class);
 
             foreach ($sale->saleDetails as $detail) {
                 $product = $detail->product;
-                $beforeStock = $product->stock;
                 $productIds[] = $product->id;
+                $referenceType = $sale->status === 'draft' ? 'draft_void' : 'sale_void';
+                $notes = $sale->status === 'draft' ? 'Draft dibatalkan' : 'Transaksi dibatalkan';
 
-                // Use base_quantity for stock calculation
-                $product->increment('stock', $detail->base_quantity);
-
-                $product->stockMovements()->create([
-                    'type' => 'in',
-                    'quantity' => $detail->base_quantity,
-                    'before_stock' => $beforeStock,
-                    'after_stock' => $product->stock,
-                    'reference_type' => $sale->status === 'draft' ? 'draft_void' : 'sale_void',
-                    'reference_id' => $sale->id,
-                    'notes' => $sale->status === 'draft' ? 'Draft dibatalkan' : 'Transaksi dibatalkan'
-                ]);
+                // Gunakan FifoService untuk mengembalikan stok dengan benar
+                $fifoService->restoreStock(
+                    $product->id,
+                    $detail->base_quantity,
+                    $referenceType,
+                    $sale->id,
+                    $notes
+                );
             }
 
             $sale->status = 'cancelled';
@@ -517,7 +554,7 @@ class SaleController extends Controller
 
         // Generate nomor invoice khusus
         $invoiceNumber = 'INV-' . date('Ymd') . '-' . str_pad($sale->id, 4, '0', STR_PAD_LEFT);
-        
+
         // Ambil data pengaturan toko
         $storeSetting = \App\Models\StoreSetting::first();
 
@@ -550,7 +587,7 @@ class SaleController extends Controller
 
         // Generate nomor invoice khusus benih
         $invoiceNumber = 'INV-BNH-' . date('Ymd') . '-' . str_pad($sale->id, 4, '0', STR_PAD_LEFT);
-        
+
         // Ambil data pengaturan toko
         $storeSetting = \App\Models\StoreSetting::first();
 
@@ -571,7 +608,7 @@ class SaleController extends Controller
 
         // Generate nomor surat jalan
         $deliveryNumber = 'SJ-' . date('Ymd') . '-' . str_pad($sale->id, 4, '0', STR_PAD_LEFT);
-        
+
         // Ambil data pengaturan toko
         $storeSetting = \App\Models\StoreSetting::first();
 

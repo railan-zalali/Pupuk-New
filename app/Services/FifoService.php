@@ -192,4 +192,100 @@ class FifoService
             ->orderBy('expiry_date', 'asc')
             ->get();
     }
+
+    /**
+     * Mengembalikan stok saat pembatalan transaksi dengan metode FIFO
+     *
+     * @param int $productId ID produk
+     * @param float $quantity Jumlah yang akan dikembalikan
+     * @param string $referenceType Tipe referensi (sale_void, draft_void, dll)
+     * @param int $referenceId ID referensi
+     * @param string $notes Catatan
+     * @return array Array dari batch yang diperbarui
+     */
+    public function restoreStock($productId, $quantity, $referenceType, $referenceId, $notes = '')
+    {
+        // Ambil produk
+        $product = Product::findOrFail($productId);
+        $beforeStock = $product->stock;
+        $updatedBatches = [];
+
+        // Mulai transaksi database
+        DB::beginTransaction();
+
+        try {
+            // Cari pergerakan stok keluar terkait dengan referensi asli
+            // Misalnya, jika ini pembatalan penjualan, cari pergerakan stok 'out' dengan reference_type 'sale'
+            $originalReferenceType = str_replace('_void', '', $referenceType);
+            
+            // Ambil pergerakan stok keluar yang terkait dengan transaksi asli
+            $stockMovements = StockMovement::where('product_id', $productId)
+                ->where('type', 'out')
+                ->where('reference_type', $originalReferenceType)
+                ->where('reference_id', $referenceId)
+                ->orderBy('created_at', 'desc') // Terbaru dulu, karena kita akan mengembalikan stok dalam urutan terbalik dari FIFO
+                ->get();
+
+            // Jika tidak ada pergerakan stok yang ditemukan, kembalikan stok secara langsung
+            if ($stockMovements->isEmpty()) {
+                // Update stok produk
+                $product->increment('stock', $quantity);
+                
+                // Catat pergerakan stok
+                StockMovement::create([
+                    'product_id' => $productId,
+                    'type' => 'in',
+                    'quantity' => $quantity,
+                    'before_stock' => $beforeStock,
+                    'after_stock' => $beforeStock + $quantity,
+                    'reference_type' => $referenceType,
+                    'reference_id' => $referenceId,
+                    'notes' => $notes
+                ]);
+            } else {
+                // Kembalikan stok ke batch yang sesuai berdasarkan pergerakan stok sebelumnya
+                foreach ($stockMovements as $movement) {
+                    // Jika ada batch_id, kembalikan stok ke batch tersebut
+                    if ($movement->batch_id) {
+                        $batch = ProductBatch::find($movement->batch_id);
+                        if ($batch) {
+                            // Kembalikan stok ke batch
+                            $batch->remaining_quantity += $movement->quantity;
+                            $batch->save();
+                            
+                            // Catat pergerakan stok
+                            StockMovement::create([
+                                'product_id' => $productId,
+                                'batch_id' => $batch->id,
+                                'type' => 'in',
+                                'quantity' => $movement->quantity,
+                                'before_stock' => $beforeStock,
+                                'after_stock' => $beforeStock + $movement->quantity,
+                                'reference_type' => $referenceType,
+                                'reference_id' => $referenceId,
+                                'notes' => $notes . ' (Batch: ' . $batch->batch_number . ')'
+                            ]);
+                            
+                            $updatedBatches[] = [
+                                'batch' => $batch,
+                                'quantity' => $movement->quantity
+                            ];
+                            
+                            // Update untuk iterasi berikutnya
+                            $beforeStock += $movement->quantity;
+                        }
+                    }
+                }
+                
+                // Update stok produk
+                $product->increment('stock', $quantity);
+            }
+
+            DB::commit();
+            return $updatedBatches;
+        } catch (\Exception $e) {
+            DB::rollBack();
+            throw $e;
+        }
+    }
 }

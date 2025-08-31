@@ -23,7 +23,9 @@ class DashboardController extends Controller
         $data['totalProducts'] = Product::count();
         $data['totalSalesToday'] = $totalSalesToday;
         $data['totalSalesThisMonth'] = $totalSalesThisMonth;
-        $data['lowStockProducts'] = Product::whereColumn('stock', '<=', 'min_stock')->count();
+        $data['lowStockProducts'] = Product::where('stock', '>', 0)
+            ->whereColumn('stock', '<=', 'min_stock')
+            ->count();
 
         // Menghitung persentase perubahan harian
         $salesChangeToday = 0;
@@ -60,7 +62,8 @@ class DashboardController extends Controller
             ->sum('remaining_amount');
 
         // Data untuk tabel
-        $data['lowStockAlerts'] = Product::whereColumn('stock', '<=', 'min_stock')
+        $data['lowStockAlerts'] = Product::where('stock', '>', 0)
+            ->whereColumn('stock', '<=', 'min_stock')
             ->latest()
             ->limit(5)
             ->get();
@@ -123,12 +126,13 @@ class DashboardController extends Controller
             ->sum('quantity');
 
         // Get products that will expire in the next 30 days
-        // Tidak perlu memeriksa stok rendah untuk produk yang akan kadaluarsa
-        $data['expiringProducts'] = Product::whereHas('productUnits', function ($query) {
-            $query->whereNotNull('expire_date')
-                ->where('expire_date', '>=', now())
-                ->where('expire_date', '<=', now()->addDays(30));
-        })
+        // Hanya menampilkan produk yang memiliki stok dan akan expire dalam 30 hari
+        $data['expiringProducts'] = Product::where('stock', '>', 0)
+            ->whereHas('productUnits', function ($query) {
+                $query->whereNotNull('expire_date')
+                    ->where('expire_date', '>=', now())
+                    ->where('expire_date', '<=', now()->addDays(30));
+            })
             ->with(['productUnits' => function ($query) {
                 $query->whereNotNull('expire_date')
                     ->where('expire_date', '>=', now())

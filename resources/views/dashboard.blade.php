@@ -887,14 +887,18 @@
                                         </td>
                                         <td
                                             class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                            {{ $product->productUnits->first()->expire_date->format('d/m/Y') }}
+                                            @if($product->productUnits->isNotEmpty())
+                                                {{ $product->productUnits->first()->expire_date->format('d/m/Y') }}
+                                            @else
+                                                -
+                                            @endif
                                         </td>
                                         <td class="whitespace-nowrap px-6 py-4 text-sm">
                                             @php
-                                                $daysLeft = now()->diffInDays(
+                                                $daysLeft = $product->productUnits->isNotEmpty() ? now()->diffInDays(
                                                     $product->productUnits->first()->expire_date,
                                                     false,
-                                                );
+                                                ) : 0;
                                             @endphp
                                             @if ($daysLeft < 0)
                                                 <span

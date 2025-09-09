@@ -1,0 +1,52 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#bgGradient)" stroke="#ffffff" stroke-width="8"/>
+  
+  <!-- Plant/Leaf Icon -->
+  <g transform="translate(256,256)">
+    <!-- Main stem -->
+    <rect x="-8" y="-80" width="16" height="160" fill="#16a34a" rx="8"/>
+    
+    <!-- Left leaf -->
+    <ellipse cx="-40" cy="-40" rx="35" ry="20" fill="url(#leafGradient)" transform="rotate(-30)"/>
+    <path d="M -65,-35 Q -40,-55 -15,-35" stroke="#16a34a" stroke-width="2" fill="none"/>
+    
+    <!-- Right leaf -->
+    <ellipse cx="40" cy="-40" rx="35" ry="20" fill="url(#leafGradient)" transform="rotate(30)"/>
+    <path d="M 15,-35 Q 40,-55 65,-35" stroke="#16a34a" stroke-width="2" fill="none"/>
+    
+    <!-- Top leaf -->
+    <ellipse cx="0" cy="-70" rx="25" ry="15" fill="url(#leafGradient)"/>
+    <path d="M -20,-70 Q 0,-85 20,-70" stroke="#16a34a" stroke-width="2" fill="none"/>
+    
+    <!-- Fertilizer granules -->
+    <circle cx="-60" cy="40" r="8" fill="#fbbf24"/>
+    <circle cx="-30" cy="50" r="6" fill="#f59e0b"/>
+    <circle cx="0" cy="45" r="7" fill="#fbbf24"/>
+    <circle cx="30" cy="55" r="5" fill="#f59e0b"/>
+    <circle cx="60" cy="40" r="8" fill="#fbbf24"/>
+    
+    <!-- Small sparkles for freshness -->
+    <g fill="#ffffff" opacity="0.8">
+      <polygon points="-80,-20 -75,-15 -80,-10 -85,-15" />
+      <polygon points="80,-30 85,-25 80,-20 75,-25" />
+      <polygon points="-20,-100 -15,-95 -20,-90 -25,-95" />
+      <polygon points="20,-100 25,-95 20,-90 15,-95" />
+    </g>
+  </g>
+  
+  <!-- App name text -->
+  <text x="256" y="420" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="32" font-weight="bold">TANI</text>
+  <text x="256" y="450" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="24">MAKMUR</text>
+</svg>

@@ -128,3 +128,160 @@
 .badge-primary {
     @apply bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400;
 }
+
+/* PWA Mobile Optimizations */
+@media (max-width: 768px) {
+    /* Touch-friendly buttons */
+    .btn, button, .btn-primary, .btn-secondary {
+        @apply min-h-[44px] px-4 py-3 text-base;
+        touch-action: manipulation;
+    }
+    
+    /* Larger form inputs for mobile */
+    input[type="text"], input[type="email"], input[type="password"], 
+    input[type="number"], input[type="tel"], textarea, select {
+        @apply min-h-[44px] text-base;
+        -webkit-appearance: none;
+        border-radius: 8px;
+    }
+    
+    /* Mobile-friendly tables */
+    .table-responsive {
+        @apply overflow-x-auto;
+    }
+    
+    .table-responsive table {
+        @apply min-w-full;
+    }
+    
+    /* Card spacing for mobile */
+    .content-card {
+        @apply mx-2 rounded-lg;
+    }
+    
+    /* Navigation improvements */
+    .sidebar {
+        @apply transform transition-transform duration-300 ease-in-out;
+    }
+    
+    .sidebar.hidden {
+        @apply -translate-x-full;
+    }
+    
+    /* Mobile menu overlay */
+    .mobile-overlay {
+        @apply fixed inset-0 bg-black bg-opacity-50 z-40;
+    }
+    
+    /* Improved spacing */
+    .container, .max-w-7xl {
+        @apply px-4;
+    }
+    
+    /* Mobile-friendly modals */
+    .modal {
+        @apply mx-4 my-8;
+    }
+    
+    /* Touch-friendly dropdowns */
+    .dropdown-menu {
+        @apply min-w-[200px];
+    }
+    
+    .dropdown-item {
+        @apply min-h-[44px] flex items-center px-4 py-3;
+    }
+}
+
+/* PWA Specific Styles */
+@media (display-mode: standalone) {
+    /* Hide browser UI elements when in PWA mode */
+    body {
+        @apply select-none;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+    }
+    
+    /* Allow text selection in content areas */
+    .content-area, .form-group, input, textarea {
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+    }
+    
+    /* PWA status bar spacing */
+    .app-header {
+        @apply pt-4;
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    /* Fix viewport height on iOS */
+    .min-h-screen {
+        min-height: -webkit-fill-available;
+    }
+    
+    /* Fix input zoom on iOS */
+    input[type="text"], input[type="email"], input[type="password"], 
+    input[type="number"], input[type="tel"], textarea, select {
+        font-size: 16px;
+    }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .btn-primary {
+        @apply border-2 border-white;
+    }
+    
+    .content-card {
+        @apply border-2;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+    }
+}
+
+/* Dark mode improvements for PWA */
+@media (prefers-color-scheme: dark) {
+    .pwa-install-button {
+        @apply bg-emerald-700 border-emerald-600;
+    }
+    
+    .network-status {
+        @apply bg-gray-800 border border-gray-700;
+    }
+}
+
+/* Loading states for offline content */
+.loading-skeleton {
+    @apply animate-pulse bg-gray-200 dark:bg-gray-700 rounded;
+}
+
+.offline-indicator {
+    @apply fixed top-0 left-0 right-0 bg-yellow-500 text-yellow-900 text-center py-2 text-sm font-medium z-50;
+}
+
+/* PWA splash screen styles */
+.pwa-splash {
+    @apply fixed inset-0 bg-emerald-600 flex items-center justify-center z-50;
+}
+
+.pwa-splash-content {
+    @apply text-center text-white;
+}
+
+.pwa-splash-icon {
+    @apply w-24 h-24 mx-auto mb-4 animate-bounce;
+}

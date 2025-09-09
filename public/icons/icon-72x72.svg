@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 72" width="72" height="72">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="36" cy="36" r="32" fill="url(#bgGradient)" stroke="#ffffff" stroke-width="2"/>
+  
+  <!-- Plant/Leaf Icon -->
+  <g transform="translate(36,36)">
+    <!-- Main stem -->
+    <rect x="-1.5" y="-12" width="3" height="24" fill="#16a34a" rx="1.5"/>
+    
+    <!-- Left leaf -->
+    <ellipse cx="-6" cy="-6" rx="5" ry="3" fill="url(#leafGradient)" transform="rotate(-30)"/>
+    
+    <!-- Right leaf -->
+    <ellipse cx="6" cy="-6" rx="5" ry="3" fill="url(#leafGradient)" transform="rotate(30)"/>
+    
+    <!-- Top leaf -->
+    <ellipse cx="0" cy="-10" rx="3" ry="2" fill="url(#leafGradient)"/>
+    
+    <!-- Fertilizer granules -->
+    <circle cx="-8" cy="6" r="1.5" fill="#fbbf24"/>
+    <circle cx="-4" cy="8" r="1" fill="#f59e0b"/>
+    <circle cx="0" cy="7" r="1.5" fill="#fbbf24"/>
+    <circle cx="4" cy="8" r="1" fill="#f59e0b"/>
+    <circle cx="8" cy="6" r="1.5" fill="#fbbf24"/>
+  </g>
+</svg>

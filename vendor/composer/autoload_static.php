@@ -610,7 +610,6 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
     );
 
     public static $classMap = array (
-        'App\\Console\\Commands\\TestInsertProduct' => __DIR__ . '/../..' . '/app/Console/Commands/TestInsertProduct.php',
         'App\\Exports\\ProductsTemplateExport' => __DIR__ . '/../..' . '/app/Exports/ProductsTemplateExport.php',
         'App\\Exports\\ReportExport' => __DIR__ . '/../..' . '/app/Exports/ReportExport.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
@@ -627,6 +626,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\CustomerController' => __DIR__ . '/../..' . '/app/Http/Controllers/CustomerController.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
+        'App\\Http\\Controllers\\DraftSaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/DraftSaleController.php',
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\ProductUnitController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductUnitController.php',
         'App\\Http\\Controllers\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProfileController.php',
@@ -666,7 +666,6 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Requests\\Updatepurchases_receiptsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Updatepurchases_receiptsRequest.php',
         'App\\Imports\\CustomersImport' => __DIR__ . '/../..' . '/app/Imports/CustomersImport.php',
         'App\\Imports\\ProductsImport' => __DIR__ . '/../..' . '/app/Imports/ProductsImport.php',
-        'App\\Models\\CashBook' => __DIR__ . '/../..' . '/app/Models/CashBook.php',
         'App\\Models\\Category' => __DIR__ . '/../..' . '/app/Models/Category.php',
         'App\\Models\\Customer' => __DIR__ . '/../..' . '/app/Models/Customer.php',
         'App\\Models\\Permission' => __DIR__ . '/../..' . '/app/Models/Permission.php',

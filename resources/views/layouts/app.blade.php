@@ -7,6 +7,24 @@
     <meta name="author" content="Railan Zalali">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="theme-color" content="#10b981">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Tani Makmur">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="application-name" content="Tani Makmur">
+    <meta name="msapplication-TileColor" content="#10b981">
+    <meta name="msapplication-tap-highlight" content="no">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="{{ asset('manifest.json') }}">
+    
+    <!-- PWA Icons -->
+    <link rel="icon" type="image/svg+xml" href="{{ asset('icons/icon.svg') }}">
+    <link rel="apple-touch-icon" href="{{ asset('icons/icon-192x192.svg') }}">
+    <link rel="mask-icon" href="{{ asset('icons/icon.svg') }}" color="#10b981">
 
     <title>{{ config('app.name', 'Laravel') }}</title>
 
@@ -204,6 +222,119 @@
             const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
             localStorage.setItem('darkMode', prefersDark);
         }
+    </script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Register service worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(function(registration) {
+                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                        
+                        // Check for updates
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // New content is available, show update notification
+                                    if (confirm('Versi baru aplikasi tersedia. Muat ulang untuk menggunakan versi terbaru?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch(function(err) {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+
+        // PWA Install Prompt
+        let deferredPrompt;
+        let installButton = null;
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            console.log('PWA install prompt triggered');
+            e.preventDefault();
+            deferredPrompt = e;
+            
+            // Show install button
+            showInstallButton();
+        });
+
+        function showInstallButton() {
+            // Create install button if it doesn't exist
+            if (!installButton) {
+                installButton = document.createElement('button');
+                installButton.innerHTML = '<i class="ti ti-download"></i> Install App';
+                installButton.className = 'fixed bottom-4 right-4 bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg shadow-lg z-50 flex items-center gap-2 transition-all duration-300';
+                installButton.style.display = 'none';
+                installButton.addEventListener('click', installPWA);
+                document.body.appendChild(installButton);
+            }
+            
+            // Show the button with animation
+            setTimeout(() => {
+                installButton.style.display = 'flex';
+                installButton.style.transform = 'translateY(0)';
+            }, 2000);
+        }
+
+        function installPWA() {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                deferredPrompt.userChoice.then((choiceResult) => {
+                    if (choiceResult.outcome === 'accepted') {
+                        console.log('User accepted the PWA install prompt');
+                    } else {
+                        console.log('User dismissed the PWA install prompt');
+                    }
+                    deferredPrompt = null;
+                    if (installButton) {
+                        installButton.style.display = 'none';
+                    }
+                });
+            }
+        }
+
+        // Hide install button after successful installation
+        window.addEventListener('appinstalled', (evt) => {
+            console.log('PWA was installed');
+            if (installButton) {
+                installButton.style.display = 'none';
+            }
+        });
+
+        // Network status monitoring
+        function updateNetworkStatus() {
+            const isOnline = navigator.onLine;
+            const statusElement = document.getElementById('network-status');
+            
+            if (!statusElement) {
+                const status = document.createElement('div');
+                status.id = 'network-status';
+                status.className = 'fixed top-4 right-4 px-3 py-1 rounded-lg text-sm font-medium z-50 transition-all duration-300';
+                document.body.appendChild(status);
+            }
+            
+            const statusEl = document.getElementById('network-status');
+            if (isOnline) {
+                statusEl.className = statusEl.className.replace('bg-red-500', 'bg-green-500');
+                statusEl.textContent = 'Online';
+                statusEl.style.display = 'none';
+            } else {
+                statusEl.className = statusEl.className.replace('bg-green-500', 'bg-red-500');
+                statusEl.textContent = 'Offline - Mode offline aktif';
+                statusEl.style.display = 'block';
+            }
+        }
+
+        window.addEventListener('online', updateNetworkStatus);
+        window.addEventListener('offline', updateNetworkStatus);
+        updateNetworkStatus();
     </script>
 
     @stack('scripts')

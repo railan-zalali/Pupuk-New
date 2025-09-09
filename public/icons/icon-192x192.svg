@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#059669;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="leafGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16a34a;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  
+  <!-- Background Circle -->
+  <circle cx="96" cy="96" r="88" fill="url(#bgGradient)" stroke="#ffffff" stroke-width="4"/>
+  
+  <!-- Plant/Leaf Icon -->
+  <g transform="translate(96,96)">
+    <!-- Main stem -->
+    <rect x="-3" y="-30" width="6" height="60" fill="#16a34a" rx="3"/>
+    
+    <!-- Left leaf -->
+    <ellipse cx="-15" cy="-15" rx="13" ry="8" fill="url(#leafGradient)" transform="rotate(-30)"/>
+    
+    <!-- Right leaf -->
+    <ellipse cx="15" cy="-15" rx="13" ry="8" fill="url(#leafGradient)" transform="rotate(30)"/>
+    
+    <!-- Top leaf -->
+    <ellipse cx="0" cy="-26" rx="9" ry="6" fill="url(#leafGradient)"/>
+    
+    <!-- Fertilizer granules -->
+    <circle cx="-22" cy="15" r="3" fill="#fbbf24"/>
+    <circle cx="-11" cy="19" r="2" fill="#f59e0b"/>
+    <circle cx="0" cy="17" r="3" fill="#fbbf24"/>
+    <circle cx="11" cy="20" r="2" fill="#f59e0b"/>
+    <circle cx="22" cy="15" r="3" fill="#fbbf24"/>
+  </g>
+  
+  <!-- App name text -->
+  <text x="96" y="150" text-anchor="middle" fill="#ffffff" font-family="Arial, sans-serif" font-size="12" font-weight="bold">TANI MAKMUR</text>
+</svg>

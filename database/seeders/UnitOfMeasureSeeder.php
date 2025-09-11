@@ -20,6 +20,16 @@ class UnitOfMeasureSeeder extends Seeder
                 'is_base_unit' => true,
             ],
             [
+                'name' => 'Pack',
+                'abbreviation' => 'Pack',
+                'is_base_unit' => false,
+            ],
+            [
+                'name' => 'Dus',
+                'abbreviation' => 'Dus',
+                'is_base_unit' => false,
+            ],
+            [
                 'name' => 'Kilogram',
                 'abbreviation' => 'Kg',
                 'is_base_unit' => false,
@@ -39,11 +49,7 @@ class UnitOfMeasureSeeder extends Seeder
                 'abbreviation' => 'mL',
                 'is_base_unit' => false,
             ],
-            [
-                'name' => 'Box',
-                'abbreviation' => 'Box',
-                'is_base_unit' => false,
-            ],
+            
             [
                 'name' => 'Sack',
                 'abbreviation' => 'Sack',
@@ -57,11 +63,6 @@ class UnitOfMeasureSeeder extends Seeder
             [
                 'name' => 'Bottle',
                 'abbreviation' => 'Btl',
-                'is_base_unit' => false,
-            ],
-            [
-                'name' => 'Pack',
-                'abbreviation' => 'Pack',
                 'is_base_unit' => false,
             ],
         ];

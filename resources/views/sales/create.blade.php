@@ -1,7 +1,40 @@
 <x-app-layout>
     <div class="max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8" x-data="{
         showShortcuts: false,
-        ...salesForm()
+        // Sales form data
+        saleItems: [],
+        totalAmount: 0,
+        
+        // Product selector integration
+        selectedProducts: [],
+        
+        // Methods
+        addSaleItem(product) {
+            const existingIndex = this.saleItems.findIndex(item => item.product_id === product.id);
+            if (existingIndex > -1) {
+                this.saleItems[existingIndex].quantity += (product.quantity || 1);
+            } else {
+                this.saleItems.push({
+                    product_id: product.id,
+                    product_name: product.name,
+                    quantity: product.quantity || 1,
+                    selling_price: product.selling_price,
+                    subtotal: (product.quantity || 1) * product.selling_price
+                });
+            }
+            this.calculateTotal();
+        },
+        
+        removeSaleItem(index) {
+            this.saleItems.splice(index, 1);
+            this.calculateTotal();
+        },
+        
+        calculateTotal() {
+            this.totalAmount = this.saleItems.reduce((total, item) => {
+                return total + (item.quantity * item.selling_price);
+            }, 0);
+        }
     }">
         <!-- Page Header -->
         <div class="mb-8">
@@ -266,26 +299,23 @@
                     </div>
 
                     <div class="flex items-center space-x-2">
-                        <div class="relative mr-2">
-                            <input type="text" id="quick-search" placeholder="Cari produk..."
-                                class="w-40 md:w-60 pl-8 pr-3 py-1.5 text-sm rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300 transition-colors">
-                            <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
-                                <svg class="h-4 w-4 text-gray-400 dark:text-gray-500"
-                                    xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
-                                    stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                                </svg>
-                            </div>
-                        </div>
-                        <button type="button" onclick="addItem()"
+                        <button type="button" onclick="openProductSelector()"
                             class="inline-flex items-center px-3 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150 transform hover:scale-105">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-2 h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            Pilih Produk
+                        </button>
+                        <button type="button" onclick="addItem()"
+                            class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-150">
                             <svg xmlns="http://www.w3.org/2000/svg" class="-ml-0.5 mr-2 h-4 w-4" fill="none"
                                 viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4v16m8-8H4" />
                             </svg>
-                            Tambah Item
+                            Tambah Manual
                         </button>
                     </div>
                 </div>
@@ -597,7 +627,11 @@
         </form>
     </div>
 
+    <!-- Product Selector Modal -->
+    <x-product-selector-modal />
+
     @push('scripts')
+        <script src="{{ asset('js/product-selector.js') }}"></script>
         <!-- Modal Histori Pembelian Pelanggan -->
         <div id="shortcuts-modal" class="fixed inset-0 overflow-y-auto hidden z-50" aria-labelledby="modal-title"
             role="dialog" aria-modal="true">
@@ -2593,6 +2627,104 @@
                 // Tampilkan notifikasi
                 showNotification('Produk berhasil ditambahkan', 'success');
             }
+
+            // Product Selector Integration
+            function openProductSelector() {
+                // Call the global function directly
+                if (typeof window.openProductSelector === 'function') {
+                    // Avoid infinite recursion by checking if we're calling the global function
+                    const globalFunction = window.openProductSelector;
+                    if (globalFunction !== openProductSelector) {
+                        globalFunction();
+                        return;
+                    }
+                }
+                
+                // Fallback: try to find and call the modal directly
+                const modalElement = document.querySelector('[x-data*="enhancedProductSelector"]');
+                if (modalElement && modalElement._x_dataStack) {
+                    const component = modalElement._x_dataStack[0];
+                    if (component && typeof component.openModal === 'function') {
+                        component.openModal();
+                        return;
+                    }
+                }
+                
+                console.error('Product selector not initialized');
+            }
+
+            // Handle product selection from modal
+            window.addEventListener('product-selected', function(event) {
+                const selectedProducts = event.detail.products;
+                
+                selectedProducts.forEach(product => {
+                    addProductToSale(product);
+                });
+            });
+
+            function addProductToSale(product) {
+                // Check if product already exists in the table
+                const existingRow = $(`#saleItems tr[data-product-id="${product.id}"]`);
+                
+                if (existingRow.length > 0) {
+                    // If product exists, increase quantity
+                    const quantityInput = existingRow.find('input[name="quantity[]"]');
+                    let currentQty = parseInt(quantityInput.val()) || 0;
+                    quantityInput.val(currentQty + (product.quantity || 1)).trigger('input');
+                    
+                    // Highlight existing row
+                    existingRow.addClass('bg-yellow-50 dark:bg-yellow-900/20');
+                    setTimeout(() => {
+                        existingRow.removeClass('bg-yellow-50 dark:bg-yellow-900/20');
+                    }, 1000);
+                } else {
+                    // Add new product row
+                    addItem();
+                    const newRow = $('#saleItems tr:last');
+                    newRow.attr('data-product-id', product.id);
+                    
+                    // Set product data
+                    const productSelect = newRow.find('select[name="product_id[]"]');
+                    
+                    // Add option if not exists
+                    if (productSelect.find(`option[value="${product.id}"]`).length === 0) {
+                        productSelect.append(`<option value="${product.id}">${product.name} - ${product.code}</option>`);
+                    }
+                    
+                    productSelect.val(product.id).trigger('change');
+                    
+                    // Set quantity if specified
+                    if (product.quantity && product.quantity > 1) {
+                        newRow.find('input[name="quantity[]"]').val(product.quantity).trigger('input');
+                    }
+                    
+                    // Highlight new row
+                    newRow.addClass('bg-green-50 dark:bg-green-900/20');
+                    setTimeout(() => {
+                        newRow.removeClass('bg-green-50 dark:bg-green-900/20');
+                    }, 1500);
+                    
+                    // Scroll to new row
+                    $('html, body').animate({
+                        scrollTop: newRow.offset().top - 100
+                    }, 500);
+                }
+            }
+
+            // Initialize product selector when document is ready
+            $(document).ready(function() {
+                // Initialize Alpine.js product selector store
+                if (typeof Alpine !== 'undefined' && window.initProductSelector) {
+                    window.initProductSelector({
+                        apiEndpoint: '/api/products',
+                        searchEndpoint: '/api/products/search',
+                        categoriesEndpoint: '/api/products/categories',
+                        multiSelect: true,
+                        showQuantityInput: true,
+                        defaultView: 'grid'
+                    });
+                }
+            });
         </script>
     @endpush
 

@@ -201,16 +201,49 @@ class CustomerController extends Controller
                 'user_name' => auth()->user()->name,
             ]);
 
-            return redirect()->back()->with('success', 'Data pelanggan berhasil diimpor!');
+            // Hitung jumlah data yang berhasil diimpor
+            $importedCount = Customer::where('created_at', '>=', now()->subMinutes(1))->count();
+            
+            $successMessage = "Data pelanggan berhasil diimpor!";
+            if ($importedCount > 0) {
+                $successMessage .= " Total {$importedCount} pelanggan telah ditambahkan.";
+            }
+            
+            return redirect()->back()->with('success', $successMessage);
         } catch (ValidationException $e) {
             // Tangkap error validasi secara spesifik
             $failures = $e->failures();
             $errorMessages = [];
+            $totalErrors = count($failures);
+
+            // Batasi tampilan error maksimal 10 untuk menghindari tampilan yang terlalu panjang
+            $maxDisplayErrors = 10;
+            $displayedErrors = 0;
 
             foreach ($failures as $failure) {
-                // Kumpulkan pesan error untuk setiap baris yang gagal
-                $errorMessage = 'Baris ' . $failure->row() . ': ' . implode(', ', $failure->errors());
+                if ($displayedErrors >= $maxDisplayErrors) {
+                    break;
+                }
+                
+                // Format pesan error yang lebih user-friendly
+                $rowNumber = $failure->row();
+                $errors = $failure->errors();
+                $values = $failure->values() ?? [];
+                
+                // Buat pesan error yang lebih deskriptif
+                $errorDetails = [];
+                foreach ($errors as $field => $messages) {
+                    $fieldName = $this->getFieldDisplayName($field);
+                    $errorDetails[] = "{$fieldName}: " . implode(', ', $messages);
+                }
+                
+                $errorMessage = "<strong>Baris {$rowNumber}:</strong> " . implode(' | ', $errorDetails);
+                if (!empty($values['nama'])) {
+                    $errorMessage .= " <em>(Nama: {$values['nama']})</em>";
+                }
+                
                 $errorMessages[] = $errorMessage;
+                $displayedErrors++;
 
                 // Log setiap error validasi
                 Log::warning('Validasi gagal saat import data pelanggan', [
@@ -220,7 +253,14 @@ class CustomerController extends Controller
                 ]);
             }
 
-            return redirect()->back()->with('error', 'Gagal mengimpor data. <br>' . implode('<br>', $errorMessages));
+            // Tambahkan informasi jika ada lebih banyak error
+            if ($totalErrors > $maxDisplayErrors) {
+                $remainingErrors = $totalErrors - $maxDisplayErrors;
+                $errorMessages[] = "<em>... dan {$remainingErrors} error lainnya. Silakan periksa file Excel Anda.</em>";
+            }
+
+            $errorHeader = "<strong>Gagal mengimpor data ({$totalErrors} error ditemukan):</strong><br><br>";
+            return redirect()->back()->with('error', $errorHeader . implode('<br><br>', $errorMessages));
         } catch (\Exception $e) {
             // Log error umum
             Log::error('Error saat import data pelanggan', [
@@ -231,9 +271,41 @@ class CustomerController extends Controller
             ]);
 
             // Tangkap error umum lainnya
-            return redirect()->back()->with('error', 'Gagal mengimpor data: ' . $e->getMessage());
+            $userFriendlyMessage = 'Terjadi kesalahan saat mengimpor data. ';
+            
+            // Berikan pesan yang lebih spesifik berdasarkan jenis error
+            if (strpos($e->getMessage(), 'file') !== false) {
+                $userFriendlyMessage .= 'Pastikan file Excel yang Anda upload valid dan tidak rusak.';
+            } elseif (strpos($e->getMessage(), 'memory') !== false) {
+                $userFriendlyMessage .= 'File terlalu besar. Coba upload file dengan data yang lebih sedikit.';
+            } elseif (strpos($e->getMessage(), 'timeout') !== false) {
+                $userFriendlyMessage .= 'Proses import memakan waktu terlalu lama. Coba dengan file yang lebih kecil.';
+            } else {
+                $userFriendlyMessage .= 'Silakan periksa format file dan coba lagi.';
+            }
+            
+            return redirect()->back()->with('error', $userFriendlyMessage . '<br><br><small>Detail error: ' . $e->getMessage() . '</small>');
         }
     }
+    
+    /**
+     * Get user-friendly field display name
+     */
+    private function getFieldDisplayName($field)
+    {
+        $fieldNames = [
+            'nik' => 'NIK',
+            'nama' => 'Nama',
+            'alamat' => 'Alamat',
+            'desa' => 'Desa',
+            'kecamatan' => 'Kecamatan',
+            'kabupaten' => 'Kabupaten',
+            'provinsi' => 'Provinsi',
+        ];
+        
+        return $fieldNames[$field] ?? ucfirst($field);
+    }
+    
     public function downloadTemplate()
     {
         // Buat template baru menggunakan CustomersTemplateExport

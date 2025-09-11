@@ -613,6 +613,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Exports\\CustomersTemplateExport' => __DIR__ . '/../..' . '/app/Exports/CustomersTemplateExport.php',
         'App\\Exports\\ProductsTemplateExport' => __DIR__ . '/../..' . '/app/Exports/ProductsTemplateExport.php',
         'App\\Exports\\ReportExport' => __DIR__ . '/../..' . '/app/Exports/ReportExport.php',
+        'App\\Http\\Controllers\\API\\SaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/SaleController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
         'App\\Http\\Controllers\\Auth\\EmailVerificationNotificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/EmailVerificationNotificationController.php',

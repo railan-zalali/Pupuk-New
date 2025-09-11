@@ -9,6 +9,7 @@ return array(
     'App\\Exports\\CustomersTemplateExport' => $baseDir . '/app/Exports/CustomersTemplateExport.php',
     'App\\Exports\\ProductsTemplateExport' => $baseDir . '/app/Exports/ProductsTemplateExport.php',
     'App\\Exports\\ReportExport' => $baseDir . '/app/Exports/ReportExport.php',
+    'App\\Http\\Controllers\\API\\SaleController' => $baseDir . '/app/Http/Controllers/API/SaleController.php',
     'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => $baseDir . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
     'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => $baseDir . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
     'App\\Http\\Controllers\\Auth\\EmailVerificationNotificationController' => $baseDir . '/app/Http/Controllers/Auth/EmailVerificationNotificationController.php',

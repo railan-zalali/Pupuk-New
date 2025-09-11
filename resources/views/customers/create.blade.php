@@ -1,93 +1,167 @@
 <x-app-layout>
     <div class="space-y-6">
         <!-- Page Heading -->
-        <div class="flex items-center justify-between">
-            <div>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                    </svg>
-                    {{ __('Tambah Pelanggan Baru') }}
-                </h2>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Isi informasi lengkap untuk menambah pelanggan
-                    baru</p>
-            </div>
-
-            <!-- Import Form -->
-            <div
-                class="w-full sm:w-auto bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700">
-                <form action="{{ route('customers.import') }}" method="POST" enctype="multipart/form-data"
-                    class="space-y-3">
-                    @csrf
-                    <div>
-                        <x-input-label for="excel_file" :value="__('Import Data Pelanggan (Excel)')"
-                            class="text-sm font-medium text-gray-700 dark:text-gray-300" />
-                        <div class="mt-1 flex items-center">
-                            <label for="excel_file" class="relative cursor-pointer">
-                                <div
-                                    class="flex items-center space-x-2 px-3 py-2 bg-indigo-50 dark:bg-indigo-900/50 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-800 rounded-md hover:bg-indigo-100 dark:hover:bg-indigo-800/50">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
-                                    </svg>
-                                    <span class="text-sm font-medium">Pilih File Excel</span>
-                                </div>
-                                <input id="excel_file" name="excel_file" type="file" accept=".xlsx,.xls"
-                                    class="sr-only" required />
-                            </label>
-                            <span id="file-name" class="ml-3 text-sm text-gray-500 dark:text-gray-400">Belum ada file
-                                dipilih</span>
-                        </div>
-                        <x-input-error :messages="$errors->get('excel_file')" class="mt-2" />
-                        <div class="mt-2 space-y-2">
-                            <a href="{{ route('customers.template.download') }}"
-                                class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                </svg>
-                                Download Template Excel
-                            </a>
-                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                <p>Format kolom yang dibutuhkan:</p>
-                                <ul class="list-disc list-inside ml-2 mt-1 space-y-0.5">
-                                    <li><span class="font-medium">NIK</span> - Nomor Induk Kependudukan (16 digit, format dengan atau tanpa tanda hubung diterima)</li>
-                                    <li><span class="font-medium">Nama</span> - Nama lengkap pelanggan</li>
-                                    <li><span class="font-medium">Alamat</span> - Alamat lengkap pelanggan</li>
-                                    <li><span class="font-medium">Desa</span> - Nama desa/kelurahan</li>
-                                    <li><span class="font-medium">Kecamatan</span> - Nama kecamatan</li>
-                                    <li><span class="font-medium">Kabupaten</span> - Nama kabupaten/kota</li>
-                                    <li><span class="font-medium">Provinsi</span> - Nama provinsi (default: JAWA BARAT)</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <x-primary-button type="submit" class="w-full justify-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1.5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-                            </svg>
-                            {{ __('Import Pelanggan') }}
-                        </x-primary-button>
-                    </div>
-                </form>
-
-                <!-- Script untuk menampilkan nama file yang dipilih -->
-                <script>
-                    document.getElementById('excel_file').addEventListener('change', function(e) {
-                        const fileName = e.target.files[0] ? e.target.files[0].name : 'Belum ada file dipilih';
-                        document.getElementById('file-name').textContent = fileName;
-                    });
-                </script>
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+            <div class="flex items-center justify-between">
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                        </svg>
+                        {{ __('Tambah Pelanggan Baru') }}
+                    </h2>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Isi informasi lengkap untuk menambah pelanggan baru atau import data dari file Excel</p>
+                </div>
             </div>
         </div>
+
+        <!-- Import Data Section -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg shadow-sm border border-blue-200 dark:border-blue-800 p-6">
+            <div class="flex items-start space-x-4">
+                <div class="flex-shrink-0">
+                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
+                        </svg>
+                    </div>
+                </div>
+                <div class="flex-1">
+                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Import Data Pelanggan</h3>
+                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Upload file Excel untuk menambahkan multiple pelanggan sekaligus</p>
+                    
+                    <form action="{{ route('customers.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                        @csrf
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                            <div class="space-y-4">
+                                <div>
+                                    <x-input-label for="excel_file" :value="__('Pilih File Excel')" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
+                                    <div class="mt-2">
+                                        <label for="excel_file" class="relative cursor-pointer group">
+                                            <div class="flex items-center justify-center w-full h-32 px-6 py-4 border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 transition-colors bg-white dark:bg-gray-800">
+                                                <div class="text-center">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-blue-400 dark:text-blue-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
+                                                    </svg>
+                                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Klik untuk pilih file</p>
+                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">atau drag & drop file Excel di sini</p>
+                                                    <p id="file-name" class="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">Belum ada file dipilih</p>
+                                                </div>
+                                            </div>
+                                            <input id="excel_file" name="excel_file" type="file" accept=".xlsx,.xls" class="sr-only" required />
+                                        </label>
+                                    </div>
+                                    <x-input-error :messages="$errors->get('excel_file')" class="mt-2" />
+                                </div>
+                                
+                                <div class="flex space-x-3">
+                                    <x-primary-button type="submit" class="flex-1 justify-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
+                                        </svg>
+                                        {{ __('Import Pelanggan') }}
+                                    </x-primary-button>
+                                </div>
+                            </div>
+                            
+                            <div class="space-y-4">
+                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
+                                    <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                        </svg>
+                                        Template & Format
+                                    </h4>
+                                    <div class="space-y-3">
+                                        <a href="{{ route('customers.template.download') }}" class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium">
+                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                                            </svg>
+                                            Download Template Excel
+                                        </a>
+                                        <div class="text-xs text-gray-600 dark:text-gray-400">
+                                            <p class="font-medium mb-2">Format kolom yang dibutuhkan:</p>
+                                            <ul class="space-y-1">
+                                                <li class="flex items-start">
+                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                                    <span><span class="font-medium">NIK</span> - 16 digit nomor induk</span>
+                                                </li>
+                                                <li class="flex items-start">
+                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                                    <span><span class="font-medium">Nama</span> - Nama lengkap</span>
+                                                </li>
+                                                <li class="flex items-start">
+                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                                    <span><span class="font-medium">Alamat</span> - Alamat lengkap</span>
+                                                </li>
+                                                <li class="flex items-start">
+                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
+                                                    <span><span class="font-medium">Desa, Kecamatan, Kabupaten, Provinsi</span></span>
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- Script untuk menampilkan nama file yang dipilih -->
+        <script>
+            document.getElementById('excel_file').addEventListener('change', function(e) {
+                const fileName = e.target.files[0] ? e.target.files[0].name : 'Belum ada file dipilih';
+                document.getElementById('file-name').textContent = fileName;
+                document.getElementById('file-name').classList.toggle('text-blue-600', e.target.files[0]);
+                document.getElementById('file-name').classList.toggle('dark:text-blue-400', e.target.files[0]);
+                document.getElementById('file-name').classList.toggle('text-gray-500', !e.target.files[0]);
+                document.getElementById('file-name').classList.toggle('dark:text-gray-400', !e.target.files[0]);
+            });
+        </script>
+
+        <!-- Success/Error Messages for Import -->
+        @if (session('success'))
+            <div class="rounded-lg bg-green-50 dark:bg-green-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-green-400 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Berhasil!</h3>
+                        <div class="mt-2 text-sm text-green-700 dark:text-green-300">
+                            <p>{!! session('success') !!}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
+
+        @if (session('error'))
+            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
+                <div class="flex">
+                    <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd"
+                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.293-4.293a1 1 0 011.414-1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293z"
+                                clip-rule="evenodd" />
+                        </svg>
+                    </div>
+                    <div class="ml-3">
+                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terjadi Kesalahan!</h3>
+                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                            <p>{!! session('error') !!}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        @endif
 
         <!-- Error Messages -->
         @if ($errors->any())

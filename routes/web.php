@@ -201,6 +201,7 @@ Route::middleware('auth')->group(function () {
 
     Route::resource('cash-book', CashBookController::class);
 });
+
 require __DIR__ . '/auth.php';
 Route::get('search/products', [ProductController::class, 'search'])->name('products.search');
 

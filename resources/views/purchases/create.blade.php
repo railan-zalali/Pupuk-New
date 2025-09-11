@@ -110,6 +110,15 @@
                         Item Pembelian
                     </h3>
                     <div class="flex space-x-2">
+                        <button type="button" id="open-product-selector"
+                            class="inline-flex items-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            Pilih Produk
+                        </button>
                         <button type="button" onclick="addItem()"
                             class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
@@ -117,7 +126,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M12 4v16m8-8H4" />
                             </svg>
-                            Tambah Item
+                            Tambah Manual
                         </button>
                     </div>
                 </div>
@@ -1039,5 +1048,78 @@
                 }, 300);
             }
         </script>
+
+        <!-- Product Selector Integration -->
+        <script src="{{ asset('js/purchase-product-selector.js') }}"></script>
+        <script>
+            // Initialize product selector modal integration
+            document.addEventListener('DOMContentLoaded', function() {
+                const openSelectorBtn = document.getElementById('open-product-selector');
+                const supplierSelect = document.getElementById('supplier_id');
+                
+                // Open product selector modal
+                openSelectorBtn.addEventListener('click', function() {
+                    const supplierId = supplierSelect.value;
+                    
+                    if (!supplierId) {
+                        alert('Pilih supplier terlebih dahulu');
+                        supplierSelect.focus();
+                        return;
+                    }
+                    
+                    // Open modal with selected supplier
+                    window.purchaseProductSelectorModal.open(supplierId, function(selectedProducts) {
+                        // Add selected products to purchase items
+                        selectedProducts.forEach(product => {
+                            addProductToTable(product);
+                        });
+                    });
+                });
+                
+                // Function to add product to purchase table
+                function addProductToTable(product) {
+                    addItem();
+                    const newRow = document.querySelector('#purchaseItems tr:last-child');
+                    const productSelect = newRow.querySelector('select[name="product_id[]"]');
+                    const quantityInput = newRow.querySelector('input[name="quantity[]"]');
+                    const unitSelect = newRow.querySelector('select[name="unit_id[]"]');
+                    const priceInput = newRow.querySelector('input[name="price[]"]');
+                    
+                    // Wait for options to load
+                    setTimeout(() => {
+                        // Set product
+                        productSelect.value = product.id;
+                        productSelect.dispatchEvent(new Event('change'));
+                        
+                        // Set quantity if provided
+                        if (product.quantity) {
+                            quantityInput.value = product.quantity;
+                        }
+                        
+                        // Set unit if provided
+                        if (product.unit_id) {
+                            setTimeout(() => {
+                                unitSelect.value = product.unit_id;
+                                unitSelect.dispatchEvent(new Event('change'));
+                            }, 100);
+                        }
+                        
+                        // Set price if available
+                        if (product.purchase_price || product.supplier_price) {
+                            setTimeout(() => {
+                                const price = product.supplier_price || product.purchase_price;
+                                priceInput.value = price;
+                                priceInput.dispatchEvent(new Event('input'));
+                            }, 200);
+                        }
+                        
+                        highlightRow(newRow);
+                    }, 300);
+                }
+            });
+        </script>
     @endpush
+    
+    <!-- Include Product Selector Modal -->
+    @include('purchases.components.product-selector-modal')
 </x-app-layout>

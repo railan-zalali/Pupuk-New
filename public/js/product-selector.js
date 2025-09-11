@@ -229,6 +229,33 @@ function enhancedProductSelector(initialProducts = [], initialCategories = [], o
             this.showNotification('Semua produk dihapus dari pilihan', 'info');
         },
         
+        confirmSelection() {
+            if (this.selectedProducts.length === 0) {
+                this.showNotification('Pilih setidaknya satu produk', 'warning');
+                return;
+            }
+            
+            // Dispatch event with selected products
+            this.$dispatch('product-selected', {
+                products: this.selectedProducts
+            });
+            
+            // Also dispatch to window for global listeners
+            window.dispatchEvent(new CustomEvent('product-selected', {
+                detail: {
+                    products: this.selectedProducts
+                }
+            }));
+            
+            this.showNotification(`${this.selectedProducts.length} produk dikonfirmasi`, 'success');
+            
+            // Close modal and clear selection if configured
+            this.closeModal();
+            if (this.config.clearAfterConfirm !== false) {
+                this.selectedProducts = [];
+            }
+        },
+        
         selectProductFromSearch(product) {
             this.addToSelection(product);
             this.searchQuery = '';

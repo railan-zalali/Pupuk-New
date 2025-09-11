@@ -19,6 +19,12 @@ Route::prefix('sales')->group(function () {
     Route::post('/', [SaleController::class, 'store']);
 });
 
+// Purchase API Routes
+Route::prefix('purchases')->group(function () {
+    Route::get('products', [\App\Http\Controllers\Api\PurchaseController::class, 'products']);
+    Route::get('products/categories', [\App\Http\Controllers\Api\PurchaseController::class, 'categories']);
+});
+
 // Enhanced Product API Routes
 Route::prefix('products')->group(function () {
     Route::get('/', [ApiProductController::class, 'index']);

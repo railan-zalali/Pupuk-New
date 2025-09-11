@@ -24,6 +24,14 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
     use SkipsErrors;
 
     /**
+     * Import produk dari file Excel/CSV
+     * 
+     * Logika import:
+     * 1. Cek produk existing berdasarkan kode (jika ada)
+     * 2. Jika tidak ditemukan, cek berdasarkan nama produk
+     * 3. Jika produk sudah ada, update data dan tambahkan stock (tidak membuat duplikat)
+     * 4. Jika produk belum ada, buat produk baru
+     *
      * @param array $row
      *
      * @return \Illuminate\Database\Eloquent\Model|null
@@ -35,8 +43,16 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
             // Inisialisasi FifoService
             $fifoService = new FifoService();
 
-            // Periksa apakah produk dengan kode ini sudah ada
-            $existingProduct = Product::where('code', $row['kode'])->first();
+            // Periksa apakah produk dengan kode atau nama ini sudah ada
+            $existingProduct = null;
+            if (!empty($row['kode'])) {
+                $existingProduct = Product::where('code', $row['kode'])->first();
+            }
+            
+            // Jika tidak ditemukan berdasarkan kode, cari berdasarkan nama
+            if (!$existingProduct && !empty($row['nama'])) {
+                $existingProduct = Product::where('name', $row['nama'])->first();
+            }
 
             // Unit default
             $unitId = $row['unit_id'] ?? null;
@@ -93,7 +109,7 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
 
             if ($existingProduct) {
                 // Update produk yang sudah ada
-                $existingProduct->update([
+                $updateData = [
                     'category_id' => $row['category_id'] ?? $existingProduct->category_id,
                     'supplier_id' => $row['supplier_id'] ?? $existingProduct->supplier_id,
                     'name' => $row['nama'] ?? $existingProduct->name,
@@ -101,9 +117,16 @@ class ProductsImport implements ToModel, WithHeadingRow, WithValidation, SkipsOn
                     'purchase_price' => $purchasePrice,
                     'selling_price' => $sellingPrice,
                     'min_stock' => $minStock,
-                ]);
+                ];
+                
+                // Update kode jika ada dan belum ada kode sebelumnya atau kode berbeda
+                if (!empty($row['kode']) && ($existingProduct->code != $row['kode'])) {
+                    $updateData['code'] = $row['kode'];
+                }
+                
+                $existingProduct->update($updateData);
 
-                // Jika ada pembaruan stok, buat batch baru dan catat pergerakan stok
+                // Jika ada pembaruan stok, tambahkan ke stok existing (tidak membuat produk duplikat)
                 if ($stock > 0) {
                     $beforeStock = $existingProduct->stock;
                     $afterStock = $beforeStock + $stock;

@@ -119,13 +119,17 @@
                         @forelse ($accounts as $account)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $account->date->format('d/m/Y') }}
+                                    {{ $account->created_at->format('d/m/Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $account->reference_number }}
+                                    {{ $account->invoice_number }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $account->entity_name }}
+                                    @if(request('type') === 'payable')
+                                        {{ $account->supplier->name ?? '-' }}
+                                    @else
+                                        {{ $account->customer->nama ?? '-' }}
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     Rp {{ number_format($account->total_amount, 0, ',', '.') }}

@@ -155,7 +155,7 @@
                         @forelse ($purchases as $purchase)
                             <tr>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $purchase->date->format('d/m/Y') }}
+                                    {{ $purchase->created_at->format('d/m/Y') }}
                                 </td>
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                                     {{ $purchase->invoice_number }}

@@ -128,7 +128,7 @@
             <tbody>
                 @forelse($payables as $payable)
                     <tr>
-                        <td>{{ $payable->date->format('d/m/Y') }}</td>
+                        <td>{{ $payable->created_at->format('d/m/Y') }}</td>
                         <td>{{ $payable->invoice_number }}</td>
                         <td>{{ $payable->supplier->name ?? '-' }}</td>
                         <td class="text-right">Rp {{ number_format($payable->total_amount, 0, ',', '.') }}</td>
@@ -167,7 +167,7 @@
             <tbody>
                 @forelse($receivables as $receivable)
                     <tr>
-                        <td>{{ $receivable->date->format('d/m/Y') }}</td>
+                        <td>{{ $receivable->created_at->format('d/m/Y') }}</td>
                         <td>{{ $receivable->invoice_number }}</td>
                         <td>{{ $receivable->customer->nama ?? '-' }}</td>
                         <td class="text-right">Rp {{ number_format($receivable->total_amount, 0, ',', '.') }}</td>

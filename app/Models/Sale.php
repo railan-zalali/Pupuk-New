@@ -34,6 +34,17 @@ class Sale extends Model
         'is_draft_processed'
     ];
 
+    protected $casts = [
+        'date' => 'datetime',
+        'due_date' => 'datetime',
+        'total_amount' => 'decimal:2',
+        'discount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'down_payment' => 'decimal:2',
+        'change_amount' => 'decimal:2',
+        'remaining_amount' => 'decimal:2'
+    ];
+
     public function customer()
     {
         return $this->belongsTo(Customer::class);

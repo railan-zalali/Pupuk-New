@@ -126,7 +126,7 @@
                     $currentBalance += $transaction->debit - $transaction->credit;
                 @endphp
                 <tr>
-                    <td>{{ $transaction->date->format('d/m/Y') }}</td>
+                    <td>{{ \Carbon\Carbon::parse($transaction->date)->format('d/m/Y') }}</td>
                     <td>{{ $transaction->description }}</td>
                     <td>{{ $transaction->reference_number ?? '-' }}</td>
                     <td class="text-right">Rp {{ number_format($transaction->debit, 0, ',', '.') }}</td>

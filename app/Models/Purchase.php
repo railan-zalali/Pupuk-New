@@ -16,13 +16,20 @@ class Purchase extends Model
         'user_id',
         'date',
         'total_amount',
+        'paid_amount',
+        'remaining_amount',
+        'payment_status',
+        'due_date',
         'status',
         'notes'
     ];
 
     protected $casts = [
         'date' => 'datetime',
-        'total_amount' => 'decimal:2'
+        'due_date' => 'datetime',
+        'total_amount' => 'decimal:2',
+        'paid_amount' => 'decimal:2',
+        'remaining_amount' => 'decimal:2'
     ];
 
     public function supplier()

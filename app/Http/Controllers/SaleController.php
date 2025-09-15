@@ -23,8 +23,8 @@ class SaleController extends Controller
         if ($request->has('status') && $request->status) {
             $query->where('status', $request->status);
         } else {
-            // Default tampilkan yang completed jika tidak ada filter
-            $query->where('status', 'completed');
+            // Default tampilkan semua transaksi kecuali yang dibatalkan
+            $query->where('status', '!=', 'cancelled');
         }
 
         // Filter berdasarkan metode pembayaran jika ada
@@ -173,9 +173,9 @@ class SaleController extends Controller
                 $paymentStatus = 'partial';
             }
 
-            // Jika pembayaran kredit belum lunas, set status transaksi menjadi 'pending'
+            // Jika pembayaran kredit belum lunas, set status transaksi menjadi 'processing'
             if ($remainingAmount > 0) {
-                $status = 'pending';
+                $status = 'processing';
             } else {
                 $status = $savingAsDraft ? 'draft' : 'completed';
             }
@@ -200,7 +200,8 @@ class SaleController extends Controller
             // Create sale
             $sale = Sale::create([
                 'invoice_number' => $invoiceNumber,
-                'date' => $request->date ?? now(),
+                // 'date' => $request->date ?? now(),
+                'date' => $request->date ?? now()->setTimezone('Asia/Jakarta'),
                 'customer_id' => $customerId,
                 'user_id' => auth()->id(),
                 'payment_method' => $paymentMethod,
@@ -619,7 +620,7 @@ class SaleController extends Controller
     {
         $creditSales = Sale::where('payment_method', 'credit')
             ->where('payment_status', '!=', 'paid')
-            ->where('status', 'completed')
+            ->whereIn('status', ['completed', 'processing'])
             ->with(['customer'])
             ->latest('due_date')
             ->paginate(10);
@@ -641,7 +642,8 @@ class SaleController extends Controller
             $sale->update([
                 'paid_amount' => $newPaidAmount,
                 'remaining_amount' => 0,
-                'payment_status' => 'paid'
+                'payment_status' => 'paid',
+                'status' => 'completed'
             ]);
         } else {
             $sale->update([

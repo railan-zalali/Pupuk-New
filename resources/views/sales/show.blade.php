@@ -20,7 +20,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                             </svg>
-                            {{ \Carbon\Carbon::parse($sale->date)->format('d F Y, H:i') }}
+                            {{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}
                         </p>
                     </div>
                 </div>
@@ -40,6 +40,13 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
                             </svg>
                             Draft
+                        </span>
+                    @elseif ($sale->status === 'processing')
+                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200">
+                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                            </svg>
+                            Sedang Diproses
                         </span>
                     @else
                         <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
@@ -195,7 +202,7 @@
                         </div>
                         <div class="ml-4">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Transaksi Dibuat</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->created_at)->format('d F Y, H:i') }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->created_at)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Transaksi dibuat oleh {{ $sale->user->name }}</p>
                         </div>
                     </div>
@@ -210,7 +217,7 @@
                         </div>
                         <div class="ml-4">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Dibuat dari Draft</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->format('d F Y, H:i') }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
                                 Transaksi ini dibuat dari draft <a href="{{ route('drafts.show', $sale->draft_id) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">#{{ $sale->draft->invoice_number }}</a>
                             </p>
@@ -228,7 +235,7 @@
                         </div>
                         <div class="ml-4">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Pembayaran Kredit</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->format('d F Y, H:i') }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
                             @if ($sale->remaining_amount > 0)
                                 <p class="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
                                     Sisa pembayaran: Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}
@@ -268,7 +275,7 @@
                         </div>
                         <div class="ml-4">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Transaksi Selesai</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->format('d F Y, H:i') }}</p>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
                             <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Transaksi telah selesai dengan metode pembayaran 
                                 <span class="font-medium capitalize">
                                     @if ($sale->payment_method === 'cash')
@@ -389,7 +396,7 @@
                     <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
                         <div class="text-sm text-gray-500 dark:text-gray-400">Tanggal</div>
                         <div class="text-sm text-gray-900 dark:text-gray-100">
-                            {{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y H:i') }}
+                            {{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }}
                         </div>
                     </div>
 

@@ -282,11 +282,11 @@ class ReportController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
 
-        $purchases = Purchase::whereBetween('date', [$startDate, $endDate])
+        $purchases = Purchase::whereBetween('created_at', [$startDate, $endDate])
             ->with('supplier')
             ->paginate(15);
 
-        $sales = Sale::whereBetween('date', [$startDate, $endDate])
+        $sales = Sale::whereBetween('created_at', [$startDate, $endDate])
             ->with('customer')
             ->paginate(15);
 
@@ -298,7 +298,7 @@ class ReportController extends Controller
 
         if ($type === 'payable') {
             // Menggunakan paginate untuk $accounts
-            $accounts = Purchase::whereBetween('date', [$startDate, $endDate])
+            $accounts = Purchase::whereBetween('created_at', [$startDate, $endDate])
                 ->where('payment_status', '!=', 'paid')
                 ->with('supplier')
                 ->paginate(15);
@@ -306,7 +306,7 @@ class ReportController extends Controller
             $entities = $payables->pluck('supplier.name')->unique()->count();
         } else {
             // Menggunakan paginate untuk $accounts
-            $accounts = Sale::whereBetween('date', [$startDate, $endDate])
+            $accounts = Sale::whereBetween('created_at', [$startDate, $endDate])
                 ->where('payment_status', '!=', 'paid')
                 ->with('customer')
                 ->paginate(15);

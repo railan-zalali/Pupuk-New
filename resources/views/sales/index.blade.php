@@ -28,6 +28,7 @@
                     <select id="statusFilter" class="rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 text-sm focus:ring focus:ring-blue-200 focus:border-blue-500">
                         <option value="">Semua Status</option>
                         <option value="completed">Selesai</option>
+                        <option value="processing">Diproses</option>
                         <option value="draft">Draft</option>
                         <option value="cancelled">Dibatalkan</option>
                     </select>
@@ -100,7 +101,7 @@
                                 <td class="whitespace-nowrap px-6 py-4 text-gray-900 dark:text-gray-100">
                                     <div class="font-medium">{{ \Carbon\Carbon::parse($sale->date)->format('d/m/Y') }}</div>
                                     <div class="text-gray-500 dark:text-gray-400 text-xs font-normal">
-                                        {{ \Carbon\Carbon::parse($sale->date)->format('H:i') }}
+                                        {{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('H:i') }}
                                         <span class="text-gray-400 dark:text-gray-500">({{ \Carbon\Carbon::parse($sale->date)->diffForHumans() }})</span>
                                     </div>
                                 </td>
@@ -150,7 +151,39 @@
                                         <div class="mt-1 text-xs text-red-600 dark:text-red-400">Sisa: Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}</div>
                                     @endif
                                 </td>
-                                <td class="px-6 py-4">                                     @if ($sale->trashed())                                         <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200">                                             <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">                                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>                                             </svg>                                             Dibatalkan                                         </span>                                     @else                                         @if ($sale->status === 'draft')                                             <span                                                 class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>                                                 </svg>                                                 Draft                                             </span>                                         @else                                             <span                                                 class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">                                                 <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">                                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>                                                 </svg>                                                 Selesai                                             </span>                                         @endif                                     @endif                                 </td>
+                                <td class="px-6 py-4">
+                                    @if ($sale->trashed())
+                                        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200">
+                                            <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                            </svg>
+                                            Dibatalkan
+                                        </span>
+                                    @else
+                                        @if ($sale->status === 'draft')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
+                                                </svg>
+                                                Draft
+                                            </span>
+                                        @elseif ($sale->status === 'processing')
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                                                </svg>
+                                                Diproses
+                                            </span>
+                                        @else
+                                            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
+                                                <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                                                </svg>
+                                                Selesai
+                                            </span>
+                                        @endif
+                                    @endif
+                                </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                      <div class="flex items-center space-x-3">
                                          <a href="{{ route('sales.show', $sale) }}"

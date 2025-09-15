@@ -109,7 +109,7 @@
             <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td>{{ $item->date->format('d/m/Y') }}</td>
+                        <td>{{ \Carbon\Carbon::parse($item['date'])->format('d/m/Y') }}</td>
                         <td>{{ ucfirst($item->type) }}</td>
                         <td>{{ $item->reference }}</td>
                         <td class="text-right">Rp {{ number_format($item->amount, 0, ',', '.') }}</td>

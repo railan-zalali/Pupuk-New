@@ -54,17 +54,17 @@ class FifoService
     }
 
     /**
-     * Mengurangi stok menggunakan metode FIFO atau FEFO
+     * Mengurangi stok menggunakan metode FIFO atau FEFO dengan logika otomatis
      *
      * @param int $productId ID produk
      * @param float $quantity Jumlah yang akan dikurangi
      * @param string $referenceType Tipe referensi (sale, adjustment, dll)
      * @param int $referenceId ID referensi
      * @param string $notes Catatan
-     * @param string $method Metode pengurangan stok ('fifo' atau 'fefo')
+     * @param string|null $method Metode pengurangan stok ('fifo', 'fefo', atau 'auto')
      * @return array Array dari batch yang digunakan dan jumlahnya
      */
-    public function reduceStock($productId, $quantity, $referenceType, $referenceId, $notes = '', $method = 'fifo')
+    public function reduceStock($productId, $quantity, $referenceType, $referenceId, $notes = '', $method = 'auto')
     {
         // Ambil produk
         $product = Product::findOrFail($productId);
@@ -74,14 +74,26 @@ class FifoService
             throw new \Exception("Stok tidak cukup untuk produk: {$product->name}");
         }
 
+        // Tentukan metode otomatis jika diperlukan
+        $selectedMethod = $this->determineOptimalMethod($productId, $method);
+
         // Ambil batch yang tersedia dengan urutan berdasarkan metode
         $query = ProductBatch::where('product_id', $productId)
             ->where('remaining_quantity', '>', 0);
             
-        // Pilih metode pengurangan stok (FIFO atau FEFO)
-        if (strtolower($method) === 'fefo' && $this->hasExpiredBatches($productId)) {
+        // Pilih metode pengurangan stok berdasarkan logika yang ditingkatkan
+        if ($selectedMethod === 'fefo') {
             // First Expired, First Out - prioritaskan batch yang akan kedaluwarsa lebih dulu
-            $batches = $query->orderBy('expiry_date', 'asc')->get();
+            $batches = $query->whereNotNull('expiry_date')
+                ->orderBy('expiry_date', 'asc')
+                ->orderBy('created_at', 'asc') // Jika tanggal kedaluwarsa sama, gunakan FIFO
+                ->get();
+                
+            // Jika tidak ada batch dengan expiry date, fallback ke FIFO
+            if ($batches->isEmpty()) {
+                $batches = $query->orderBy('created_at', 'asc')->get();
+                $selectedMethod = 'fifo';
+            }
         } else {
             // First In, First Out - default
             $batches = $query->orderBy('created_at', 'asc')->get();
@@ -117,7 +129,7 @@ class FifoService
                     'after_stock' => $beforeStock - $quantityFromBatch,
                     'reference_type' => $referenceType,
                     'reference_id' => $referenceId,
-                    'notes' => $notes . ($method === 'fefo' ? ' (FEFO)' : ' (FIFO)')
+                    'notes' => $notes . ' (' . strtoupper($selectedMethod) . ')'
                 ]);
 
                 // Update untuk iterasi berikutnya
@@ -162,35 +174,179 @@ class FifoService
     }
     
     /**
+     * Menentukan metode optimal untuk pengurangan stok
+     *
+     * @param int $productId ID produk
+     * @param string $requestedMethod Metode yang diminta ('fifo', 'fefo', 'auto')
+     * @return string Metode yang akan digunakan ('fifo' atau 'fefo')
+     */
+    public function determineOptimalMethod($productId, $requestedMethod = 'auto')
+    {
+        // Jika metode spesifik diminta, gunakan itu
+        if (in_array(strtolower($requestedMethod), ['fifo', 'fefo'])) {
+            return strtolower($requestedMethod);
+        }
+
+        // Logika otomatis untuk menentukan metode terbaik
+        $hasExpiryBatches = $this->hasExpiryBatches($productId);
+        $hasNearExpiryBatches = $this->hasNearExpiryBatches($productId, 30); // 30 hari ke depan
+        $hasCriticalExpiryBatches = $this->hasNearExpiryBatches($productId, 7); // 7 hari ke depan
+
+        // Prioritas FEFO jika:
+        // 1. Ada batch yang akan kedaluwarsa dalam 7 hari (kritis)
+        // 2. Ada batch yang akan kedaluwarsa dalam 30 hari dan lebih dari 50% batch memiliki expiry date
+        if ($hasCriticalExpiryBatches) {
+            return 'fefo';
+        }
+
+        if ($hasNearExpiryBatches && $this->getExpiryBatchPercentage($productId) > 0.5) {
+            return 'fefo';
+        }
+
+        // Default ke FIFO jika tidak ada kondisi khusus
+        return 'fifo';
+    }
+
+    /**
      * Memeriksa apakah produk memiliki batch dengan tanggal kedaluwarsa
      *
      * @param int $productId ID produk
      * @return bool
      */
-    public function hasExpiredBatches($productId)
+    public function hasExpiryBatches($productId)
     {
         return ProductBatch::where('product_id', $productId)
             ->where('remaining_quantity', '>', 0)
             ->whereNotNull('expiry_date')
             ->exists();
     }
+
+    /**
+     * Memeriksa apakah produk memiliki batch dengan tanggal kedaluwarsa (alias untuk backward compatibility)
+     *
+     * @param int $productId ID produk
+     * @return bool
+     */
+    public function hasExpiredBatches($productId)
+    {
+        return $this->hasExpiryBatches($productId);
+    }
+
+    /**
+     * Memeriksa apakah produk memiliki batch yang akan kedaluwarsa dalam waktu tertentu
+     *
+     * @param int $productId ID produk
+     * @param int $days Jumlah hari ke depan
+     * @return bool
+     */
+    public function hasNearExpiryBatches($productId, $days = 30)
+    {
+        $expiryDate = now()->addDays($days);
+        
+        return ProductBatch::where('product_id', $productId)
+            ->where('remaining_quantity', '>', 0)
+            ->whereNotNull('expiry_date')
+            ->where('expiry_date', '<=', $expiryDate)
+            ->where('expiry_date', '>=', now())
+            ->exists();
+    }
+
+    /**
+     * Mendapatkan persentase batch yang memiliki tanggal kedaluwarsa
+     *
+     * @param int $productId ID produk
+     * @return float Persentase (0.0 - 1.0)
+     */
+    public function getExpiryBatchPercentage($productId)
+    {
+        $totalBatches = ProductBatch::where('product_id', $productId)
+            ->where('remaining_quantity', '>', 0)
+            ->count();
+
+        if ($totalBatches === 0) {
+            return 0.0;
+        }
+
+        $expiryBatches = ProductBatch::where('product_id', $productId)
+            ->where('remaining_quantity', '>', 0)
+            ->whereNotNull('expiry_date')
+            ->count();
+
+        return $expiryBatches / $totalBatches;
+    }
     
     /**
      * Mendapatkan batch yang akan kedaluwarsa dalam waktu dekat
      *
      * @param int $days Jumlah hari ke depan
+     * @param bool $includeProduct Apakah menyertakan informasi produk
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getExpiringBatches($days = 30)
+    public function getExpiringBatches($days = 30, $includeProduct = false)
     {
         $expiryDate = now()->addDays($days);
         
-        return ProductBatch::whereNotNull('expiry_date')
+        $query = ProductBatch::whereNotNull('expiry_date')
             ->where('remaining_quantity', '>', 0)
             ->where('expiry_date', '<=', $expiryDate)
             ->where('expiry_date', '>=', now())
-            ->orderBy('expiry_date', 'asc')
-            ->get();
+            ->orderBy('expiry_date', 'asc');
+            
+        if ($includeProduct) {
+            $query->with('product');
+        }
+        
+        return $query->get();
+    }
+
+    /**
+     * Mendapatkan batch yang sudah kedaluwarsa
+     *
+     * @param bool $includeProduct Apakah menyertakan informasi produk
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
+    public function getExpiredBatches($includeProduct = false)
+    {
+        $query = ProductBatch::whereNotNull('expiry_date')
+            ->where('remaining_quantity', '>', 0)
+            ->where('expiry_date', '<', now())
+            ->orderBy('expiry_date', 'asc');
+            
+        if ($includeProduct) {
+            $query->with('product');
+        }
+        
+        return $query->get();
+    }
+
+    /**
+     * Mendapatkan statistik kedaluwarsa untuk dashboard
+     *
+     * @return array
+     */
+    public function getExpiryStatistics()
+    {
+        $now = now();
+        
+        return [
+            'expired' => ProductBatch::whereNotNull('expiry_date')
+                ->where('remaining_quantity', '>', 0)
+                ->where('expiry_date', '<', $now)
+                ->count(),
+            'expiring_7_days' => ProductBatch::whereNotNull('expiry_date')
+                ->where('remaining_quantity', '>', 0)
+                ->where('expiry_date', '>=', $now)
+                ->where('expiry_date', '<=', $now->copy()->addDays(7))
+                ->count(),
+            'expiring_30_days' => ProductBatch::whereNotNull('expiry_date')
+                ->where('remaining_quantity', '>', 0)
+                ->where('expiry_date', '>=', $now)
+                ->where('expiry_date', '<=', $now->copy()->addDays(30))
+                ->count(),
+            'total_with_expiry' => ProductBatch::whereNotNull('expiry_date')
+                ->where('remaining_quantity', '>', 0)
+                ->count(),
+        ];
     }
 
     /**

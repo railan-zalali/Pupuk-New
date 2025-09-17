@@ -188,6 +188,80 @@
                     </div>
                 </div>
 
+                <!-- Section: FIFO/FEFO Configuration -->
+                <div
+                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
+                    <h3
+                        class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg"
+                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                        Konfigurasi Stok & Kedaluwarsa
+                    </h3>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <x-input-label for="stock_method" value="Metode Stok" />
+                            <select name="stock_method" id="stock_method"
+                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                                <option value="FIFO" {{ $product->stock_method === 'FIFO' ? 'selected' : '' }}>FIFO (First In, First Out)</option>
+                                <option value="FEFO" {{ $product->stock_method === 'FEFO' ? 'selected' : '' }}>FEFO (First Expired, First Out)</option>
+                            </select>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                FIFO: Stok lama keluar duluan | FEFO: Stok yang akan kedaluwarsa keluar duluan
+                            </p>
+                            <x-input-error :messages="$errors->get('stock_method')" class="mt-2" />
+                        </div>
+
+                        <div>
+                            <x-input-label for="expiry_warning_days" value="Peringatan Kedaluwarsa (Hari)" />
+                            <x-text-input type="number" name="expiry_warning_days" id="expiry_warning_days" 
+                                min="0" step="1" value="{{ $product->expiry_warning_days }}" class="mt-1 block w-full" />
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                                Berapa hari sebelum kedaluwarsa untuk menampilkan peringatan
+                            </p>
+                            <x-input-error :messages="$errors->get('expiry_warning_days')" class="mt-2" />
+                        </div>
+
+                        <div class="md:col-span-2">
+                            <div class="space-y-4">
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="requires_expiry_date" id="requires_expiry_date" 
+                                        value="1" {{ $product->requires_expiry_date ? 'checked' : '' }}
+                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700">
+                                    <label for="requires_expiry_date" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Wajib memiliki tanggal kedaluwarsa
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="is_perishable" id="is_perishable" 
+                                        value="1" {{ $product->is_perishable ? 'checked' : '' }}
+                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700">
+                                    <label for="is_perishable" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Produk mudah rusak/kedaluwarsa
+                                    </label>
+                                </div>
+
+                                <div class="flex items-center">
+                                    <input type="checkbox" name="strict_expiry_validation" id="strict_expiry_validation" 
+                                        value="1" {{ $product->strict_expiry_validation ? 'checked' : '' }}
+                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700">
+                                    <label for="strict_expiry_validation" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
+                                        Validasi ketat tanggal kedaluwarsa
+                                    </label>
+                                </div>
+                            </div>
+                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
+                                Validasi ketat akan mencegah penjualan produk yang sudah kedaluwarsa atau mendekati kedaluwarsa
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Section: Units of Measure -->
                 <div
                     class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
@@ -704,6 +778,71 @@
                             alert('Error accessing camera: ' + err.message);
                         }
                     });
+                }
+
+                // Expiry Date Validation for Perishable Products
+                const isPerishableCheckbox = document.getElementById('is_perishable');
+                const requiresExpiryCheckbox = document.getElementById('requires_expiry_date');
+                const expiryWarningDaysInput = document.getElementById('expiry_warning_days');
+                const expireDateInputs = document.querySelectorAll('input[name$="[expire_date]"]');
+
+                function toggleExpiryValidation() {
+                    const isPerishable = isPerishableCheckbox?.checked || false;
+                    const requiresExpiry = requiresExpiryCheckbox?.checked || false;
+                    const shouldRequireExpiry = isPerishable || requiresExpiry;
+
+                    // Toggle required attribute for expiry warning days
+                    if (expiryWarningDaysInput) {
+                        expiryWarningDaysInput.required = shouldRequireExpiry;
+                        if (shouldRequireExpiry && !expiryWarningDaysInput.value) {
+                            expiryWarningDaysInput.value = '30'; // Default value
+                        }
+                    }
+
+                    // Toggle required attribute for expire date inputs
+                    expireDateInputs.forEach(input => {
+                        input.required = shouldRequireExpiry;
+                        if (shouldRequireExpiry) {
+                            // Set minimum date to tomorrow
+                            const tomorrow = new Date();
+                            tomorrow.setDate(tomorrow.getDate() + 1);
+                            input.min = tomorrow.toISOString().split('T')[0];
+                        } else {
+                            input.removeAttribute('min');
+                        }
+                    });
+
+                    // Show/hide validation messages
+                    const validationMessage = document.getElementById('expiry-validation-message');
+                    if (validationMessage) {
+                        validationMessage.style.display = shouldRequireExpiry ? 'block' : 'none';
+                    }
+                }
+
+                // Add event listeners
+                if (isPerishableCheckbox) {
+                    isPerishableCheckbox.addEventListener('change', toggleExpiryValidation);
+                }
+                if (requiresExpiryCheckbox) {
+                    requiresExpiryCheckbox.addEventListener('change', toggleExpiryValidation);
+                }
+
+                // Initial validation check
+                toggleExpiryValidation();
+
+                // Add validation message if it doesn't exist
+                if (!document.getElementById('expiry-validation-message')) {
+                    const validationDiv = document.createElement('div');
+                    validationDiv.id = 'expiry-validation-message';
+                    validationDiv.className = 'mt-2 text-sm text-blue-600 dark:text-blue-400';
+                    validationDiv.style.display = 'none';
+                    validationDiv.innerHTML = '<i class="fas fa-info-circle mr-1"></i>Tanggal kedaluwarsa dan hari peringatan wajib diisi untuk produk yang mudah rusak.';
+                    
+                    // Insert after the strict_expiry_validation checkbox
+                    const strictValidationDiv = document.querySelector('input[name="strict_expiry_validation"]')?.closest('.flex');
+                    if (strictValidationDiv) {
+                        strictValidationDiv.parentNode.insertBefore(validationDiv, strictValidationDiv.nextSibling);
+                    }
                 }
             });
         </script>

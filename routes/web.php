@@ -5,6 +5,7 @@ use App\Http\Controllers\CashBookController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\CustomerController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ExpiryNotificationController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\PurchaseController;
@@ -186,10 +187,29 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/stock-in', [ReportController::class, 'stockIn'])->name('reports.stock-in');
         Route::get('/reports/stock-out', [ReportController::class, 'stockOut'])->name('reports.stock-out');
         Route::get('/reports/fifo-stock', [ReportController::class, 'fifoStock'])->name('reports.fifo-stock');
+        Route::get('/reports/fefo', [ReportController::class, 'fefoReport'])->name('reports.fefo');
         Route::get('/reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         Route::get('/reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
         Route::get('/reports/accounts', [ReportController::class, 'accounts'])->name('reports.accounts');
         Route::get('/reports/export/sales', [ReportController::class, 'exportSales'])->name('reports.export.sales');
+    });
+
+    // Expiry Notification routes
+    Route::middleware(['permission:access-reports'])->group(function () {
+        Route::get('/expiry-notifications', [ExpiryNotificationController::class, 'show'])->name('expiry-notifications.index');
+        Route::get('/expiry-notifications/summary', [ExpiryNotificationController::class, 'summary'])->name('expiry-notifications.summary');
+        Route::get('/expiry-notifications/severity/{severity}', [ExpiryNotificationController::class, 'getBySeverity'])->name('expiry-notifications.severity');
+        Route::get('/expiry-notifications/product/{productId}', [ExpiryNotificationController::class, 'getByProduct'])->name('expiry-notifications.product');
+        Route::get('/expiry-notifications/recommendations/{batchId}', [ExpiryNotificationController::class, 'getActionRecommendations'])->name('expiry-notifications.recommendations');
+        Route::post('/expiry-notifications/batch/{batchId}/mark-handled', [ExpiryNotificationController::class, 'markHandled'])->name('expiry-notifications.mark-handled');
+        Route::post('/expiry-notifications/refresh', [ExpiryNotificationController::class, 'refresh'])->name('expiry-notifications.refresh');
+        Route::get('/expiry-notifications/widget', [ExpiryNotificationController::class, 'dashboardWidget'])->name('expiry-notifications.widget');
+    });
+
+    // API routes for AJAX calls
+    Route::prefix('api')->middleware(['auth'])->group(function () {
+        Route::get('/expiry-notifications', [ExpiryNotificationController::class, 'index'])->name('api.expiry-notifications.index');
+        Route::get('/expiry-notifications/summary', [ExpiryNotificationController::class, 'summary'])->name('api.expiry-notifications.summary');
     });
     
     // Store Settings routes

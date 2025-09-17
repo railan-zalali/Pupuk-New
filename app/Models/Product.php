@@ -20,7 +20,19 @@ class Product extends Model
         'purchase_price',
         'selling_price',
         'stock',
-        'min_stock'
+        'min_stock',
+        'stock_method',
+        'requires_expiry_date',
+        'is_perishable',
+        'expiry_warning_days',
+        'strict_expiry_validation'
+    ];
+
+    protected $casts = [
+        'requires_expiry_date' => 'boolean',
+        'is_perishable' => 'boolean',
+        'strict_expiry_validation' => 'boolean',
+        'expiry_warning_days' => 'integer',
     ];
 
     public function category()
@@ -118,6 +130,117 @@ class Product extends Model
             }
         }
 
-        return implode(' + ', $result);
+        return implode(' + ', $result) ?: '0';
+    }
+
+    /**
+     * Get the effective stock method for this product
+     */
+    public function getEffectiveStockMethod()
+    {
+        if ($this->stock_method === 'auto') {
+            // Auto-determine based on product characteristics
+            if ($this->is_perishable || $this->requires_expiry_date) {
+                return 'fefo';
+            }
+            return 'fifo';
+        }
+        
+        return $this->stock_method;
+    }
+
+    /**
+     * Check if this product uses FEFO method
+     */
+    public function usesFefo()
+    {
+        return $this->getEffectiveStockMethod() === 'fefo';
+    }
+
+    /**
+     * Check if this product uses FIFO method
+     */
+    public function usesFifo()
+    {
+        return $this->getEffectiveStockMethod() === 'fifo';
+    }
+
+    /**
+     * Get expiry warning days (product-specific or system default)
+     */
+    public function getExpiryWarningDays()
+    {
+        return $this->expiry_warning_days ?? 7; // Default to 7 days
+    }
+
+    /**
+     * Check if product requires expiry date validation
+     */
+    public function requiresExpiryDate()
+    {
+        return $this->requires_expiry_date || $this->is_perishable;
+    }
+
+    /**
+     * Get stock method display name
+     */
+    public function getStockMethodDisplayAttribute()
+    {
+        $methods = [
+            'auto' => 'Otomatis',
+            'fifo' => 'FIFO (First In, First Out)',
+            'fefo' => 'FEFO (First Expired, First Out)'
+        ];
+
+        return $methods[$this->stock_method] ?? 'Otomatis';
+    }
+
+    /**
+     * Get effective stock method display name
+     */
+    public function getEffectiveStockMethodDisplayAttribute()
+    {
+        $methods = [
+            'fifo' => 'FIFO (First In, First Out)',
+            'fefo' => 'FEFO (First Expired, First Out)'
+        ];
+
+        return $methods[$this->getEffectiveStockMethod()] ?? 'FIFO';
+    }
+
+    /**
+     * Scope for products that require expiry dates
+     */
+    public function scopeRequiresExpiry($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('requires_expiry_date', true)
+              ->orWhere('is_perishable', true);
+        });
+    }
+
+    /**
+     * Scope for perishable products
+     */
+    public function scopePerishable($query)
+    {
+        return $query->where('is_perishable', true);
+    }
+
+    /**
+     * Scope for products using FEFO method
+     */
+    public function scopeUsesFefo($query)
+    {
+        return $query->where(function ($q) {
+            $q->where('stock_method', 'fefo')
+              ->orWhere(function ($subQ) {
+                  $subQ->where('stock_method', 'auto')
+                       ->where(function ($autoQ) {
+                           $autoQ->where('is_perishable', true)
+                                  ->orWhere('requires_expiry_date', true);
+                       });
+              });
+        });
     }
 }

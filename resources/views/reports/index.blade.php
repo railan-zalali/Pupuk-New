@@ -129,6 +129,36 @@
                     </div>
                 </div>
 
+                {{-- Kartu Laporan FEFO --}}
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex items-center">
+                            <div class="flex-shrink-0 p-3 bg-orange-100 rounded-full">
+                                <svg class="w-6 h-6 text-orange-600" fill="none" stroke="currentColor"
+                                    viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z">
+                                    </path>
+                                </svg>
+                            </div>
+                            <div class="ml-4">
+                                <h3 class="text-lg font-medium text-gray-900">Laporan FEFO</h3>
+                                <p class="mt-1 text-sm text-gray-500">Analisis kadaluarsa dengan First Expired First Out</p>
+                            </div>
+                        </div>
+                        <div class="mt-6">
+                            <a href="{{ route('reports.fefo') }}"
+                                class="inline-flex items-center text-sm font-medium text-orange-600 hover:text-orange-500">
+                                Lihat Laporan
+                                <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M9 5l7 7-7 7"></path>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+
                 {{-- Kartu Laporan Laba/Rugi --}}
                 <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
                     <div class="p-6">

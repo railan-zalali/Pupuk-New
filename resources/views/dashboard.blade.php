@@ -366,6 +366,9 @@
             </div>
         </div>
 
+        <!-- Expiry Notification Widget -->
+        <x-expiry-notification-widget />
+
         <!-- Charts Section -->
         <div class="grid grid-cols-1 gap-5 lg:grid-cols-2">
             <!-- Sales Chart -->

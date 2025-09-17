@@ -10,6 +10,7 @@ use App\Models\StockMovement;
 use App\Models\Supplier;
 use App\Models\UnitOfMeasure;
 use App\Imports\ProductsImport;
+use App\Services\FifoService;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -47,7 +48,8 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $validated = $request->validate([
+            // Base validation rules
+            $rules = [
                 'category_id' => 'required|exists:categories,id',
                 'supplier_id' => 'required|exists:suppliers,id',
                 'name' => 'required|string|max:255',
@@ -56,6 +58,11 @@ class ProductController extends Controller
                 'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
                 'stock' => 'required|integer|min:0',
                 'min_stock' => 'required|integer|min:0',
+                'stock_method' => 'required|in:FIFO,FEFO',
+                'requires_expiry_date' => 'nullable|boolean',
+                'is_perishable' => 'nullable|boolean',
+                'expiry_warning_days' => 'nullable|integer|min:0',
+                'strict_expiry_validation' => 'nullable|boolean',
                 'units' => 'required|array|min:1',
                 'units.*.unit_id' => 'required|exists:unit_of_measures,id',
                 'units.*.conversion_factor' => 'required|numeric|min:1',
@@ -63,7 +70,24 @@ class ProductController extends Controller
                 'units.*.selling_price' => 'required|numeric|min:0',
                 'units.*.expire_date' => 'nullable|date',
                 'units.*.is_default' => 'nullable'
-            ]);
+            ];
+
+            // Add conditional validation for perishable products
+            if ($request->boolean('is_perishable') || $request->boolean('requires_expiry_date')) {
+                $rules['expiry_warning_days'] = 'required|integer|min:1|max:365';
+                $rules['units.*.expire_date'] = 'required|date|after:today';
+            }
+
+            // Custom validation messages
+            $messages = [
+                'units.*.expire_date.required' => 'Tanggal kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
+                'units.*.expire_date.after' => 'Tanggal kedaluwarsa harus setelah hari ini.',
+                'expiry_warning_days.required' => 'Hari peringatan kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
+                'expiry_warning_days.min' => 'Hari peringatan kedaluwarsa minimal 1 hari.',
+                'expiry_warning_days.max' => 'Hari peringatan kedaluwarsa maksimal 365 hari.',
+            ];
+
+            $validated = $request->validate($rules, $messages);
 
             // Process image if uploaded
             if ($request->hasFile('image')) {
@@ -105,6 +129,11 @@ class ProductController extends Controller
                 'selling_price' => $request->units[$baseUnitIndex]['selling_price'],
                 'stock' => $validated['stock'],
                 'min_stock' => $validated['min_stock'],
+                'stock_method' => $validated['stock_method'],
+                'requires_expiry_date' => $request->boolean('requires_expiry_date'),
+                'is_perishable' => $request->boolean('is_perishable'),
+                'expiry_warning_days' => $validated['expiry_warning_days'] ?? 30,
+                'strict_expiry_validation' => $request->boolean('strict_expiry_validation'),
                 'expire_date' => $request->units[$baseUnitIndex]['expire_date'] ?? null,
             ]);
 
@@ -150,7 +179,8 @@ class ProductController extends Controller
         try {
             DB::beginTransaction();
 
-            $request->validate([
+            // Base validation rules
+            $rules = [
                 'supplier_id' => 'required|exists:suppliers,id',
                 'products' => 'required|array|min:1',
                 'products.*.category_id' => 'required|exists:categories,id',
@@ -161,7 +191,34 @@ class ProductController extends Controller
                 'products.*.min_stock' => 'required|integer|min:0',
                 'products.*.unit_id' => 'required|exists:unit_of_measures,id',
                 'products.*.description' => 'nullable|string',
-            ]);
+                'products.*.is_perishable' => 'nullable|boolean',
+                'products.*.requires_expiry_date' => 'nullable|boolean',
+                'products.*.expiry_warning_days' => 'nullable|integer|min:0',
+                'products.*.expire_date' => 'nullable|date',
+                'products.*.strict_expiry_validation' => 'nullable|boolean',
+            ];
+
+            // Add conditional validation for perishable products
+            if ($request->has('products')) {
+                foreach ($request->products as $index => $product) {
+                    if (isset($product['is_perishable']) && $product['is_perishable'] || 
+                        isset($product['requires_expiry_date']) && $product['requires_expiry_date']) {
+                        $rules["products.{$index}.expiry_warning_days"] = 'required|integer|min:1|max:365';
+                        $rules["products.{$index}.expire_date"] = 'required|date|after:today';
+                    }
+                }
+            }
+
+            // Custom validation messages
+            $messages = [
+                'products.*.expire_date.required' => 'Tanggal kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
+                'products.*.expire_date.after' => 'Tanggal kedaluwarsa harus setelah hari ini.',
+                'products.*.expiry_warning_days.required' => 'Hari peringatan kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
+                'products.*.expiry_warning_days.min' => 'Hari peringatan kedaluwarsa minimal 1 hari.',
+                'products.*.expiry_warning_days.max' => 'Hari peringatan kedaluwarsa maksimal 365 hari.',
+            ];
+
+            $request->validate($rules, $messages);
 
             // Log untuk debug
             Log::info('Request batch product masuk', [
@@ -223,7 +280,11 @@ class ProductController extends Controller
                     'purchase_price' => $productData['purchase_price'],
                     'selling_price' => $productData['selling_price'],
                     'stock' => $productData['stock'],
-                    'min_stock' => $productData['min_stock']
+                    'min_stock' => $productData['min_stock'],
+                    'requires_expiry_date' => isset($productData['requires_expiry_date']) ? (bool)$productData['requires_expiry_date'] : false,
+                    'is_perishable' => isset($productData['is_perishable']) ? (bool)$productData['is_perishable'] : false,
+                    'expiry_warning_days' => $productData['expiry_warning_days'] ?? 30,
+                    'strict_expiry_validation' => isset($productData['strict_expiry_validation']) ? (bool)$productData['strict_expiry_validation'] : false,
                 ]);
 
                 Log::info('Produk batch berhasil dibuat', [
@@ -238,6 +299,7 @@ class ProductController extends Controller
                     'conversion_factor' => 1, // Base unit
                     'purchase_price' => $productData['purchase_price'],
                     'selling_price' => $productData['selling_price'],
+                    'expire_date' => $productData['expire_date'] ?? null,
                     'is_default' => true
                 ]);
 
@@ -302,7 +364,7 @@ class ProductController extends Controller
 
     public function showBatches(Product $product)
     {
-        $product->load(['category', 'supplier', 'units.unit']);
+        $product->load(['category', 'supplier', 'units']);
         
         // Ambil semua batch produk
         $batches = $product->batches()->orderBy('created_at', 'asc')->get();
@@ -329,13 +391,19 @@ class ProductController extends Controller
     }
     public function update(Request $request, Product $product)
     {
-        $request->validate([
+        // Base validation rules
+        $rules = [
             'category_id' => 'required|exists:categories,id',
             'supplier_id' => 'required|exists:suppliers,id',
             'name' => 'required|string|max:255',
             'code' => 'required|string|max:50|unique:products,code,' . $product->id,
             'description' => 'nullable|string',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'stock_method' => 'required|in:FIFO,FEFO',
+            'requires_expiry_date' => 'nullable|boolean',
+            'is_perishable' => 'nullable|boolean',
+            'expiry_warning_days' => 'nullable|integer|min:0',
+            'strict_expiry_validation' => 'nullable|boolean',
             'units' => 'required|array|min:1',
             'units.*.unit_id' => 'required|exists:unit_of_measures,id',
             'units.*.conversion_factor' => 'required|numeric|min:1',
@@ -343,7 +411,24 @@ class ProductController extends Controller
             'units.*.selling_price' => 'required|numeric|min:0',
             'units.*.expire_date' => 'nullable|date',
             'units.*.is_default' => 'nullable|boolean',
-        ]);
+        ];
+
+        // Add conditional validation for perishable products
+        if ($request->boolean('is_perishable') || $request->boolean('requires_expiry_date')) {
+            $rules['expiry_warning_days'] = 'required|integer|min:1|max:365';
+            $rules['units.*.expire_date'] = 'required|date|after:today';
+        }
+
+        // Custom validation messages
+        $messages = [
+            'units.*.expire_date.required' => 'Tanggal kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
+            'units.*.expire_date.after' => 'Tanggal kedaluwarsa harus setelah hari ini.',
+            'expiry_warning_days.required' => 'Hari peringatan kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
+            'expiry_warning_days.min' => 'Hari peringatan kedaluwarsa minimal 1 hari.',
+            'expiry_warning_days.max' => 'Hari peringatan kedaluwarsa maksimal 365 hari.',
+        ];
+
+        $request->validate($rules, $messages);
 
         DB::beginTransaction();
         try {
@@ -354,6 +439,11 @@ class ProductController extends Controller
                 'name' => $request->name,
                 'code' => $request->code,
                 'description' => $request->description,
+                'stock_method' => $request->stock_method,
+                'requires_expiry_date' => $request->boolean('requires_expiry_date'),
+                'is_perishable' => $request->boolean('is_perishable'),
+                'expiry_warning_days' => $request->expiry_warning_days ?? 30,
+                'strict_expiry_validation' => $request->boolean('strict_expiry_validation'),
             ]);
 
             // Handle image upload
@@ -638,5 +728,140 @@ class ProductController extends Controller
     public function downloadTemplate()
     {
         return Excel::download(new \App\Exports\ProductsTemplateExport(), 'template_import_produk.xlsx');
+    }
+
+    /**
+     * Get product batches with FEFO ordering for batch selection
+     */
+    public function getBatches(Product $product)
+    {
+        try {
+            // Check if FIFO service exists and product uses batch tracking
+            if (class_exists('FifoService') && $product->stock_method === 'fifo') {
+                $fifoService = new FifoService();
+                $batches = $fifoService->getAvailableBatches($product->id);
+                
+                // Transform batches for frontend consumption
+                $transformedBatches = collect($batches)->map(function ($batch) {
+                    return [
+                        'id' => $batch->id,
+                        'batch_number' => $batch->batch_number,
+                        'production_date' => $batch->production_date,
+                        'expiry_date' => $batch->expire_date,
+                        'quantity' => $batch->quantity,
+                        'remaining_quantity' => $batch->remaining_quantity,
+                        'purchase_price' => $batch->purchase_price,
+                        'created_at' => $batch->created_at,
+                        'days_to_expiry' => $batch->expire_date ? 
+                            now()->diffInDays($batch->expire_date, false) : null,
+                        'is_expired' => $batch->expire_date ? 
+                            now()->isAfter($batch->expire_date) : false,
+                        'expiry_status' => $this->getExpiryStatus($batch->expire_date)
+                    ];
+                });
+                
+                // Sort by FEFO logic (First Expired, First Out)
+                $sortedBatches = $transformedBatches->sort(function ($a, $b) {
+                    // First, prioritize by expiry date (earliest first)
+                    if ($a['expiry_date'] && $b['expiry_date']) {
+                        $dateA = \Carbon\Carbon::parse($a['expiry_date']);
+                        $dateB = \Carbon\Carbon::parse($b['expiry_date']);
+                        
+                        if (!$dateA->equalTo($dateB)) {
+                            return $dateA->lt($dateB) ? -1 : 1;
+                        }
+                    }
+                    
+                    // If one has expiry date and other doesn't, prioritize the one with expiry date
+                    if ($a['expiry_date'] && !$b['expiry_date']) return -1;
+                    if (!$a['expiry_date'] && $b['expiry_date']) return 1;
+                    
+                    // If both don't have expiry dates, sort by production date (FIFO)
+                    if ($a['production_date'] && $b['production_date']) {
+                        $prodA = \Carbon\Carbon::parse($a['production_date']);
+                        $prodB = \Carbon\Carbon::parse($b['production_date']);
+                        return $prodA->lt($prodB) ? -1 : 1;
+                    }
+                    
+                    // Finally, sort by creation date (FIFO)
+                    $createdA = \Carbon\Carbon::parse($a['created_at']);
+                    $createdB = \Carbon\Carbon::parse($b['created_at']);
+                    return $createdA->lt($createdB) ? -1 : 1;
+                })->values();
+                
+                return response()->json([
+                    'status' => 'success',
+                    'batches' => $sortedBatches,
+                    'total_available' => $sortedBatches->sum('remaining_quantity'),
+                    'batch_count' => $sortedBatches->count(),
+                    'fefo_enabled' => true
+                ]);
+            }
+            
+            // Fallback: return simple batch info from product units
+            $productUnits = $product->productUnits()
+                ->with('unit')
+                ->where('is_default', true)
+                ->get();
+            
+            $simpleBatches = $productUnits->map(function ($unit) use ($product) {
+                return [
+                    'id' => $unit->id,
+                    'batch_number' => 'SIMPLE-' . $unit->id,
+                    'production_date' => $unit->created_at->format('Y-m-d'),
+                    'expiry_date' => $unit->expire_date,
+                    'quantity' => $product->stock,
+                    'remaining_quantity' => $product->stock,
+                    'purchase_price' => $product->purchase_price,
+                    'created_at' => $unit->created_at,
+                    'days_to_expiry' => $unit->expire_date ? 
+                        now()->diffInDays($unit->expire_date, false) : null,
+                    'is_expired' => $unit->expire_date ? 
+                        now()->isAfter($unit->expire_date) : false,
+                    'expiry_status' => $this->getExpiryStatus($unit->expire_date)
+                ];
+            });
+            
+            return response()->json([
+                'status' => 'success',
+                'batches' => $simpleBatches,
+                'total_available' => $product->stock,
+                'batch_count' => $simpleBatches->count(),
+                'fefo_enabled' => false
+            ]);
+            
+        } catch (\Exception $e) {
+            Log::error('Error fetching product batches: ' . $e->getMessage());
+            
+            return response()->json([
+                'status' => 'error',
+                'message' => 'Failed to fetch product batches',
+                'error' => $e->getMessage()
+            ], 500);
+        }
+    }
+    
+    /**
+     * Get expiry status for a batch
+     */
+    private function getExpiryStatus($expiryDate)
+    {
+        if (!$expiryDate) {
+            return 'no_expiry';
+        }
+        
+        $daysToExpiry = now()->diffInDays($expiryDate, false);
+        
+        if ($daysToExpiry < 0) {
+            return 'expired';
+        } elseif ($daysToExpiry === 0) {
+            return 'expires_today';
+        } elseif ($daysToExpiry <= 7) {
+            return 'expires_soon';
+        } elseif ($daysToExpiry <= 30) {
+            return 'expires_within_month';
+        } else {
+            return 'fresh';
+        }
     }
 }

@@ -630,8 +630,12 @@
     <!-- Product Selector Modal -->
     <x-product-selector-modal />
 
+    <!-- Batch Selector Modal -->
+    <x-batch-selector />
+
     @push('scripts')
         <script src="{{ asset('js/product-selector.js') }}"></script>
+        <script src="{{ asset('js/batch-selector.js') }}"></script>
         <!-- Modal Histori Pembelian Pelanggan -->
         <div id="shortcuts-modal" class="fixed inset-0 overflow-y-auto hidden z-50" aria-labelledby="modal-title"
             role="dialog" aria-modal="true">

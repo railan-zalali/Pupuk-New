@@ -885,4 +885,263 @@ class ReportController extends Controller
             return back()->with('error', 'An error occurred while generating the report');
         }
     }
+
+    /**
+     * Generate comprehensive FEFO (First Expired, First Out) report
+     */
+    public function fefoReport(Request $request)
+    {
+        try {
+            $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
+            $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
+            $search = $request->get('search', '');
+            $severity = $request->get('severity', 'all');
+            $category = $request->get('category');
+
+            // Get expiry notification service
+            $expiryService = new \App\Services\ExpiryNotificationService();
+            
+            // Base query for products with batches
+            $productsQuery = Product::with(['category', 'productBatches' => function($query) {
+                $query->where('remaining_quantity', '>', 0)
+                      ->whereNotNull('expiry_date')
+                      ->orderBy('expiry_date', 'asc');
+            }])
+            ->whereHas('productBatches', function($query) {
+                $query->where('remaining_quantity', '>', 0)
+                      ->whereNotNull('expiry_date');
+            });
+
+            // Apply search filter
+            if ($search) {
+                $productsQuery->where(function($query) use ($search) {
+                    $query->where('name', 'like', "%{$search}%")
+                          ->orWhere('code', 'like', "%{$search}%")
+                          ->orWhereHas('category', function($q) use ($search) {
+                              $q->where('name', 'like', "%{$search}%");
+                          });
+                });
+            }
+
+            // Apply category filter
+            if ($category) {
+                $productsQuery->where('category_id', $category);
+            }
+
+            $products = $productsQuery->get();
+
+            // Process products and calculate FEFO metrics
+            $fefoData = [];
+            $totalValue = 0;
+            $totalExpiredValue = 0;
+            $totalCriticalValue = 0;
+            $totalWarningValue = 0;
+
+            foreach ($products as $product) {
+                $batches = $product->productBatches;
+                $productData = [
+                    'product' => $product,
+                    'batches' => [],
+                    'total_quantity' => 0,
+                    'total_value' => 0,
+                    'expired_quantity' => 0,
+                    'expired_value' => 0,
+                    'critical_quantity' => 0,
+                    'critical_value' => 0,
+                    'warning_quantity' => 0,
+                    'warning_value' => 0,
+                    'fresh_quantity' => 0,
+                    'fresh_value' => 0,
+                    'oldest_expiry' => null,
+                    'newest_expiry' => null,
+                    'priority_score' => 0
+                ];
+
+                foreach ($batches as $batch) {
+                    $now = now();
+                    $daysToExpiry = $batch->expiry_date ? $now->diffInDays($batch->expiry_date, false) : null;
+                    $batchValue = $batch->remaining_quantity * $batch->purchase_price;
+                    
+                    $batchData = [
+                        'batch' => $batch,
+                        'days_to_expiry' => $daysToExpiry,
+                        'value' => $batchValue,
+                        'status' => $this->getBatchExpiryStatus($daysToExpiry),
+                        'priority' => $this->getBatchPriority($daysToExpiry),
+                        'recommended_action' => $this->getRecommendedAction($daysToExpiry)
+                    ];
+
+                    $productData['batches'][] = $batchData;
+                    $productData['total_quantity'] += $batch->remaining_quantity;
+                    $productData['total_value'] += $batchValue;
+
+                    // Categorize by expiry status
+                    if ($daysToExpiry !== null) {
+                        if ($daysToExpiry < 0) {
+                            $productData['expired_quantity'] += $batch->remaining_quantity;
+                            $productData['expired_value'] += $batchValue;
+                            $productData['priority_score'] += 100;
+                        } elseif ($daysToExpiry <= 7) {
+                            $productData['critical_quantity'] += $batch->remaining_quantity;
+                            $productData['critical_value'] += $batchValue;
+                            $productData['priority_score'] += 50;
+                        } elseif ($daysToExpiry <= 30) {
+                            $productData['warning_quantity'] += $batch->remaining_quantity;
+                            $productData['warning_value'] += $batchValue;
+                            $productData['priority_score'] += 20;
+                        } else {
+                            $productData['fresh_quantity'] += $batch->remaining_quantity;
+                            $productData['fresh_value'] += $batchValue;
+                            $productData['priority_score'] += 1;
+                        }
+
+                        // Track oldest and newest expiry dates
+                        if (!$productData['oldest_expiry'] || $batch->expiry_date < $productData['oldest_expiry']) {
+                            $productData['oldest_expiry'] = $batch->expiry_date;
+                        }
+                        if (!$productData['newest_expiry'] || $batch->expiry_date > $productData['newest_expiry']) {
+                            $productData['newest_expiry'] = $batch->expiry_date;
+                        }
+                    }
+                }
+
+                // Sort batches by FEFO order (earliest expiry first)
+                usort($productData['batches'], function($a, $b) {
+                    if ($a['batch']->expiry_date && $b['batch']->expiry_date) {
+                        return $a['batch']->expiry_date <=> $b['batch']->expiry_date;
+                    }
+                    return $a['batch']->created_at <=> $b['batch']->created_at;
+                });
+
+                // Apply severity filter
+                $includeProduct = false;
+                if ($severity === 'all') {
+                    $includeProduct = true;
+                } elseif ($severity === 'expired' && $productData['expired_quantity'] > 0) {
+                    $includeProduct = true;
+                } elseif ($severity === 'critical' && $productData['critical_quantity'] > 0) {
+                    $includeProduct = true;
+                } elseif ($severity === 'warning' && $productData['warning_quantity'] > 0) {
+                    $includeProduct = true;
+                } elseif ($severity === 'fresh' && $productData['fresh_quantity'] > 0) {
+                    $includeProduct = true;
+                }
+
+                if ($includeProduct) {
+                    $fefoData[] = $productData;
+                    $totalValue += $productData['total_value'];
+                    $totalExpiredValue += $productData['expired_value'];
+                    $totalCriticalValue += $productData['critical_value'];
+                    $totalWarningValue += $productData['warning_value'];
+                }
+            }
+
+            // Sort products by priority score (highest first)
+            usort($fefoData, function($a, $b) {
+                return $b['priority_score'] <=> $a['priority_score'];
+            });
+
+            // Get categories for filter
+            $categories = \App\Models\Category::orderBy('name')->get();
+
+            // Get expiry notifications summary
+            $notificationSummary = $expiryService->getNotificationSummary();
+
+            // Calculate additional metrics
+            $metrics = [
+                'total_products' => count($fefoData),
+                'total_batches' => collect($fefoData)->sum(function($item) {
+                    return count($item['batches']);
+                }),
+                'total_value' => $totalValue,
+                'expired_value' => $totalExpiredValue,
+                'critical_value' => $totalCriticalValue,
+                'warning_value' => $totalWarningValue,
+                'fresh_value' => $totalValue - $totalExpiredValue - $totalCriticalValue - $totalWarningValue,
+                'risk_percentage' => $totalValue > 0 ? (($totalExpiredValue + $totalCriticalValue) / $totalValue) * 100 : 0,
+                'expired_percentage' => $totalValue > 0 ? ($totalExpiredValue / $totalValue) * 100 : 0,
+                'critical_percentage' => $totalValue > 0 ? ($totalCriticalValue / $totalValue) * 100 : 0,
+                'warning_percentage' => $totalValue > 0 ? ($totalWarningValue / $totalValue) * 100 : 0
+            ];
+
+            $data = [
+                'fefoData' => $fefoData,
+                'metrics' => $metrics,
+                'notificationSummary' => $notificationSummary,
+                'categories' => $categories,
+                'startDate' => $startDate,
+                'endDate' => $endDate,
+                'search' => $search,
+                'severity' => $severity,
+                'category' => $category,
+                'headers' => [
+                    'Product' => 'product_name',
+                    'Category' => 'category_name',
+                    'Total Batches' => 'batch_count',
+                    'Total Quantity' => 'total_quantity',
+                    'Total Value' => 'total_value',
+                    'Expired' => 'expired_quantity',
+                    'Critical' => 'critical_quantity',
+                    'Warning' => 'warning_quantity',
+                    'Fresh' => 'fresh_quantity',
+                    'Priority Score' => 'priority_score'
+                ],
+                'items' => $fefoData,
+                'date' => now()
+            ];
+
+            // Handle export
+            if ($request->get('type') === 'pdf' || $request->get('type') === 'excel') {
+                return $this->handleExport(
+                    $data,
+                    'fefo-report',
+                    'fefo_report_' . $startDate->format('Y-m-d') . '_' . $endDate->format('Y-m-d')
+                );
+            }
+
+            return view('reports.fefo', $data);
+
+        } catch (\Exception $e) {
+            Log::error('Error in FEFO report: ' . $e->getMessage());
+            return back()->with('error', 'Terjadi kesalahan saat memuat laporan FEFO: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Get batch expiry status
+     */
+    private function getBatchExpiryStatus($daysToExpiry)
+    {
+        if ($daysToExpiry === null) return 'no_expiry';
+        if ($daysToExpiry < 0) return 'expired';
+        if ($daysToExpiry <= 7) return 'critical';
+        if ($daysToExpiry <= 30) return 'warning';
+        return 'fresh';
+    }
+
+    /**
+     * Get batch priority level
+     */
+    private function getBatchPriority($daysToExpiry)
+    {
+        if ($daysToExpiry === null) return 'low';
+        if ($daysToExpiry < 0) return 'critical';
+        if ($daysToExpiry <= 3) return 'urgent';
+        if ($daysToExpiry <= 7) return 'high';
+        if ($daysToExpiry <= 30) return 'medium';
+        return 'low';
+    }
+
+    /**
+     * Get recommended action for batch
+     */
+    private function getRecommendedAction($daysToExpiry)
+    {
+        if ($daysToExpiry === null) return 'Monitor normal';
+        if ($daysToExpiry < 0) return 'Disposal segera';
+        if ($daysToExpiry <= 3) return 'Diskon besar (30-50%)';
+        if ($daysToExpiry <= 7) return 'Promosi khusus (15-25%)';
+        if ($daysToExpiry <= 30) return 'Monitor ketat';
+        return 'Penjualan normal';
+    }
 }

@@ -33,6 +33,7 @@ Route::prefix('products')->group(function () {
     Route::get('/categories', [ApiProductController::class, 'categories']);
     Route::get('/statistics', [ApiProductController::class, 'statistics']);
     Route::post('/clear-cache', [ApiProductController::class, 'clearCache']);
+    Route::get('/{product}/batches', [ProductController::class, 'getBatches']);
     Route::get('/{id}', [ApiProductController::class, 'show']);
 });
 

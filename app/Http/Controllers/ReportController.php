@@ -902,12 +902,12 @@ class ReportController extends Controller
             $expiryService = new \App\Services\ExpiryNotificationService();
             
             // Base query for products with batches
-            $productsQuery = Product::with(['category', 'productBatches' => function($query) {
+            $productsQuery = Product::with(['category', 'batches' => function($query) {
                 $query->where('remaining_quantity', '>', 0)
                       ->whereNotNull('expiry_date')
                       ->orderBy('expiry_date', 'asc');
             }])
-            ->whereHas('productBatches', function($query) {
+            ->whereHas('batches', function($query) {
                 $query->where('remaining_quantity', '>', 0)
                       ->whereNotNull('expiry_date');
             });
@@ -938,7 +938,7 @@ class ReportController extends Controller
             $totalWarningValue = 0;
 
             foreach ($products as $product) {
-                $batches = $product->productBatches;
+                $batches = $product->batches;
                 $productData = [
                     'product' => $product,
                     'batches' => [],

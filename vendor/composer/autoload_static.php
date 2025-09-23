@@ -4,7 +4,7 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
+class ComposerStaticInitff9e8d71f5c8e79d9c845fcb565c0985
 {
     public static $files = array (
         '6e3fae29631ef280660b3cdad06f25a8' => __DIR__ . '/..' . '/symfony/deprecation-contracts/function.php',
@@ -624,7 +624,9 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Exports\\CustomersTemplateExport' => __DIR__ . '/../..' . '/app/Exports/CustomersTemplateExport.php',
         'App\\Exports\\ProductsTemplateExport' => __DIR__ . '/../..' . '/app/Exports/ProductsTemplateExport.php',
         'App\\Exports\\ReportExport' => __DIR__ . '/../..' . '/app/Exports/ReportExport.php',
-        'App\\Http\\Controllers\\API\\SaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/API/SaleController.php',
+        'App\\Http\\Controllers\\Api\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/ProductController.php',
+        'App\\Http\\Controllers\\Api\\PurchaseController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/PurchaseController.php',
+        'App\\Http\\Controllers\\Api\\SaleController' => __DIR__ . '/../..' . '/app/Http/Controllers/Api/SaleController.php',
         'App\\Http\\Controllers\\Auth\\AuthenticatedSessionController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/AuthenticatedSessionController.php',
         'App\\Http\\Controllers\\Auth\\ConfirmablePasswordController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/ConfirmablePasswordController.php',
         'App\\Http\\Controllers\\Auth\\EmailVerificationNotificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/Auth/EmailVerificationNotificationController.php',
@@ -639,6 +641,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Controllers\\Controller' => __DIR__ . '/../..' . '/app/Http/Controllers/Controller.php',
         'App\\Http\\Controllers\\CustomerController' => __DIR__ . '/../..' . '/app/Http/Controllers/CustomerController.php',
         'App\\Http\\Controllers\\DashboardController' => __DIR__ . '/../..' . '/app/Http/Controllers/DashboardController.php',
+        'App\\Http\\Controllers\\ExpiryNotificationController' => __DIR__ . '/../..' . '/app/Http/Controllers/ExpiryNotificationController.php',
         'App\\Http\\Controllers\\ProductController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductController.php',
         'App\\Http\\Controllers\\ProductUnitController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProductUnitController.php',
         'App\\Http\\Controllers\\ProfileController' => __DIR__ . '/../..' . '/app/Http/Controllers/ProfileController.php',
@@ -680,6 +683,7 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Http\\Requests\\Updatepurchases_receiptsRequest' => __DIR__ . '/../..' . '/app/Http/Requests/Updatepurchases_receiptsRequest.php',
         'App\\Imports\\CustomersImport' => __DIR__ . '/../..' . '/app/Imports/CustomersImport.php',
         'App\\Imports\\ProductsImport' => __DIR__ . '/../..' . '/app/Imports/ProductsImport.php',
+        'App\\Jobs\\ProcessExpiryNotifications' => __DIR__ . '/../..' . '/app/Jobs/ProcessExpiryNotifications.php',
         'App\\Models\\CashBook' => __DIR__ . '/../..' . '/app/Models/CashBook.php',
         'App\\Models\\Category' => __DIR__ . '/../..' . '/app/Models/Category.php',
         'App\\Models\\Customer' => __DIR__ . '/../..' . '/app/Models/Customer.php',
@@ -712,9 +716,11 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
         'App\\Providers\\AppServiceProvider' => __DIR__ . '/../..' . '/app/Providers/AppServiceProvider.php',
         'App\\Providers\\EventServiceProvider' => __DIR__ . '/../..' . '/app/Providers/EventServiceProvider.php',
         'App\\Providers\\MiddlewareServiceProvider' => __DIR__ . '/../..' . '/app/Providers/MiddlewareServiceProvider.php',
+        'App\\Services\\ExpiryNotificationService' => __DIR__ . '/../..' . '/app/Services/ExpiryNotificationService.php',
         'App\\Services\\FifoService' => __DIR__ . '/../..' . '/app/Services/FifoService.php',
         'App\\Traits\\ReportExport' => __DIR__ . '/../..' . '/app/Traits/ReportExport.php',
         'App\\View\\Components\\AppLayout' => __DIR__ . '/../..' . '/app/View/Components/AppLayout.php',
+        'App\\View\\Components\\ExpiryNotificationWidget' => __DIR__ . '/../..' . '/app/View/Components/ExpiryNotificationWidget.php',
         'App\\View\\Components\\GuestLayout' => __DIR__ . '/../..' . '/app/View/Components/GuestLayout.php',
         'App\\View\\Components\\ReportExportButtons' => __DIR__ . '/../..' . '/app/View/Components/ReportExportButtons.php',
         'App\\View\\Components\\SidebarLink' => __DIR__ . '/../..' . '/app/View/Components/SidebarLink.php',
@@ -8146,10 +8152,10 @@ class ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8::$prefixesPsr0;
-            $loader->classMap = ComposerStaticInit6e0f910a688f0d2938bdb3eb12e96cd8::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitff9e8d71f5c8e79d9c845fcb565c0985::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitff9e8d71f5c8e79d9c845fcb565c0985::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitff9e8d71f5c8e79d9c845fcb565c0985::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitff9e8d71f5c8e79d9c845fcb565c0985::$classMap;
 
         }, null, ClassLoader::class);
     }

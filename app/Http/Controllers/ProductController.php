@@ -11,6 +11,7 @@ use App\Models\Supplier;
 use App\Models\UnitOfMeasure;
 use App\Imports\ProductsImport;
 use App\Services\FifoService;
+use App\Http\Requests\StoreProductRequest;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -43,51 +44,12 @@ class ProductController extends Controller
         return view('products.create', compact('categories', 'suppliers', 'units', 'productCode'));
     }
 
-    public function store(Request $request)
+    public function store(StoreProductRequest $request)
     {
         try {
             DB::beginTransaction();
 
-            // Base validation rules
-            $rules = [
-                'category_id' => 'required|exists:categories,id',
-                'supplier_id' => 'required|exists:suppliers,id',
-                'name' => 'required|string|max:255',
-                'code' => 'required|string|unique:products,code,NULL,id,deleted_at,NULL',
-                'description' => 'nullable|string',
-                'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-                'stock' => 'required|integer|min:0',
-                'min_stock' => 'required|integer|min:0',
-                'stock_method' => 'required|in:FIFO,FEFO',
-                'requires_expiry_date' => 'nullable|boolean',
-                'is_perishable' => 'nullable|boolean',
-                'expiry_warning_days' => 'nullable|integer|min:0',
-                'strict_expiry_validation' => 'nullable|boolean',
-                'units' => 'required|array|min:1',
-                'units.*.unit_id' => 'required|exists:unit_of_measures,id',
-                'units.*.conversion_factor' => 'required|numeric|min:1',
-                'units.*.purchase_price' => 'required|numeric|min:0',
-                'units.*.selling_price' => 'required|numeric|min:0',
-                'units.*.expire_date' => 'nullable|date',
-                'units.*.is_default' => 'nullable'
-            ];
-
-            // Add conditional validation for perishable products
-            if ($request->boolean('is_perishable') || $request->boolean('requires_expiry_date')) {
-                $rules['expiry_warning_days'] = 'required|integer|min:1|max:365';
-                $rules['units.*.expire_date'] = 'required|date|after:today';
-            }
-
-            // Custom validation messages
-            $messages = [
-                'units.*.expire_date.required' => 'Tanggal kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
-                'units.*.expire_date.after' => 'Tanggal kedaluwarsa harus setelah hari ini.',
-                'expiry_warning_days.required' => 'Hari peringatan kedaluwarsa wajib diisi untuk produk yang mudah rusak.',
-                'expiry_warning_days.min' => 'Hari peringatan kedaluwarsa minimal 1 hari.',
-                'expiry_warning_days.max' => 'Hari peringatan kedaluwarsa maksimal 365 hari.',
-            ];
-
-            $validated = $request->validate($rules, $messages);
+            $validated = $request->validated();
 
             // Process image if uploaded
             if ($request->hasFile('image')) {
@@ -577,7 +539,7 @@ class ProductController extends Controller
             'expire_date' => 'nullable|date'
         ]);
 
-        $beforeStock = $product->stock;
+        $beforeStock = $product->actual_stock;
         $quantity = $validated['quantity'];
 
         if ($validated['adjustment_type'] === 'add') {
@@ -610,8 +572,8 @@ class ProductController extends Controller
                 );
             }
         } else {
-            if ($product->stock < $quantity) {
-                return back()->with('error', 'Insufficient stock');
+            if ($product->actual_stock < $quantity) {
+                return back()->with('error', "Stok tidak cukup untuk dikurangi. Stok tersedia: {$product->actual_stock}, diminta: {$quantity}");
             }
             $product->decrement('stock', $quantity);
             $type = 'out';
@@ -623,7 +585,7 @@ class ProductController extends Controller
             'type' => $type,
             'quantity' => $quantity,
             'before_stock' => $beforeStock,
-            'after_stock' => $product->stock,
+            'after_stock' => $product->actual_stock,
             'reference_type' => 'adjustment',
             'reference_id' => $product->id,
             'notes' => $validated['notes'] ?? null
@@ -674,7 +636,7 @@ class ProductController extends Controller
     public function getUnits(Product $product)
     {
         return response()->json([
-            'stock' => $product->stock,
+            'stock' => $product->actual_stock,
             'units' => $product->productUnits->map(function ($unit) {
                 return [
                     'id' => $unit->id,
@@ -810,8 +772,8 @@ class ProductController extends Controller
                     'batch_number' => 'SIMPLE-' . $unit->id,
                     'production_date' => $unit->created_at->format('Y-m-d'),
                     'expiry_date' => $unit->expire_date,
-                    'quantity' => $product->stock,
-                    'remaining_quantity' => $product->stock,
+                    'quantity' => $product->actual_stock,
+                'remaining_quantity' => $product->actual_stock,
                     'purchase_price' => $product->purchase_price,
                     'created_at' => $unit->created_at,
                     'days_to_expiry' => $unit->expire_date ? 
@@ -825,7 +787,7 @@ class ProductController extends Controller
             return response()->json([
                 'status' => 'success',
                 'batches' => $simpleBatches,
-                'total_available' => $product->stock,
+                'total_available' => $product->actual_stock,
                 'batch_count' => $simpleBatches->count(),
                 'fefo_enabled' => false
             ]);

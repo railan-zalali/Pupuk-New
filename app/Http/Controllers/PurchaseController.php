@@ -58,7 +58,7 @@ class PurchaseController extends Controller
                 'category_id' => $product->category_id,
                 'category_name' => $product->category->name,
                 'supplier_id' => $product->supplier_id,
-                'stock' => $product->stock,
+                'stock' => $product->actual_stock,
                 'min_stock' => $product->min_stock,
                 'base_unit' => $baseUnit ? $baseUnit->abbreviation : '',
                 'description' => $product->description,
@@ -88,73 +88,7 @@ class PurchaseController extends Controller
     }
 
 
-    // public function store(Request $request)
-    // {
-    //     $request->validate([
-    //         'supplier_id' => 'required|exists:suppliers,id',
-    //         'date' => 'required|date',
-    //         'product_id' => 'required|array|min:1',
-    //         'product_id.*' => 'required|exists:products,id',
-    //         'quantity' => 'required|array|min:1',
-    //         'quantity.*' => 'required|integer|min:1',
-    //         'purchase_price' => 'required|array|min:1',
-    //         'purchase_price.*' => 'required|numeric|min:0',
-    //         'notes' => 'nullable|string',
-    //     ]);
 
-    //     try {
-    //         // Create the purchase
-    //         $purchase = new Purchase();
-    //         $purchase->invoice_number = $this->generateInvoiceNumber();
-    //         $purchase->supplier_id = $request->supplier_id;
-    //         $purchase->user_id = Auth::id();
-    //         $purchase->date = $request->date;
-    //         $purchase->status = 'pending';
-    //         $purchase->notes = $request->notes;
-
-    //         // Calculate total amount
-    //         $totalAmount = 0;
-    //         for ($i = 0; $i < count($request->product_id); $i++) {
-    //             $totalAmount += $request->quantity[$i] * $request->purchase_price[$i];
-    //         }
-    //         $purchase->total_amount = $totalAmount;
-    //         $purchase->save();
-
-    //         // Create purchase details
-    //         for ($i = 0; $i < count($request->product_id); $i++) {
-    //             $detail = new PurchaseDetail();
-    //             $detail->purchase_id = $purchase->id;
-    //             $detail->product_id = $request->product_id[$i];
-    //             $detail->quantity = $request->quantity[$i];
-    //             $detail->received_quantity = 0;
-    //             $detail->purchase_price = $request->purchase_price[$i];
-    //             $detail->subtotal = $request->quantity[$i] * $request->purchase_price[$i];
-    //             $detail->save();
-
-    //             // Update product supplier price if needed
-    //             $product = Product::find($request->product_id[$i]);
-    //             $supplier = Supplier::find($request->supplier_id);
-
-    //             // Check if relationship exists and update price
-    //             if (!$supplier->products()->where('product_id', $product->id)->exists()) {
-    //                 $supplier->products()->attach($product->id, [
-    //                     'purchase_price' => $request->purchase_price[$i]
-    //                 ]);
-    //             } else {
-    //                 // Update the pivot if price has changed
-    //                 $supplier->products()->updateExistingPivot($product->id, [
-    //                     'purchase_price' => $request->purchase_price[$i]
-    //                 ]);
-    //             }
-    //         }
-
-    //         return redirect()->route('purchases.show', $purchase)
-    //             ->with('success', 'Pembelian berhasil dibuat.');
-    //     } catch (\Exception $e) {
-    //         Log::error('Purchase creation failed: ' . $e->getMessage());
-    //         return back()->withErrors(['error' => 'Terjadi kesalahan: ' . $e->getMessage()])->withInput();
-    //     }
-    // }
 
 
     public function store(Request $request)
@@ -512,11 +446,11 @@ class PurchaseController extends Controller
                     }
 
                     // Store the current stock before updating
-                    $beforeStock = $product->stock;
+                    $beforeStock = $product->actual_stock;
 
                     // UBAH BARIS INI - Gunakan baseQuantityReceived, bukan receivedQty
                     // Update product stock
-                    $product->stock += $baseQuantityReceived; // Menggunakan jumlah yang telah dikonversi
+                    $product->actual_stock += $baseQuantityReceived; // Menggunakan jumlah yang telah dikonversi
                     $product->save();
 
                     // Update stock movement juga
@@ -525,7 +459,7 @@ class PurchaseController extends Controller
                         'type' => 'in',
                         'quantity' => $baseQuantityReceived, // Ubah ini juga
                         'before_stock' => $beforeStock,
-                        'after_stock' => $product->stock,
+                        'after_stock' => $product->actual_stock,
                         'reference_type' => 'purchase_receipt',
                         'reference_id' => $receipt->id,
                         'notes' => "Penerimaan pembelian #{$purchase->invoice_number}"
@@ -705,7 +639,7 @@ class PurchaseController extends Controller
 
                 // Get product and update stock
                 $product = Product::findOrFail($detail->product_id);
-                $beforeStock = $product->stock;
+                $beforeStock = $product->actual_stock;
                 $product->increment('stock', $baseQuantityReceived);
 
                 // Create stock movement record
@@ -714,7 +648,7 @@ class PurchaseController extends Controller
                     'quantity' => $baseQuantityReceived,
                     'type' => 'in',
                     'before_stock' => $beforeStock,
-                    'after_stock' => $product->stock,
+                    'after_stock' => $product->actual_stock,
                     'reference_id' => $receipt->id,
                     'reference_type' => 'purchase_receipt',
                     'notes' => 'Penerimaan barang pembelian #' . $purchase->invoice_number,
@@ -790,7 +724,7 @@ class PurchaseController extends Controller
 
         // Add stock information to each product
         $products->each(function ($product) {
-            $product->stock = $product->current_stock;
+            $product->stock = $product->actual_stock;
         });
 
         return response()->json($products);
@@ -829,11 +763,11 @@ class PurchaseController extends Controller
 
             return response()->json([
                 'units' => $product->units,
-                'stock' => $product->stock,
+                'stock' => $product->actual_stock,
                 'default_unit' => $defaultUnitName,
                 'last_purchase' => $lastPurchaseInfo,
                 'min_stock' => $product->min_stock,
-                'has_low_stock' => $product->stock < $product->min_stock
+                'has_low_stock' => $product->actual_stock < $product->min_stock
             ]);
         } catch (\Exception $e) {
             return response()->json([
@@ -879,7 +813,7 @@ class PurchaseController extends Controller
         // Add additional info to each product
         $products->each(function ($product) {
             // Get current stock
-            $product->stock = $product->stock;
+            $product->stock = $product->actual_stock;
 
             // Get default unit
             $defaultUnit = $product->units->first();
@@ -898,7 +832,7 @@ class PurchaseController extends Controller
             $product->category_name = $product->category ? $product->category->name : '';
 
             // Add low stock indicator
-            $product->is_low_stock = $product->stock < $product->min_stock;
+            $product->is_low_stock = $product->actual_stock < $product->min_stock;
         });
 
         return response()->json($products);
@@ -975,7 +909,7 @@ class PurchaseController extends Controller
             $product = $detail->product;
 
             // Check if product stock is below minimum after receipt
-            if ($product->stock < $product->min_stock) {
+            if ($product->actual_stock < $product->min_stock) {
                 $lowStockProducts[] = $product;
             }
         }
@@ -1053,7 +987,7 @@ class PurchaseController extends Controller
                 'id' => $product->id,
                 'name' => $product->name,
                 'code' => $product->code,
-                'stock' => $product->stock
+                'stock' => $product->actual_stock
             ],
             'unit' => $unit ? [
                 'id' => $unit->id,

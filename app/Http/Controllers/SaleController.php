@@ -231,9 +231,9 @@ class SaleController extends Controller
 
                 // Stock validation and update only for completed transactions
                 if (!$savingAsDraft) {
-                    // Stock validation
-                    if ($baseQuantity > $product->stock) {
-                        throw new \Exception("Stok tidak cukup untuk produk: {$product->name}");
+                    // Stock validation using actual stock from batches
+                    if ($baseQuantity > $product->actual_stock) {
+                        throw new \Exception("Stok tidak cukup untuk produk: {$product->name}. Stok tersedia: {$product->actual_stock}, diminta: {$baseQuantity}");
                     }
                 }
 
@@ -264,9 +264,8 @@ class SaleController extends Controller
                     $product->stockMovements()->create([
                         'type' => 'draft_out',
                         'quantity' => $baseQuantity,
-                        'before_stock' => $product->stock,
-                        'after_stock' => $product->stock, // Tidak mengurangi stok fisik
-
+                        'before_stock' => $product->actual_stock,
+                        'after_stock' => $product->actual_stock, // Tidak mengurangi stok fisik untuk draft
                         'reference_type' => 'draft_sale',
                         'reference_id' => $sale->id,
                         'notes' => 'Draft penjualan produk'
@@ -406,7 +405,7 @@ class SaleController extends Controller
             $insufficientStockProducts = [];
             foreach ($sale->saleDetails as $detail) {
                 $product = $detail->product;
-                $currentStock = $product->stock;
+                $currentStock = $product->actual_stock;
 
                 // Kita perlu memeriksa apakah stok masih mencukupi
                 // Kita tidak perlu mengurangi kuantitas draft karena sudah dikurangi

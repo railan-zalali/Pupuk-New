@@ -433,7 +433,7 @@ class ReportController extends Controller
             ->paginate(20); // Add pagination here
 
         $productsCollection = $products->getCollection()->map(function ($product) {
-            $product->stock_value = $product->stock * $product->purchase_price;
+            $product->stock_value = $product->actual_stock * $product->purchase_price;
             return $product;
         });
 
@@ -446,7 +446,7 @@ class ReportController extends Controller
             'summary' => [
                 'total_products' => $products->count(),
                 'total_stock_value' => $products->sum('stock_value'),
-                'low_stock_count' => $products->where('stock', '<=', 'min_stock')->count(),
+                'low_stock_count' => $products->where('actual_stock', '<=', 'min_stock')->count(),
             ],
             'headers' => [
                 'Code' => 'code',

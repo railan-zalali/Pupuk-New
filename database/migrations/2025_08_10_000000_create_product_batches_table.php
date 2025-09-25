@@ -11,27 +11,31 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('product_batches', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('product_id')->constrained();
-            $table->string('batch_number');
-            $table->integer('quantity');
-            $table->integer('remaining_quantity');
-            $table->date('production_date')->nullable();
-            $table->date('expiry_date')->nullable();
-            $table->decimal('purchase_price', 15, 2)->default(0);
-            $table->foreignId('purchase_id')->nullable()->constrained();
-            $table->timestamps();
-            
-            // Indeks untuk pencarian cepat
-            $table->index(['product_id', 'remaining_quantity']);
-            $table->index(['product_id', 'expiry_date']);
-        });
+        if (!Schema::hasTable('product_batches')) {
+            Schema::create('product_batches', function (Blueprint $table) {
+                $table->id();
+                $table->foreignId('product_id')->constrained();
+                $table->string('batch_number');
+                $table->integer('quantity');
+                $table->integer('remaining_quantity');
+                $table->date('production_date')->nullable();
+                $table->date('expiry_date')->nullable();
+                $table->decimal('purchase_price', 15, 2)->default(0);
+                $table->foreignId('purchase_id')->nullable()->constrained();
+                $table->timestamps();
+                
+                // Indeks untuk pencarian cepat
+                $table->index(['product_id', 'remaining_quantity']);
+                $table->index(['product_id', 'expiry_date']);
+            });
+        }
         
-        // Tambahkan kolom batch_id ke tabel stock_movements
-        Schema::table('stock_movements', function (Blueprint $table) {
-            $table->foreignId('batch_id')->nullable()->after('product_id');
-        });
+        // Tambahkan kolom batch_id ke tabel stock_movements jika belum ada
+        if (Schema::hasTable('stock_movements') && !Schema::hasColumn('stock_movements', 'batch_id')) {
+            Schema::table('stock_movements', function (Blueprint $table) {
+                $table->foreignId('batch_id')->nullable()->after('product_id');
+            });
+        }
     }
 
     /**

@@ -45,7 +45,7 @@ class PurchaseReceiptController extends Controller
 
                 // Update product stock
                 $product = $purchaseDetail->product;
-                $oldStock = $product->stock;
+                $oldStock = $product->actual_stock;
                 $newStock = $oldStock + $detail['received_quantity'];
 
                 $product->update([
@@ -59,7 +59,7 @@ class PurchaseReceiptController extends Controller
                     'type' => 'in',
                     'quantity' => $detail['received_quantity'],
                     'before_stock' => $oldStock,
-                    'after_stock' => $newStock,
+                    'after_stock' => $product->actual_stock,
                     'reference_type' => 'purchase_receipt',
                     'reference_id' => $receipt->id,
                     'notes' => 'Purchase receipt #' . $receipt->id,

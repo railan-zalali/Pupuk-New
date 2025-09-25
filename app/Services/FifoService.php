@@ -69,13 +69,13 @@ class FifoService
         // Ambil produk
         $product = Product::findOrFail($productId);
 
-        // Validasi stok cukup
-        if ($product->stock < $quantity) {
-            throw new \Exception("Stok tidak cukup untuk produk: {$product->name}");
+        // Validasi stok cukup menggunakan actual_stock yang dihitung dari batch
+        if ($product->actual_stock < $quantity) {
+            throw new \Exception("Stok tidak cukup untuk produk: {$product->name}. Stok tersedia: {$product->actual_stock}, diminta: {$quantity}");
         }
 
-        // Tentukan metode otomatis jika diperlukan
-        $selectedMethod = $this->determineOptimalMethod($productId, $method);
+        // Tentukan metode berdasarkan setting produk atau parameter yang diberikan
+        $selectedMethod = $this->determineOptimalMethod($productId, $method, $product);
 
         // Ambil batch yang tersedia dengan urutan berdasarkan metode
         $query = ProductBatch::where('product_id', $productId)
@@ -101,7 +101,7 @@ class FifoService
 
         $remainingQuantity = $quantity;
         $usedBatches = [];
-        $beforeStock = $product->stock;
+        $beforeStock = $product->actual_stock;
 
         // Mulai transaksi database
         DB::beginTransaction();
@@ -178,33 +178,49 @@ class FifoService
      *
      * @param int $productId ID produk
      * @param string $requestedMethod Metode yang diminta ('fifo', 'fefo', 'auto')
+     * @param Product|null $product Instance produk (opsional)
      * @return string Metode yang akan digunakan ('fifo' atau 'fefo')
      */
-    public function determineOptimalMethod($productId, $requestedMethod = 'auto')
+    public function determineOptimalMethod($productId, $requestedMethod = 'auto', $product = null)
     {
         // Jika metode spesifik diminta, gunakan itu
         if (in_array(strtolower($requestedMethod), ['fifo', 'fefo'])) {
             return strtolower($requestedMethod);
         }
 
-        // Logika otomatis untuk menentukan metode terbaik
-        $hasExpiryBatches = $this->hasExpiryBatches($productId);
-        $hasNearExpiryBatches = $this->hasNearExpiryBatches($productId, 30); // 30 hari ke depan
-        $hasCriticalExpiryBatches = $this->hasNearExpiryBatches($productId, 7); // 7 hari ke depan
-
-        // Prioritas FEFO jika:
-        // 1. Ada batch yang akan kedaluwarsa dalam 7 hari (kritis)
-        // 2. Ada batch yang akan kedaluwarsa dalam 30 hari dan lebih dari 50% batch memiliki expiry date
-        if ($hasCriticalExpiryBatches) {
-            return 'fefo';
+        // Ambil produk jika belum ada
+        if (!$product) {
+            $product = Product::findOrFail($productId);
         }
 
-        if ($hasNearExpiryBatches && $this->getExpiryBatchPercentage($productId) > 0.5) {
-            return 'fefo';
+        // Gunakan metode yang sudah dikonfigurasi di produk
+        $effectiveMethod = $product->getEffectiveStockMethod();
+        
+        // Jika metode produk adalah 'auto', gunakan logika otomatis yang ditingkatkan
+        if ($effectiveMethod === 'auto' || $product->stock_method === 'auto') {
+            // Logika otomatis untuk menentukan metode terbaik
+            $hasExpiryBatches = $this->hasExpiryBatches($productId);
+            $hasNearExpiryBatches = $this->hasNearExpiryBatches($productId, 30); // 30 hari ke depan
+            $hasCriticalExpiryBatches = $this->hasNearExpiryBatches($productId, 7); // 7 hari ke depan
+
+            // Prioritas FEFO jika:
+            // 1. Ada batch yang akan kedaluwarsa dalam 7 hari (kritis)
+            // 2. Ada batch yang akan kedaluwarsa dalam 30 hari dan lebih dari 50% batch memiliki expiry date
+            // 3. Produk adalah perishable atau memerlukan tracking expiry date
+            if ($hasCriticalExpiryBatches || $product->is_perishable || $product->requires_expiry_date) {
+                return 'fefo';
+            }
+
+            if ($hasNearExpiryBatches && $this->getExpiryBatchPercentage($productId) > 0.5) {
+                return 'fefo';
+            }
+
+            // Default ke FIFO jika tidak ada kondisi khusus
+            return 'fifo';
         }
 
-        // Default ke FIFO jika tidak ada kondisi khusus
-        return 'fifo';
+        // Gunakan metode yang sudah dikonfigurasi
+        return $effectiveMethod;
     }
 
     /**
@@ -363,7 +379,7 @@ class FifoService
     {
         // Ambil produk
         $product = Product::findOrFail($productId);
-        $beforeStock = $product->stock;
+        $beforeStock = $product->actual_stock;
         $updatedBatches = [];
 
         // Mulai transaksi database

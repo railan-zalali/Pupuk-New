@@ -150,6 +150,61 @@ class Product extends Model
     }
 
     /**
+     * Calculate actual stock from batches (replaces direct stock field)
+     * This is the source of truth for stock levels
+     */
+    public function getActualStockAttribute()
+    {
+        return $this->batches()->sum('remaining_quantity');
+    }
+
+    /**
+     * Get available stock (alias for actual_stock for backward compatibility)
+     */
+    public function getAvailableStockAttribute()
+    {
+        return $this->getActualStockAttribute();
+    }
+
+    /**
+     * Check if product has sufficient stock
+     */
+    public function hasSufficientStock($requiredQuantity)
+    {
+        return $this->actual_stock >= $requiredQuantity;
+    }
+
+    /**
+     * Get stock status (low, normal, out)
+     */
+    public function getStockStatusAttribute()
+    {
+        $actualStock = $this->actual_stock;
+        
+        if ($actualStock <= 0) {
+            return 'out';
+        } elseif ($actualStock <= $this->min_stock) {
+            return 'low';
+        }
+        
+        return 'normal';
+    }
+
+    /**
+     * Sync the legacy stock field with actual batch stock
+     * This method should be called after batch operations to maintain consistency
+     * Eventually, the stock field should be removed from the database
+     */
+    public function syncStockFromBatches()
+    {
+        $actualStock = $this->actual_stock;
+        if ($this->stock !== $actualStock) {
+            $this->update(['stock' => $actualStock]);
+        }
+        return $actualStock;
+    }
+
+    /**
      * Check if this product uses FEFO method
      */
     public function usesFefo()

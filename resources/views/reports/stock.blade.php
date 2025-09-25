@@ -105,7 +105,7 @@
                                         {{ $product->category->name ?? '-' }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100">
-                                        {{ number_format($product->stock) }}
+                                        {{ number_format($product->actual_stock) }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100">
                                         Rp {{ number_format($product->purchase_price, 0, ',', '.') }}
@@ -114,12 +114,12 @@
                                         Rp {{ number_format($product->selling_price, 0, ',', '.') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap text-xs text-gray-900 dark:text-gray-100">
-                                        Rp {{ number_format($product->stock * $product->purchase_price, 0, ',', '.') }}
+                                        Rp {{ number_format($product->actual_stock * $product->purchase_price, 0, ',', '.') }}
                                     </td>
                                     <td class="px-6 py-4 whitespace-nowrap">
                                         <span
-                                            class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {{ $product->stock <= $product->min_stock ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' }}">
-                                            {{ $product->stock <= $product->min_stock ? 'Stok Rendah' : 'Stok Cukup' }}
+                                            class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {{ $product->actual_stock <= $product->min_stock ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' }}">
+                                            {{ $product->actual_stock <= $product->min_stock ? 'Stok Rendah' : 'Stok Cukup' }}
                                         </span>
                                     </td>
                                 </tr>

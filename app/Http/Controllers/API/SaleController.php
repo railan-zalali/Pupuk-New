@@ -26,7 +26,7 @@ class SaleController extends Controller
     {
         try {
             $products = Product::with(['category', 'productUnits.unit'])
-                ->where('stock', '>', 0)
+                ->where('actual_stock', '>', 0)
                 ->get()
                 ->map(function ($product) {
                     $units = $product->productUnits->map(function ($unit) {
@@ -48,7 +48,7 @@ class SaleController extends Controller
                         'image_path' => $product->image_path,
                         'category_id' => $product->category_id,
                         'category_name' => $product->category ? $product->category->name : null,
-                        'stock' => $product->stock,
+                        'stock' => $product->actual_stock,
                         'units' => $units,
                     ];
                 });
@@ -153,8 +153,11 @@ class SaleController extends Controller
                 // Stock validation for completed transactions
                 if (!$savingAsDraft) {
                     // Stock validation
-                    if ($baseQuantity > $product->stock) {
-                        throw new \Exception("Insufficient stock for product: {$product->name}");
+                    if ($baseQuantity > $product->actual_stock) {
+                        return response()->json([
+                            'success' => false,
+                            'message' => "Stok tidak cukup untuk produk: {$product->name}. Stok tersedia: {$product->actual_stock}, diminta: {$baseQuantity}"
+                        ], 400);
                     }
                 }
 

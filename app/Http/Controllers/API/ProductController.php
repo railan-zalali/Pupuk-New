@@ -55,13 +55,13 @@ class ProductController extends Controller
             if ($request->filled('stock_filter')) {
                 switch ($request->stock_filter) {
                     case 'available':
-                        $query->where('stock', '>', 0);
+                        $query->where('actual_stock', '>', 0);
                         break;
                     case 'low':
-                        $query->whereRaw('stock > 0 AND stock <= COALESCE(min_stock, 10)');
+                        $query->whereRaw('actual_stock > 0 AND actual_stock <= COALESCE(min_stock, 10)');
                         break;
                     case 'out':
-                        $query->where('stock', '<=', 0);
+                        $query->where('actual_stock', '<=', 0);
                         break;
                 }
             }
@@ -86,7 +86,7 @@ class ProductController extends Controller
                     $query->orderBy('selling_price', $sortOrder);
                     break;
                 case 'stock':
-                    $query->orderBy('stock', $sortOrder);
+                    $query->orderBy('actual_stock', $sortOrder);
                     break;
                 case 'category':
                     $query->join('categories', 'products.category_id', '=', 'categories.id')
@@ -123,7 +123,7 @@ class ProductController extends Controller
                     ] : null,
                     'purchase_price' => (float) $product->purchase_price,
                     'selling_price' => (float) $product->selling_price,
-                    'stock' => (int) $product->stock,
+                    'stock' => (int) $product->actual_stock,
                     'min_stock' => (int) $product->min_stock,
                     'unit_id' => $product->unit_id,
                     'units' => $product->units->map(function ($unit) {
@@ -135,7 +135,7 @@ class ProductController extends Controller
                     }),
                     'image_path' => $product->image_path ? asset('storage/' . $product->image_path) : null,
                     'is_active' => $product->is_active,
-                    'stock_status' => $this->getStockStatus($product->stock, $product->min_stock),
+                    'stock_status' => $this->getStockStatus($product->actual_stock, $product->min_stock),
                     'formatted_price' => 'Rp ' . number_format($product->selling_price, 0, ',', '.'),
                     'created_at' => $product->created_at->format('Y-m-d H:i:s')
                 ];
@@ -219,14 +219,14 @@ class ProductController extends Controller
                     'name' => $product->name,
                     'code' => $product->code,
                     'selling_price' => (float) $product->selling_price,
-                    'stock' => (int) $product->stock,
+                    'stock' => (int) $product->actual_stock,
                     'min_stock' => (int) $product->min_stock,
                     'category' => $product->category ? [
                         'id' => $product->category->id,
                         'name' => $product->category->name
                     ] : null,
                     'image_path' => $product->image_path ? asset('storage/' . $product->image_path) : null,
-                    'stock_status' => $this->getStockStatus($product->stock, $product->min_stock),
+                    'stock_status' => $this->getStockStatus($product->actual_stock, $product->min_stock),
                     'formatted_price' => 'Rp ' . number_format($product->selling_price, 0, ',', '.')
                 ];
             });
@@ -274,7 +274,7 @@ class ProductController extends Controller
                     ] : null,
                     'purchase_price' => (float) $product->purchase_price,
                     'selling_price' => (float) $product->selling_price,
-                    'stock' => (int) $product->stock,
+                    'stock' => (int) $product->actual_stock,
                     'min_stock' => (int) $product->min_stock,
                     'unit_id' => $product->unit_id,
                     'units' => $product->units->map(function ($unit) {
@@ -286,7 +286,7 @@ class ProductController extends Controller
                     }),
                     'image_path' => $product->image_path ? asset('storage/' . $product->image_path) : null,
                     'is_active' => $product->is_active,
-                    'stock_status' => $this->getStockStatus($product->stock, $product->min_stock),
+                    'stock_status' => $this->getStockStatus($product->actual_stock, $product->min_stock),
                     'formatted_price' => 'Rp ' . number_format($product->selling_price, 0, ',', '.'),
                     'created_at' => $product->created_at->format('Y-m-d H:i:s'),
                     'updated_at' => $product->updated_at->format('Y-m-d H:i:s')
@@ -337,17 +337,17 @@ class ProductController extends Controller
             $stats = Cache::remember('product_statistics', 1800, function () {
                 return [
                     'total_products' => Product::where('is_active', true)->count(),
-                    'available_products' => Product::where('is_active', true)->where('stock', '>', 0)->count(),
+                    'available_products' => Product::where('is_active', true)->where('actual_stock', '>', 0)->count(),
                     'low_stock_products' => Product::where('is_active', true)
-                        ->whereRaw('stock > 0 AND stock <= COALESCE(min_stock, 10)')
+                        ->whereRaw('actual_stock > 0 AND actual_stock <= COALESCE(min_stock, 10)')
                         ->count(),
-                    'out_of_stock_products' => Product::where('is_active', true)->where('stock', '<=', 0)->count(),
+                    'out_of_stock_products' => Product::where('is_active', true)->where('actual_stock', '<=', 0)->count(),
                     'total_categories' => Category::whereHas('products', function ($query) {
                         $query->where('is_active', true);
                     })->count(),
                     'average_price' => Product::where('is_active', true)->avg('selling_price'),
                     'total_stock_value' => Product::where('is_active', true)
-                        ->selectRaw('SUM(stock * selling_price) as total')
+                        ->selectRaw('SUM(actual_stock * selling_price) as total')
                         ->value('total')
                 ];
             });
@@ -402,14 +402,14 @@ class ProductController extends Controller
                     'name' => $product->name,
                     'code' => $product->code,
                     'selling_price' => (float) $product->selling_price,
-                    'stock' => (int) $product->stock,
+                    'stock' => (int) $product->actual_stock,
                     'min_stock' => (int) $product->min_stock,
                     'category' => $product->category ? [
                         'id' => $product->category->id,
                         'name' => $product->category->name
                     ] : null,
                     'image_path' => $product->image_path ? asset('storage/' . $product->image_path) : null,
-                    'stock_status' => $this->getStockStatus($product->stock, $product->min_stock),
+                    'stock_status' => $this->getStockStatus($product->actual_stock, $product->min_stock),
                     'formatted_price' => 'Rp ' . number_format($product->selling_price, 0, ',', '.'),
                     'total_sold' => (int) $product->total_sold
                 ];

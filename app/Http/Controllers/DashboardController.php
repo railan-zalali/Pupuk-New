@@ -23,8 +23,8 @@ class DashboardController extends Controller
         $data['totalProducts'] = Product::count();
         $data['totalSalesToday'] = $totalSalesToday;
         $data['totalSalesThisMonth'] = $totalSalesThisMonth;
-        $data['lowStockProducts'] = Product::where('stock', '>', 0)
-            ->whereColumn('stock', '<=', 'min_stock')
+        $data['lowStockProducts'] = Product::where('actual_stock', '>', 0)
+            ->whereColumn('actual_stock', '<=', 'min_stock')
             ->count();
 
         // Menghitung persentase perubahan harian
@@ -62,8 +62,8 @@ class DashboardController extends Controller
             ->sum('remaining_amount');
 
         // Data untuk tabel
-        $data['lowStockAlerts'] = Product::where('stock', '>', 0)
-            ->whereColumn('stock', '<=', 'min_stock')
+        $data['lowStockAlerts'] = Product::where('actual_stock', '>', 0)
+            ->whereColumn('actual_stock', '<=', 'min_stock')
             ->latest()
             ->limit(5)
             ->get();
@@ -127,7 +127,7 @@ class DashboardController extends Controller
 
         // Get products that will expire in the next 30 days
         // Hanya menampilkan produk yang memiliki stok dan akan expire dalam 30 hari
-        $data['expiringProducts'] = Product::where('stock', '>', 0)
+        $data['expiringProducts'] = Product::where('actual_stock', '>', 0)
             ->whereHas('productUnits', function ($query) {
                 $query->whereNotNull('expire_date')
                     ->where('expire_date', '>=', now())

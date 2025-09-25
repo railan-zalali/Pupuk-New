@@ -281,10 +281,29 @@ class SaleController extends Controller
                     ->with('success', 'Draft penjualan berhasil disimpan');
             } else {
                 // Jika ini adalah transaksi dari draft, update status draft asli menjadi completed
+                // dan pastikan stok dikurangi dengan benar
                 if ($request->draft_id) {
                     $draft = Sale::find($request->draft_id);
-                    if ($draft) {
-                        $draft->update(['status' => 'completed']);
+                    if ($draft && $draft->status === 'draft' && !$draft->is_draft_processed) {
+                        // Tandai draft sebagai diproses dan ubah status menjadi completed
+                        $draft->update([
+                            'status' => 'completed',
+                            'is_draft_processed' => true
+                        ]);
+
+                        // Kurangi stok untuk setiap produk dalam draft menggunakan FIFO
+                        $draft->load(['saleDetails.product']);
+                        $fifoService = new FifoService();
+                        
+                        foreach ($draft->saleDetails as $detail) {
+                            $fifoService->reduceStock(
+                                $detail->product_id,
+                                $detail->base_quantity,
+                                'sale',
+                                $draft->id,
+                                'Penjualan produk dari draft'
+                            );
+                        }
                     }
                 }
 

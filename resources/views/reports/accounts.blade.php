@@ -17,6 +17,7 @@
                 'start_date' => request('start_date'),
                 'end_date' => request('end_date'),
                 'type' => request('type'),
+                'payment_status' => request('payment_status'),
             ]" />
         </div>
 
@@ -28,7 +29,7 @@
                 </svg>
                 Filter Laporan
             </h3>
-            <form action="{{ route('reports.accounts') }}" method="GET" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <form action="{{ route('reports.accounts') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
                 <div>
                     <x-input-label for="start_date" value="Tanggal Mulai" />
                     <x-text-input type="date" name="start_date" id="start_date"
@@ -51,7 +52,18 @@
                     </select>
                 </div>
 
-                <div class="flex items-end md:col-span-3">
+                <div>
+                    <x-input-label for="payment_status" value="Status Pembayaran" />
+                    <select name="payment_status" id="payment_status"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
+                        <option value="all" {{ request('payment_status', 'all') === 'all' ? 'selected' : '' }}>Semua Status</option>
+                        <option value="outstanding" {{ request('payment_status') === 'outstanding' ? 'selected' : '' }}>Belum Lunas</option>
+                        <option value="paid" {{ request('payment_status') === 'paid' ? 'selected' : '' }}>Lunas</option>
+                        <option value="partial" {{ request('payment_status') === 'partial' ? 'selected' : '' }}>Sebagian</option>
+                    </select>
+                </div>
+
+                <div class="flex items-end md:col-span-4">
                     <x-primary-button type="submit" class="w-full justify-center">
                         <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

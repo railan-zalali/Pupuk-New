@@ -24,6 +24,8 @@ class DatabaseSeeder extends Seeder
         // Memanggil RolePermissionSeeder
         $this->call([
             RolePermissionSeeder::class,
+            CategorySeeder::class,
+            SupplierSeeder::class,
             // UnitOfMeasureSeeder::class,
             ProductUnitSeeder::class,
         ]);

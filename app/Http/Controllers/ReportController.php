@@ -282,6 +282,77 @@ class ReportController extends Controller
         $startDate = $request->start_date ? Carbon::parse($request->start_date) : Carbon::now()->startOfMonth();
         $endDate = $request->end_date ? Carbon::parse($request->end_date)->endOfDay() : Carbon::now()->endOfDay();
 
+        // Get payment status filter (default: all)
+        $paymentStatus = $request->get('payment_status', 'all');
+        
+        // Prepare accounts data based on type filter
+        $type = $request->get('type', 'receivable');
+
+        if ($type === 'payable') {
+            // Build query for purchases
+            $query = Purchase::whereBetween('created_at', [$startDate, $endDate])
+                ->with('supplier');
+            
+            // Apply payment status filter
+            if ($paymentStatus !== 'all') {
+                if ($paymentStatus === 'outstanding') {
+                    $query->where('payment_status', '!=', 'paid');
+                } else {
+                    $query->where('payment_status', $paymentStatus);
+                }
+            }
+            
+            $accounts = $query->paginate(15);
+            
+            // Calculate totals based on filter
+            $allPurchases = Purchase::whereBetween('created_at', [$startDate, $endDate])->get();
+            $payables = $allPurchases->where('payment_status', '!=', 'paid');
+            
+            if ($paymentStatus === 'all') {
+                $totalAmount = $allPurchases->sum('remaining_amount');
+                $entities = $allPurchases->pluck('supplier.name')->unique()->count();
+            } elseif ($paymentStatus === 'outstanding') {
+                $totalAmount = $payables->sum('remaining_amount');
+                $entities = $payables->pluck('supplier.name')->unique()->count();
+            } else {
+                $filteredPurchases = $allPurchases->where('payment_status', $paymentStatus);
+                $totalAmount = $filteredPurchases->sum('remaining_amount');
+                $entities = $filteredPurchases->pluck('supplier.name')->unique()->count();
+            }
+        } else {
+            // Build query for sales
+            $query = Sale::whereBetween('created_at', [$startDate, $endDate])
+                ->with('customer');
+            
+            // Apply payment status filter
+            if ($paymentStatus !== 'all') {
+                if ($paymentStatus === 'outstanding') {
+                    $query->where('payment_status', '!=', 'paid');
+                } else {
+                    $query->where('payment_status', $paymentStatus);
+                }
+            }
+            
+            $accounts = $query->paginate(15);
+            
+            // Calculate totals based on filter
+            $allSales = Sale::whereBetween('created_at', [$startDate, $endDate])->get();
+            $receivables = $allSales->where('payment_status', '!=', 'paid');
+            
+            if ($paymentStatus === 'all') {
+                $totalAmount = $allSales->sum('remaining_amount');
+                $entities = $allSales->pluck('customer.nama')->unique()->count();
+            } elseif ($paymentStatus === 'outstanding') {
+                $totalAmount = $receivables->sum('remaining_amount');
+                $entities = $receivables->pluck('customer.nama')->unique()->count();
+            } else {
+                $filteredSales = $allSales->where('payment_status', $paymentStatus);
+                $totalAmount = $filteredSales->sum('remaining_amount');
+                $entities = $filteredSales->pluck('customer.nama')->unique()->count();
+            }
+        }
+
+        // For backward compatibility
         $purchases = Purchase::whereBetween('created_at', [$startDate, $endDate])
             ->with('supplier')
             ->paginate(15);
@@ -292,27 +363,6 @@ class ReportController extends Controller
 
         $payables = $purchases->where('payment_status', '!=', 'paid');
         $receivables = $sales->where('payment_status', '!=', 'paid');
-
-        // Prepare accounts data based on type filter
-        $type = $request->get('type', 'receivable');
-
-        if ($type === 'payable') {
-            // Menggunakan paginate untuk $accounts
-            $accounts = Purchase::whereBetween('created_at', [$startDate, $endDate])
-                ->where('payment_status', '!=', 'paid')
-                ->with('supplier')
-                ->paginate(15);
-            $totalAmount = $payables->sum('remaining_amount');
-            $entities = $payables->pluck('supplier.name')->unique()->count();
-        } else {
-            // Menggunakan paginate untuk $accounts
-            $accounts = Sale::whereBetween('created_at', [$startDate, $endDate])
-                ->where('payment_status', '!=', 'paid')
-                ->with('customer')
-                ->paginate(15);
-            $totalAmount = $receivables->sum('remaining_amount');
-            $entities = $receivables->pluck('customer.nama')->unique()->count();
-        }
 
         // Prepare chart data
         $chartData = [

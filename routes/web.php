@@ -154,6 +154,8 @@ Route::middleware('auth')->group(function () {
             ->name('purchases.receipt');
         Route::post('/purchases/{purchase}/receipt', [PurchaseController::class, 'storeReceipt'])
             ->name('purchases.storeReceipt');
+        Route::get('/purchases/{purchase}/print', [PurchaseController::class, 'print'])
+            ->name('purchases.print');
     });
 
 

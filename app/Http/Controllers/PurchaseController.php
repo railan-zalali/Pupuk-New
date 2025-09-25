@@ -1064,4 +1064,21 @@ class PurchaseController extends Controller
             'default_price' => $productUnit->purchase_price
         ]);
     }
+
+    /**
+     * Print the specified purchase.
+     */
+    public function print(Purchase $purchase)
+    {
+        // Eager load relationships for printing
+        $purchase->load([
+            'supplier', 
+            'user', 
+            'purchaseDetails.product', 
+            'purchaseDetails.unit',
+            'receipts.receiptDetails'
+        ]);
+
+        return view('purchases.print', compact('purchase'));
+    }
 }

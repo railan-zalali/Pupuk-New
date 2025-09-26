@@ -221,14 +221,25 @@
         <div
             class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
             <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    Daftar Transaksi
-                </h3>
+                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
+                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                        Daftar Transaksi
+                    </h3>
+                    <div class="relative">
+                        <input type="text" id="invoiceSearch" placeholder="Cari nomor faktur..." 
+                            class="w-full sm:w-64 px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
+                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
             </div>
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -257,9 +268,9 @@
                                 Aksi</th>
                         </tr>
                     </thead>
-                    <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                    <tbody id="salesTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($sales as $sale)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50" data-invoice="{{ $sale->invoice_number }}">
                                 <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                     {{ $sale->created_at->format('d/m/Y H:i') }}
                                 </td>
@@ -314,89 +325,158 @@
     @push('scripts')
         <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
         <script>
-            // Prepare data for sales chart
-            const salesCtx = document.getElementById('salesChart').getContext('2d');
-            const salesData = @json($salesChartData);
+            document.addEventListener('DOMContentLoaded', function() {
+                // Invoice search functionality
+                const invoiceSearch = document.getElementById('invoiceSearch');
+                const salesTableBody = document.getElementById('salesTableBody');
+                const allRows = salesTableBody.querySelectorAll('tr');
 
-            new Chart(salesCtx, {
-                type: 'line',
-                data: {
-                    labels: Object.keys(salesData),
-                    datasets: [{
-                        label: 'Total Penjualan',
-                        data: Object.values(salesData),
-                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                        borderColor: 'rgb(59, 130, 246)',
-                        borderWidth: 2,
-                        tension: 0.1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            ticks: {
-                                callback: function(value) {
-                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
-                                }
-                            }
+                invoiceSearch.addEventListener('input', function() {
+                    const searchTerm = this.value.toLowerCase().trim();
+                    
+                    allRows.forEach(row => {
+                        const invoiceNumber = row.getAttribute('data-invoice');
+                        if (invoiceNumber && invoiceNumber.toLowerCase().includes(searchTerm)) {
+                            row.style.display = '';
+                        } else {
+                            row.style.display = 'none';
                         }
-                    },
-                    plugins: {
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    return context.dataset.label + ': Rp ' + new Intl.NumberFormat('id-ID').format(
-                                        context.raw);
+                    });
+
+                    // Show/hide empty state
+                    const visibleRows = Array.from(allRows).filter(row => row.style.display !== 'none');
+                    const emptyRow = salesTableBody.querySelector('.empty-state');
+                    
+                    if (visibleRows.length === 0 && searchTerm !== '') {
+                        if (!emptyRow) {
+                            const emptyStateRow = document.createElement('tr');
+                            emptyStateRow.className = 'empty-state';
+                            emptyStateRow.innerHTML = `
+                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    Tidak ada transaksi yang ditemukan dengan faktur "${searchTerm}".
+                                </td>
+                            `;
+                            salesTableBody.appendChild(emptyStateRow);
+                        }
+                    } else if (emptyRow) {
+                        emptyRow.remove();
+                    }
+                });
+
+                // Prepare data for sales chart
+                try {
+                    const salesCtx = document.getElementById('salesChart');
+                    if (salesCtx) {
+                        const salesData = @json($salesChartData ?? []);
+                        
+                        // Check if we have data
+                        if (Object.keys(salesData).length === 0) {
+                            // Show message if no data
+                            salesCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400"><p>Tidak ada data penjualan untuk ditampilkan</p></div>';
+                        } else {
+                            new Chart(salesCtx, {
+                                type: 'line',
+                                data: {
+                                    labels: Object.keys(salesData),
+                                    datasets: [{
+                                        label: 'Total Penjualan',
+                                        data: Object.values(salesData),
+                                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
+                                        borderColor: 'rgb(59, 130, 246)',
+                                        borderWidth: 2,
+                                        tension: 0.1,
+                                        fill: true
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    scales: {
+                                        y: {
+                                            beginAtZero: true,
+                                            ticks: {
+                                                callback: function(value) {
+                                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
+                                                }
+                                            }
+                                        }
+                                    },
+                                    plugins: {
+                                        tooltip: {
+                                            callbacks: {
+                                                label: function(context) {
+                                                    return context.dataset.label + ': Rp ' + new Intl.NumberFormat('id-ID').format(context.raw);
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
-                            }
+                            });
                         }
                     }
+                } catch (error) {
+                    console.error('Error creating sales chart:', error);
+                    const salesCtx = document.getElementById('salesChart');
+                    if (salesCtx) {
+                        salesCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-red-500"><p>Error loading sales chart</p></div>';
+                    }
                 }
-            });
 
-            // Prepare data for payment method chart
-            const paymentCtx = document.getElementById('paymentMethodChart').getContext('2d');
-            const paymentMethods = @json($summary['payment_methods']);
-            const paymentLabels = [];
-            const paymentData = [];
-            const paymentColors = [
-                'rgba(59, 130, 246, 0.7)', // Blue
-                'rgba(16, 185, 129, 0.7)', // Green
-                'rgba(245, 158, 11, 0.7)', // Yellow
-                'rgba(239, 68, 68, 0.7)' // Red
-            ];
+                // Prepare data for payment method chart
+                try {
+                    const paymentCtx = document.getElementById('paymentMethodChart');
+                    if (paymentCtx) {
+                        const paymentMethods = @json($summary['payment_methods'] ?? []);
+                        const paymentLabels = [];
+                        const paymentData = [];
+                        const paymentColors = [
+                            'rgba(59, 130, 246, 0.7)', // Blue
+                            'rgba(16, 185, 129, 0.7)', // Green
+                            'rgba(245, 158, 11, 0.7)', // Yellow
+                            'rgba(239, 68, 68, 0.7)' // Red
+                        ];
 
-            Object.keys(paymentMethods).forEach((method, index) => {
-                let label;
-                if (method === 'cash') label = 'Tunai';
-                else if (method === 'transfer') label = 'Transfer';
-                else if (method === 'credit') label = 'Kredit';
-                else label = method;
+                        if (Object.keys(paymentMethods).length === 0) {
+                            paymentCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400"><p>Tidak ada data metode pembayaran</p></div>';
+                        } else {
+                            Object.keys(paymentMethods).forEach((method, index) => {
+                                let label;
+                                if (method === 'cash') label = 'Tunai';
+                                else if (method === 'transfer') label = 'Transfer';
+                                else if (method === 'credit') label = 'Kredit';
+                                else label = method;
 
-                paymentLabels.push(label);
-                paymentData.push(paymentMethods[method]);
-            });
+                                paymentLabels.push(label);
+                                paymentData.push(paymentMethods[method]);
+                            });
 
-            new Chart(paymentCtx, {
-                type: 'doughnut',
-                data: {
-                    labels: paymentLabels,
-                    datasets: [{
-                        data: paymentData,
-                        backgroundColor: paymentColors,
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom'
+                            new Chart(paymentCtx, {
+                                type: 'doughnut',
+                                data: {
+                                    labels: paymentLabels,
+                                    datasets: [{
+                                        data: paymentData,
+                                        backgroundColor: paymentColors,
+                                        borderWidth: 1
+                                    }]
+                                },
+                                options: {
+                                    responsive: true,
+                                    maintainAspectRatio: false,
+                                    plugins: {
+                                        legend: {
+                                            position: 'bottom'
+                                        }
+                                    }
+                                }
+                            });
                         }
+                    }
+                } catch (error) {
+                    console.error('Error creating payment method chart:', error);
+                    const paymentCtx = document.getElementById('paymentMethodChart');
+                    if (paymentCtx) {
+                        paymentCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-red-500"><p>Error loading payment chart</p></div>';
                     }
                 }
             });

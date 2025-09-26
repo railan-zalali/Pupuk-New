@@ -40,7 +40,7 @@
     @open-product-selector.window="openModal()"
     class="product-selector-modal">
     
-    <!-- Debug info (remove in production) -->
+    
     <div x-show="false" x-text="'Modal open: ' + isModalOpen"></div>
     
     <!-- Modal Backdrop -->

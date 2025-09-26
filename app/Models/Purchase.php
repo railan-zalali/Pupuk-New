@@ -42,11 +42,6 @@ class Purchase extends Model
         return $this->belongsTo(User::class);
     }
 
-    // public function purchaseDetails()
-    // {
-    //     return $this->hasMany(PurchaseDetail::class);
-    // }
-
     public function receipts()
     {
         return $this->hasMany(PurchaseReceipt::class);

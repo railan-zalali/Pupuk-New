@@ -187,7 +187,7 @@ class SaleController extends Controller
                     $product->stockMovements()->create([
                         'quantity' => $baseQuantity,
                         'type' => 'draft_out',
-                        'reference_type' => 'sale',
+                        'reference_type' => 'App\Models\Sale',
                         'reference_id' => $sale->id,
                         'notes' => 'Draft sale'
                     ]);

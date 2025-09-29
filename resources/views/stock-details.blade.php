@@ -67,7 +67,7 @@
                                     <td class="whitespace-nowrap px-6 py-3 text-sm text-gray-500 dark:text-gray-400 customer-name">
                                         @if($movement->reference_type === 'initial')
                                             Stok Awal
-                                        @elseif($movement->reference && $movement->reference_type === 'App\Models\Sale' && $movement->reference->customer)
+                                        @elseif($movement->reference && ($movement->reference_type === 'App\Models\Sale' || $movement->reference_type === 'sale') && $movement->reference->customer)
                                             {{ $movement->reference->customer->name ?? 'Tidak ada' }}
                                         @else
                                             -

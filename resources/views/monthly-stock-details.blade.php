@@ -2,16 +2,16 @@
     <div class="space-y-4">
         <div class="flex justify-between items-center">
             <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
-                {{ __('Detail Stok Mingguan') }}
+                {{ __('Detail Stok Bulanan (3 Bulan)') }}
             </h2>
             <div class="mt-4 sm:mt-0 flex space-x-2">
                 <a href="{{ route('stock.details') }}"
                     class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors">
                     {{ __('Harian') }}
                 </a>
-                <a href="{{ route('monthly.stock.details') }}"
+                <a href="{{ route('weekly.stock.details') }}"
                     class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors">
-                    {{ __('Bulanan') }}
+                    {{ __('Mingguan') }}
                 </a>
                 <a href="{{ route('dashboard') }}"
                     class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors">
@@ -28,7 +28,10 @@
         @forelse ($stockDetails as $detail)
             <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4">
                 <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-3">
-                    {{ $detail['date']->format('l, d M Y') }}
+                    {{ $detail['month']->format('F Y') }}
+                    <span class="text-sm font-normal text-gray-600 dark:text-gray-400">
+                        (Keluar: {{ $detail['outgoing_total'] }} | Masuk: {{ $detail['incoming_total'] }})
+                    </span>
                 </h3>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -43,11 +46,11 @@
                             <input type="text" 
                                    class="outgoing-search w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                    placeholder="Cari produk, pelanggan..."
-                                   data-date="{{ $detail['date']->format('Y-m-d') }}">
+                                   data-month="{{ $detail['month']->format('Y-m') }}">
                         </div>
                         
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm outgoing-table" data-date="{{ $detail['date']->format('Y-m-d') }}">
+                            <table class="w-full text-sm outgoing-table" data-month="{{ $detail['month']->format('Y-m') }}">
                                 <thead>
                                     <tr class="bg-gray-100 dark:bg-gray-700">
                                         <th class="p-2 text-left">Produk</th>
@@ -95,11 +98,11 @@
                             <input type="text" 
                                    class="incoming-search w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md text-sm bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                                    placeholder="Cari produk, pengguna..."
-                                   data-date="{{ $detail['date']->format('Y-m-d') }}">
+                                   data-month="{{ $detail['month']->format('Y-m') }}">
                         </div>
                         
                         <div class="overflow-x-auto">
-                            <table class="w-full text-sm incoming-table" data-date="{{ $detail['date']->format('Y-m-d') }}">
+                            <table class="w-full text-sm incoming-table" data-month="{{ $detail['month']->format('Y-m') }}">
                                 <thead>
                                     <tr class="bg-gray-100 dark:bg-gray-700">
                                         <th class="p-2 text-left">Produk</th>
@@ -139,7 +142,7 @@
             </div>
         @empty
             <div class="text-center text-gray-500 py-4">
-                Tidak ada data stok mingguan
+                Tidak ada data stok bulanan
             </div>
         @endforelse
     </div>
@@ -150,8 +153,8 @@
             document.querySelectorAll('.outgoing-search').forEach(function(searchInput) {
                 searchInput.addEventListener('keyup', function() {
                     const searchTerm = this.value.toLowerCase();
-                    const date = this.getAttribute('data-date');
-                    const table = document.querySelector(`.outgoing-table[data-date="${date}"]`);
+                    const month = this.getAttribute('data-month');
+                    const table = document.querySelector(`.outgoing-table[data-month="${month}"]`);
                     const rows = table.querySelectorAll('.searchable-row');
                     let visibleRows = 0;
 
@@ -179,8 +182,8 @@
             document.querySelectorAll('.incoming-search').forEach(function(searchInput) {
                 searchInput.addEventListener('keyup', function() {
                     const searchTerm = this.value.toLowerCase();
-                    const date = this.getAttribute('data-date');
-                    const table = document.querySelector(`.incoming-table[data-date="${date}"]`);
+                    const month = this.getAttribute('data-month');
+                    const table = document.querySelector(`.incoming-table[data-month="${month}"]`);
                     const rows = table.querySelectorAll('.searchable-row');
                     let visibleRows = 0;
 

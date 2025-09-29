@@ -23,6 +23,7 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     Route::get('/stock-details', [DashboardController::class, 'dailyStockDetails'])->name('stock.details');
     Route::get('/weekly-stock-details', [DashboardController::class, 'weeklyStockDetails'])->name('weekly.stock.details');
+    Route::get('/monthly-stock-details', [DashboardController::class, 'monthlyStockDetails'])->name('monthly.stock.details');
 
 
     // Profile routes

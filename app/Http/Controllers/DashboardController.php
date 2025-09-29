@@ -172,13 +172,27 @@ class DashboardController extends Controller
     {
         $outgoingStockDetails = StockMovement::where('type', 'out')
             ->whereDate('created_at', Carbon::today())
-            ->with('product')
+            ->with(['product'])
             ->get();
+
+        // Load reference only for non-initial movements
+        $outgoingStockDetails->each(function ($movement) {
+            if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                $movement->load('reference');
+            }
+        });
 
         $incomingStockDetails = StockMovement::where('type', 'in')
             ->whereDate('created_at', Carbon::today())
-            ->with('product')
+            ->with(['product'])
             ->get();
+
+        // Load reference only for non-initial movements
+        $incomingStockDetails->each(function ($movement) {
+            if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                $movement->load('reference');
+            }
+        });
 
         return view('stock-details', [
             'outgoingStockDetails' => $outgoingStockDetails,
@@ -192,12 +206,27 @@ class DashboardController extends Controller
             $date = Carbon::today()->subDays($i);
             $outgoingStock = StockMovement::where('type', 'out')
                 ->whereDate('created_at', $date)
-                ->with('product')
+                ->with(['product'])
                 ->get();
+                
+            // Load reference only for non-initial movements
+            $outgoingStock->each(function ($movement) {
+                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                    $movement->load('reference');
+                }
+            });
+            
             $incomingStock = StockMovement::where('type', 'in')
                 ->whereDate('created_at', $date)
-                ->with('product')
+                ->with(['product'])
                 ->get();
+                
+            // Load reference only for non-initial movements
+            $incomingStock->each(function ($movement) {
+                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                    $movement->load('reference');
+                }
+            });
 
             $dates->push([
                 'date' => $date,
@@ -208,6 +237,53 @@ class DashboardController extends Controller
 
         return view('weekly-stock-details', [
             'stockDetails' => $dates,
+        ]);
+    }
+
+    public function monthlyStockDetails()
+    {
+        $months = collect();
+        
+        // Get data for 3 months: 2 previous months + current month
+        for ($i = 2; $i >= 0; $i--) {
+            $startOfMonth = Carbon::today()->subMonths($i)->startOfMonth();
+            $endOfMonth = Carbon::today()->subMonths($i)->endOfMonth();
+            
+            $outgoingStock = StockMovement::where('type', 'out')
+                ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                ->with(['product'])
+                ->get();
+                
+            // Load reference only for non-initial movements
+            $outgoingStock->each(function ($movement) {
+                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                    $movement->load('reference');
+                }
+            });
+                
+            $incomingStock = StockMovement::where('type', 'in')
+                ->whereBetween('created_at', [$startOfMonth, $endOfMonth])
+                ->with(['product'])
+                ->get();
+                
+            // Load reference only for non-initial movements
+            $incomingStock->each(function ($movement) {
+                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                    $movement->load('reference');
+                }
+            });
+
+            $months->push([
+                'month' => $startOfMonth,
+                'outgoing_stock' => $outgoingStock,
+                'incoming_stock' => $incomingStock,
+                'outgoing_total' => $outgoingStock->sum('quantity'),
+                'incoming_total' => $incomingStock->sum('quantity'),
+            ]);
+        }
+
+        return view('monthly-stock-details', [
+            'stockDetails' => $months,
         ]);
     }
 }

@@ -256,7 +256,7 @@
                                         class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
                                         expire_date</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                        Tanggal kadaluarsa (format: YYYY-MM-DD)</td>
+                                        Tanggal kadaluarsa (format: YYYY-MM-DD, DD-MM-YYYY, DD/MM/YYYY, atau MM/DD/YYYY)</td>
                                     <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                                         <span
                                             class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-300">

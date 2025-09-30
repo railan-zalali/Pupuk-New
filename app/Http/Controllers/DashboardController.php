@@ -127,17 +127,32 @@ class DashboardController extends Controller
 
         // Get products that will expire in the next 30 days
         // Hanya menampilkan produk yang memiliki stok dan akan expire dalam 30 hari
-        $data['expiringProducts'] = Product::where('actual_stock', '>', 0)
-            ->whereHas('productUnits', function ($query) {
-                $query->whereNotNull('expire_date')
-                    ->where('expire_date', '>=', now())
-                    ->where('expire_date', '<=', now()->addDays(30));
+        $data['expiringProducts'] = Product::whereHas('productBatches', function ($query) {
+                $query->whereNotNull('expiry_date')
+                    ->where('expiry_date', '>=', now())
+                    ->where('expiry_date', '<=', now()->addDays(30))
+                    ->where('remaining_quantity', '>', 0);
             })
-            ->with(['productUnits' => function ($query) {
-                $query->whereNotNull('expire_date')
-                    ->where('expire_date', '>=', now())
-                    ->where('expire_date', '<=', now()->addDays(30))
-                    ->orderBy('expire_date');
+            ->with(['productBatches' => function ($query) {
+                $query->whereNotNull('expiry_date')
+                    ->where('expiry_date', '>=', now())
+                    ->where('expiry_date', '<=', now()->addDays(30))
+                    ->where('remaining_quantity', '>', 0)
+                    ->orderBy('expiry_date');
+            }])
+            ->get();
+
+        // Get products that are already expired
+        $data['expiredProducts'] = Product::whereHas('productBatches', function ($query) {
+                $query->whereNotNull('expiry_date')
+                    ->where('expiry_date', '<', now())
+                    ->where('remaining_quantity', '>', 0);
+            })
+            ->with(['productBatches' => function ($query) {
+                $query->whereNotNull('expiry_date')
+                    ->where('expiry_date', '<', now())
+                    ->where('remaining_quantity', '>', 0)
+                    ->orderBy('expiry_date');
             }])
             ->get();
 

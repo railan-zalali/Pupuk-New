@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Facades\Excel;
+use App\Helpers\DateValidationHelper;
 
 class ProductController extends Controller
 {
@@ -371,14 +372,14 @@ class ProductController extends Controller
             'units.*.conversion_factor' => 'required|numeric|min:1',
             'units.*.purchase_price' => 'required|numeric|min:0',
             'units.*.selling_price' => 'required|numeric|min:0',
-            'units.*.expire_date' => 'nullable|date',
+            'units.*.expire_date' => DateValidationHelper::getExpireDateRule(),
             'units.*.is_default' => 'nullable|boolean',
         ];
 
         // Add conditional validation for perishable products
         if ($request->boolean('is_perishable') || $request->boolean('requires_expiry_date')) {
             $rules['expiry_warning_days'] = 'required|integer|min:1|max:365';
-            $rules['units.*.expire_date'] = 'required|date|after:today';
+            $rules['units.*.expire_date'] = array_merge(['required'], DateValidationHelper::getExpireDateRule(true));
         }
 
         // Custom validation messages
@@ -536,7 +537,7 @@ class ProductController extends Controller
             'adjustment_type' => 'required|in:add,subtract',
             'quantity' => 'required|integer|min:1',
             'notes' => 'nullable|string',
-            'expire_date' => 'nullable|date'
+            'expire_date' => DateValidationHelper::getExpireDateRule()
         ]);
 
         $beforeStock = $product->actual_stock;

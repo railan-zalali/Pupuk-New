@@ -59,6 +59,14 @@ class Product extends Model
     }
     
     /**
+     * Get the product batches (alias for batches method).
+     */
+    public function productBatches()
+    {
+        return $this->hasMany(ProductBatch::class);
+    }
+    
+    /**
      * Get available batches with remaining stock (FIFO order).
      */
     public function availableBatches()

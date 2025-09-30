@@ -43,10 +43,10 @@
                         class="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 transition-all relative">
                         <i class="ti ti-bell text-indigo-500"></i>
                         Notifikasi
-                        @if ($data['lowStockProducts'] > 0 || $data['totalUpcomingCredits'] > 0)
+                        @if ($data['lowStockProducts'] > 0 || $data['totalUpcomingCredits'] > 0 || (isset($data['expiredProducts']) && $data['expiredProducts']->count() > 0) || (isset($data['expiringProducts']) && $data['expiringProducts']->count() > 0))
                             <span
                                 class="absolute -top-1 -right-1 h-5 w-5 rounded-full bg-red-500 flex items-center justify-center text-xs text-white font-medium shadow-md">
-                                {{ $data['lowStockProducts'] + $data['totalUpcomingCredits'] }}
+                                {{ $data['lowStockProducts'] + $data['totalUpcomingCredits'] + (isset($data['expiredProducts']) ? $data['expiredProducts']->count() : 0) + (isset($data['expiringProducts']) ? $data['expiringProducts']->count() : 0) }}
                             </span>
                         @endif
                     </button>
@@ -794,6 +794,151 @@
             </div>
         </div>
 
+        <!-- Expired Products Section -->
+        <div id="expired-products"
+            class="overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-4">
+                    <h3 class="text-lg font-semibold leading-6 text-gray-900 dark:text-gray-100 flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-red-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                        Produk yang Sudah Expired
+                    </h3>
+                    @if (isset($data['expiredProducts']) && $data['expiredProducts']->count() > 0)
+                        <a href="#" id="view-all-expired-products"
+                            class="text-sm text-blue-600 dark:text-blue-300 hover:text-blue-900 dark:hover:text-blue-500 flex items-center">
+                            <span>Lihat Produk</span>
+                            <svg xmlns="http://www.w3.org/2000/svg" class="ml-1 h-4 w-4" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5l7 7-7 7" />
+                            </svg>
+                        </a>
+                    @endif
+                </div>
+                <div class="mt-2 overflow-x-auto">
+                    <div class="min-w-full rounded-lg border border-gray-200 dark:border-gray-700">
+                        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                            <thead class="bg-gray-50 dark:bg-gray-700">
+                                <tr>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Kode
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Nama Produk
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Stok
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Tanggal Expired
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Hari Terlambat
+                                    </th>
+                                    <th
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
+                                        Tindakan
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-800">
+                                @forelse($data['expiredProducts'] as $product)
+                                    <tr class="hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors bg-red-50 dark:bg-red-900/20">
+                                        <td
+                                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $product->code }}
+                                        </td>
+                                        <td
+                                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            <div class="flex items-center">
+                                                <div
+                                                    class="h-8 w-8 flex-shrink-0 rounded-md bg-gray-100 dark:bg-gray-700 flex items-center justify-center mr-3">
+                                                    @if ($product->image_path)
+                                                        <img src="{{ Storage::url($product->image_path) }}"
+                                                            alt="{{ $product->name }}"
+                                                            class="h-full w-full object-cover rounded-md">
+                                                    @else
+                                                        <svg class="h-4 w-4 text-gray-400 dark:text-gray-500"
+                                                            fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                            <path stroke-linecap="round" stroke-linejoin="round"
+                                                                stroke-width="2"
+                                                                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                                                            </path>
+                                                        </svg>
+                                                    @endif
+                                                </div>
+                                                <div>
+                                                    <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
+                                                        {{ $product->name }}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td
+                                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            {{ $product->stock }}
+                                        </td>
+                                        <td
+                                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                                            @if($product->productBatches->isNotEmpty())
+                                                {{ $product->productBatches->first()->expiry_date->format('d/m/Y') }}
+                                            @else
+                                                -
+                                            @endif
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm">
+                                            @php
+                                                $daysOverdue = $product->productBatches->isNotEmpty() ? now()->diffInDays(
+                                                    $product->productBatches->first()->expiry_date,
+                                                    false,
+                                                ) : 0;
+                                            @endphp
+                                            <span
+                                                class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900 px-3 py-0.5 text-xs font-medium text-red-800 dark:text-red-400">
+                                                {{ abs((int) $daysOverdue) }} hari
+                                            </span>
+                                        </td>
+                                        <td class="whitespace-nowrap px-6 py-4 text-sm">
+                                            <a href="{{ route('products.show', $product) }}"
+                                                class="text-indigo-600 hover:text-indigo-900 dark:text-indigo-400 dark:hover:text-indigo-300 mr-3">
+                                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4"
+                                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                    <path stroke-linecap="round" stroke-linejoin="round"
+                                                        stroke-width="2"
+                                                        d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                                                </svg>
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="px-6 py-8 text-center">
+                                            <svg class="mx-auto h-10 w-10 text-gray-400 dark:text-gray-500 mb-2"
+                                                fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                            </svg>
+                                            <p class="text-gray-500 dark:text-gray-400 font-medium">Tidak ada produk
+                                                yang sudah expired</p>
+                                        </td>
+                                    </tr>
+                                @endforelse
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <!-- Expiring Products Section -->
         <div id="expiring-products"
             class="overflow-hidden rounded-xl bg-white dark:bg-gray-800 shadow-md border border-gray-200 dark:border-gray-700">
@@ -888,20 +1033,20 @@
                                             {{ $product->stock }}
                                         </td>
                                         <td
-                                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                            @if($product->productUnits->isNotEmpty())
-                                                {{ $product->productUnits->first()->expire_date->format('d/m/Y') }}
-                                            @else
-                                                -
-                                            @endif
-                                        </td>
-                                        <td class="whitespace-nowrap px-6 py-4 text-sm">
-                                            @php
-                                                $daysLeft = $product->productUnits->isNotEmpty() ? now()->diffInDays(
-                                                    $product->productUnits->first()->expire_date,
-                                                    false,
-                                                ) : 0;
-                                            @endphp
+                            class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                            @if($product->productBatches->isNotEmpty())
+                                {{ $product->productBatches->first()->expiry_date->format('d/m/Y') }}
+                            @else
+                                -
+                            @endif
+                        </td>
+                        <td class="whitespace-nowrap px-6 py-4 text-sm">
+                            @php
+                                $daysLeft = $product->productBatches->isNotEmpty() ? now()->diffInDays(
+                                    $product->productBatches->first()->expiry_date,
+                                    false,
+                                ) : 0;
+                            @endphp
                                             @if ($daysLeft < 0)
                                                 <span
                                                     class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900 px-3 py-0.5 text-xs font-medium text-red-800 dark:text-red-400">
@@ -976,7 +1121,7 @@
                     </button>
                 </div>
                 <div class="flex-1 overflow-y-auto p-4">
-                    @if ($data['lowStockProducts'] > 0 || $data['totalUpcomingCredits'] > 0)
+                    @if ($data['lowStockProducts'] > 0 || $data['totalUpcomingCredits'] > 0 || (isset($data['expiredProducts']) && $data['expiredProducts']->count() > 0) || (isset($data['expiringProducts']) && $data['expiringProducts']->count() > 0))
                         <div class="mb-4">
                             @if ($data['lowStockProducts'] > 0)
                                 <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
@@ -1040,7 +1185,38 @@
                                 </div>
                             @endif
 
-                            @if (isset($data['expiringProducts']) && is_countable($data['expiringProducts']) && count($data['expiringProducts']) > 0)
+                            @if (isset($data['expiredProducts']) && $data['expiredProducts']->count() > 0)
+                                <div class="bg-red-50 dark:bg-red-900/20 p-4 rounded-lg">
+                                    <div class="flex">
+                                        <div class="flex-shrink-0">
+                                            <svg class="h-5 w-5 text-red-400 dark:text-red-300" fill="none"
+                                                viewBox="0 0 24 24" stroke="currentColor">
+                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                                    d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                            </svg>
+                                        </div>
+                                        <div class="ml-3">
+                                            <h3 class="text-sm font-medium text-red-800 dark:text-red-300">Produk
+                                                Sudah Expired</h3>
+                                            <div class="mt-2 text-sm text-red-700 dark:text-red-200">
+                                                <p>Terdapat {{ $data['expiredProducts']->count() }} produk yang sudah
+                                                    expired. Segera lakukan tindakan untuk menghindari kerugian.
+                                                </p>
+                                            </div>
+                                            <div class="mt-4">
+                                                <div class="-mx-2 -my-1.5 flex">
+                                                    <a href="#expired-products" id="view-expired-products"
+                                                        class="px-2 py-1.5 rounded-md text-sm font-medium text-red-800 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 dark:focus:ring-offset-gray-800">
+                                                        Lihat Produk
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
+                            @if (isset($data['expiringProducts']) && $data['expiringProducts']->count() > 0)
                                 <div class="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
                                     <div class="flex">
                                         <div class="flex-shrink-0">
@@ -1054,10 +1230,10 @@
                                             <h3 class="text-sm font-medium text-yellow-800 dark:text-yellow-300">Produk
                                                 Akan Expired</h3>
                                             <div class="mt-2 text-sm text-yellow-700 dark:text-yellow-200">
-                                                <p>Terdapat {{ count($data['expiringProducts']) }} produk yang akan
-                                                    segera
-                                                    expired. Pastikan untuk memprioritaskan penjualan produk tersebut.
-                                                </p>
+                                                <p>Terdapat {{ $data['expiringProducts']->count() }} produk yang akan
+                                    segera
+                                    expired. Pastikan untuk memprioritaskan penjualan produk tersebut.
+                                </p>
                                             </div>
                                             <div class="mt-4">
                                                 <div class="-mx-2 -my-1.5 flex">
@@ -1136,6 +1312,20 @@
                     });
                 }
 
+                // Handle expired products alert button
+                const viewExpiredProductsBtn = document.getElementById('view-expired-products');
+                if (viewExpiredProductsBtn) {
+                    viewExpiredProductsBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        const expiredProductsSection = document.getElementById('expired-products');
+                        if (expiredProductsSection) {
+                            expiredProductsSection.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+
                 // Handle main alert button
                 const viewExpiringProductsBtn = document.getElementById('view-expiring-products');
                 if (viewExpiringProductsBtn) {
@@ -1144,6 +1334,21 @@
                         const expiringProductsSection = document.getElementById('expiring-products');
                         if (expiringProductsSection) {
                             expiringProductsSection.scrollIntoView({
+                                behavior: 'smooth'
+                            });
+                        }
+                    });
+                }
+
+                // Handle "Lihat Produk" button in the expired products section
+                const viewAllExpiredProductsBtn = document.getElementById('view-all-expired-products');
+                if (viewAllExpiredProductsBtn) {
+                    viewAllExpiredProductsBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        // Scroll to the expired products table
+                        const expiredProductsSection = document.getElementById('expired-products');
+                        if (expiredProductsSection) {
+                            expiredProductsSection.scrollIntoView({
                                 behavior: 'smooth'
                             });
                         }

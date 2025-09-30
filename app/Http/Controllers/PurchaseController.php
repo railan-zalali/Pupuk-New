@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
+use App\Helpers\DateValidationHelper;
 
 class PurchaseController extends Controller
 {
@@ -372,6 +373,7 @@ class PurchaseController extends Controller
             'items.*.purchase_detail_id' => 'required|exists:purchase_details,id',
             'items.*.product_id' => 'required|exists:products,id',
             'items.*.received_quantity' => 'required|integer|min:0',
+            'items.*.expire_date' => DateValidationHelper::getExpireDateRule(),
             'notes' => 'nullable|string',
             'receipt_file' => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:2048',
         ]);
@@ -438,7 +440,7 @@ class PurchaseController extends Controller
                         $baseQuantityReceived,
                         $purchaseDetail->purchase_price,
                         null, // Batch number akan digenerate otomatis
-                        null  // Expiry date bisa ditambahkan jika diperlukan
+                        $item['expire_date'] ?? null  // Ambil expiry date dari form input
                     );
 
                     if ($purchaseDetail->received_quantity < $purchaseDetail->quantity) {

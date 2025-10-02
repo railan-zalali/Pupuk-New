@@ -142,13 +142,13 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan FEFO</h3>
-                                <p class="mt-1 text-sm text-gray-500">Analisis kadaluarsa dengan First Expired First Out</p>
+                                <h3 class="text-lg font-medium text-gray-900">Laporan Stok FEFO</h3>
+                                <p class="mt-1 text-sm text-gray-500">Analisis stok berdasarkan tanggal kadaluarsa (First Expired First Out)</p>
                             </div>
                         </div>
                         <div class="mt-6">
-                            <a href="{{ route('reports.fefo') }}"
-                                class="inline-flex items-center text-sm font-medium text-orange-600 hover:text-orange-500">
+                            <a href="{{ route('reports.fefo-stock') }}"
+                                class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500">
                                 Lihat Laporan
                                 <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

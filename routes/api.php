@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\CategoryController;
-use App\Http\Controllers\API\SaleController;
+use App\Http\Controllers\Api\SaleController;
 use App\Http\Controllers\Api\ProductController as ApiProductController;
 
 Route::get('/user', function (Request $request) {

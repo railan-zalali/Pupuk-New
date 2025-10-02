@@ -131,7 +131,7 @@ Route::middleware('auth')->group(function () {
         Route::get('/reports/stock-in', [ReportController::class, 'stockIn'])->name('reports.stock-in');
         Route::get('/reports/stock-out', [ReportController::class, 'stockOut'])->name('reports.stock-out');
         Route::get('/reports/fifo-stock', [ReportController::class, 'fifoStock'])->name('reports.fifo-stock');
-        Route::get('/reports/fefo', [ReportController::class, 'fefoReport'])->name('reports.fefo');
+        Route::get('/reports/fefo-stock', [ReportController::class, 'fefoStock'])->name('reports.fefo-stock');
         Route::get('/reports/profit-loss', [ReportController::class, 'profitLoss'])->name('reports.profit-loss');
         Route::get('/reports/cash-flow', [ReportController::class, 'cashFlow'])->name('reports.cash-flow');
         Route::get('/reports/accounts', [ReportController::class, 'accounts'])->name('reports.accounts');

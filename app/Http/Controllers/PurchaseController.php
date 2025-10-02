@@ -450,16 +450,16 @@ class PurchaseController extends Controller
                     // Store the current stock before updating
                     $beforeStock = $product->actual_stock;
 
-                    // UBAH BARIS INI - Gunakan baseQuantityReceived, bukan receivedQty
-                    // Update product stock
-                    $product->actual_stock += $baseQuantityReceived; // Menggunakan jumlah yang telah dikonversi
-                    $product->save();
+                    // Update product stock field and sync with batches
+                    $product->increment('stock', $baseQuantityReceived);
+                    $product->syncStockFromBatches();
+                    $product->refresh(); // Refresh to get updated actual_stock
 
-                    // Update stock movement juga
+                    // Update stock movement
                     StockMovement::create([
                         'product_id' => $product->id,
                         'type' => 'in',
-                        'quantity' => $baseQuantityReceived, // Ubah ini juga
+                        'quantity' => $baseQuantityReceived,
                         'before_stock' => $beforeStock,
                         'after_stock' => $product->actual_stock,
                         'reference_type' => 'purchase_receipt',
@@ -643,6 +643,10 @@ class PurchaseController extends Controller
                 $product = Product::findOrFail($detail->product_id);
                 $beforeStock = $product->actual_stock;
                 $product->increment('stock', $baseQuantityReceived);
+                
+                // Sync stock from batches to ensure consistency
+                $product->syncStockFromBatches();
+                $product->refresh(); // Refresh to get updated actual_stock
 
                 // Create stock movement record
                 StockMovement::create([

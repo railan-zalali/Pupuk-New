@@ -117,15 +117,15 @@
                                     </span>
                                 </td>
                                 <td class="px-6 py-4">
-                                    @if ($product->stock <= $product->min_stock)
+                                    @if ($product->actual_stock <= $product->min_stock)
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                            {{ $product->stock }}
+                                            {{ $product->actual_stock }}
                                         </span>
                                     @else
                                         <span
                                             class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                            {{ $product->stock }}
+                                            {{ $product->actual_stock }}
                                         </span>
                                     @endif
                                 </td>
@@ -273,12 +273,12 @@
                                         </span>
                                     </td>
                                     <td class="px-6 py-4">
-                                        ${product.stock <= product.min_stock
+                                        ${product.actual_stock <= product.min_stock
                                             ? `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-red-100 dark:bg-red-900 text-red-800 dark:text-red-200">
-                                                                                    ${product.stock}
+                                                                                    ${product.actual_stock}
                                                                                 </span>`
                                             : `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs bg-green-100 dark:bg-green-900 text-green-800 dark:text-green-200">
-                                                                                    ${product.stock}
+                                                                                    ${product.actual_stock}
                                                                                 </span>`
                                         }
                                     </td>

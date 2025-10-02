@@ -116,8 +116,8 @@
                             <div class="flex justify-between">
                                 <dt class="text-sm text-gray-500 dark:text-gray-400">Stok</dt>
                                 <dd
-                                    class="@if ($product->stock <= $product->min_stock) text-red-600 dark:text-red-400 @else text-green-600 dark:text-green-400 @endif font-medium">
-                                    {{ $product->stock }}
+                                    class="@if ($product->actual_stock <= $product->min_stock) text-red-600 dark:text-red-400 @else text-green-600 dark:text-green-400 @endif font-medium">
+                                    {{ $product->actual_stock }}
                                 </dd>
                             </div>
                             <div class="flex justify-between">

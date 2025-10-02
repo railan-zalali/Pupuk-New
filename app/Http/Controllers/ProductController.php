@@ -542,6 +542,7 @@ class ProductController extends Controller
 
         $beforeStock = $product->actual_stock;
         $quantity = $validated['quantity'];
+        $createStockMovement = true; // Flag untuk menentukan apakah perlu membuat StockMovement
 
         if ($validated['adjustment_type'] === 'add') {
             $product->increment('stock', $quantity);
@@ -576,21 +577,47 @@ class ProductController extends Controller
             if ($product->actual_stock < $quantity) {
                 return back()->with('error', "Stok tidak cukup untuk dikurangi. Stok tersedia: {$product->actual_stock}, diminta: {$quantity}");
             }
-            $product->decrement('stock', $quantity);
+            
+            // Gunakan FifoService untuk mengurangi stok dari batch
+            if (class_exists('\App\Services\FifoService')) {
+                try {
+                    $fifoService = new \App\Services\FifoService();
+                    $fifoService->reduceStock(
+                        $product->id,
+                        $quantity,
+                        'adjustment',
+                        $product->id,
+                        $validated['notes'] ?? 'Stock adjustment - reduction'
+                    );
+                    $createStockMovement = false; // FifoService sudah membuat StockMovement
+                } catch (\Exception $e) {
+                    return back()->with('error', $e->getMessage());
+                }
+            } else {
+                // Fallback jika FifoService tidak tersedia
+                $product->decrement('stock', $quantity);
+            }
+            
             $type = 'out';
         }
+        
+        // Sync stock from batches to ensure consistency
+        $product->syncStockFromBatches();
+        $product->refresh(); // Refresh to get updated actual_stock
 
-        // Record stock movement
-        StockMovement::create([
-            'product_id' => $product->id,
-            'type' => $type,
-            'quantity' => $quantity,
-            'before_stock' => $beforeStock,
-            'after_stock' => $product->actual_stock,
-            'reference_type' => 'adjustment',
-            'reference_id' => $product->id,
-            'notes' => $validated['notes'] ?? null
-        ]);
+        // Record stock movement hanya jika belum dibuat oleh FifoService
+        if ($createStockMovement) {
+            StockMovement::create([
+                'product_id' => $product->id,
+                'type' => $type,
+                'quantity' => $quantity,
+                'before_stock' => $beforeStock,
+                'after_stock' => $product->actual_stock,
+                'reference_type' => 'adjustment',
+                'reference_id' => $product->id,
+                'notes' => $validated['notes'] ?? null
+            ]);
+        }
 
         return back()->with('success', 'Stock updated successfully');
     }

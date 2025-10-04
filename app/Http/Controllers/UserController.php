@@ -15,6 +15,28 @@ class UserController extends Controller
         return view('users.index', compact('users'));
     }
 
+    public function approve(User $user)
+    {
+        if ($user->approval_status === 'approved') {
+            return back()->with('error', 'User sudah disetujui sebelumnya.');
+        }
+
+        $user->approve(auth()->id());
+
+        return back()->with('success', 'User berhasil disetujui.');
+    }
+
+    public function reject(User $user)
+    {
+        if ($user->approval_status === 'rejected') {
+            return back()->with('error', 'User sudah ditolak sebelumnya.');
+        }
+
+        $user->reject(auth()->id());
+
+        return back()->with('success', 'User berhasil ditolak.');
+    }
+
     public function create()
     {
         $roles = Role::all();

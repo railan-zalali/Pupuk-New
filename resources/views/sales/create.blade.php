@@ -90,10 +90,10 @@
 
         @if ($draft)
             <!-- Draft Info Banner -->
-            <div class="mb-6 bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md">
+            <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-md">
                 <div class="flex">
                     <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-yellow-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
                             fill="currentColor">
                             <path fill-rule="evenodd"
                                 d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
@@ -101,7 +101,7 @@
                         </svg>
                     </div>
                     <div class="ml-3">
-                        <p class="text-sm text-yellow-700">
+                        <p class="text-sm text-yellow-700 dark:text-yellow-200">
                             Anda sedang memproses draft penjualan. Periksa data dan selesaikan transaksi dengan menekan
                             tombol <strong>Simpan Transaksi</strong>. Jika ingin tetap menyimpan sebagai draft, gunakan
                             tombol <strong>Simpan Sebagai Draft</strong>.
@@ -849,18 +849,7 @@
                 </button>
             </div>
 
-            {{-- <div id="barcode-scan-button" class="tooltip-container">
-                <button type="button" onclick="showBarcodeScanner()"
-                    class="inline-flex items-center justify-center p-3 rounded-full bg-green-600 text-white shadow-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-colors"
-                    title="Scan Barcode (Alt+B)">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h4M4 12h4m12 0h.01M5 8h2a1 1 0 001-1V5a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1zm12 0h2a1 1 0 001-1V5a1 1 0 00-1-1h-2a1 1 0 00-1 1v2a1 1 0 001 1zM5 20h2a1 1 0 001-1v-2a1 1 0 00-1-1H5a1 1 0 00-1 1v2a1 1 0 001 1z" />
-                    </svg>
-                </button>
-                <div class="tooltip">Scan Barcode (Alt+B)</div>
-            </div> --}}
+            
 
             <div id="help-button" class="tooltip-container">
                 <button type="button"

@@ -25,17 +25,17 @@
 
         <div class="p-6 text-gray-900">
             @if (session('success'))
-                <div class="mb-4 rounded-md bg-green-50 p-4">
+                <div class="mb-4 rounded-md bg-green-50 dark:bg-green-900/50 border border-green-200 dark:border-green-700 p-4">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-green-400" viewBox="0 0 20 20" fill="currentColor">
+                            <svg class="h-5 w-5 text-green-400 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
                                     clip-rule="evenodd" />
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-green-800">
+                            <p class="text-sm font-medium text-green-800 dark:text-green-200">
                                 {{ session('success') }}
                             </p>
                         </div>
@@ -44,17 +44,17 @@
             @endif
 
             @if (session('error'))
-                <div class="mb-4 rounded-md bg-red-50 p-4">
+                <div class="mb-4 rounded-md bg-red-50 dark:bg-red-900/50 border border-red-200 dark:border-red-700 p-4">
                     <div class="flex">
                         <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                            <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
                                 <path fill-rule="evenodd"
                                     d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
                                     clip-rule="evenodd" />
                             </svg>
                         </div>
                         <div class="ml-3">
-                            <p class="text-sm font-medium text-red-800">
+                            <p class="text-sm font-medium text-red-800 dark:text-red-200">
                                 {{ session('error') }}
                             </p>
                         </div>
@@ -80,6 +80,10 @@
                             </th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                Status Persetujuan
+                            </th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                 Aksi
                             </th>
                         </tr>
@@ -97,8 +101,58 @@
                                         </span>
                                     @endforeach
                                 </td>
+                                <td class="px-6 py-4 whitespace-nowrap">
+                                    @if($user->approval_status === 'approved')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 dark:bg-green-700 text-green-800 dark:text-green-300">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Disetujui
+                                        </span>
+                                    @elseif($user->approval_status === 'pending')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 dark:bg-yellow-700 text-yellow-800 dark:text-yellow-300">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Menunggu
+                                        </span>
+                                    @elseif($user->approval_status === 'rejected')
+                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 dark:bg-red-700 text-red-800 dark:text-red-300">
+                                            <svg class="w-3 h-3 mr-1" fill="currentColor" viewBox="0 0 20 20">
+                                                <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                            </svg>
+                                            Ditolak
+                                        </span>
+                                    @endif
+                                </td>
                                 <td class="whitespace-nowrap px-6 py-4">
                                     <div class="flex items-center space-x-3">
+                                        <!-- Approval Actions -->
+                                        @if($user->approval_status === 'pending')
+                                            <form action="{{ route('users.approve', $user) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" 
+                                                    class="p-2 text-green-600 dark:text-green-400 hover:text-green-900 dark:hover:text-green-200 rounded-full hover:bg-green-50 dark:hover:bg-green-900/50"
+                                                    title="Setujui User">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                            <form action="{{ route('users.reject', $user) }}" method="POST" class="inline">
+                                                @csrf
+                                                <button type="submit" 
+                                                    class="p-2 text-red-600 dark:text-red-400 hover:text-red-900 dark:hover:text-red-200 rounded-full hover:bg-red-50 dark:hover:bg-red-900/50"
+                                                    title="Tolak User"
+                                                    onclick="return confirm('Apakah Anda yakin ingin menolak user ini?')">
+                                                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                                                        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
+                                                    </svg>
+                                                </button>
+                                            </form>
+                                        @endif
+
+                                        <!-- Regular Actions -->
                                         <a href="{{ route('users.edit', $user) }}"
                                             class="p-2 text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-200 rounded-full hover:bg-blue-50 dark:hover:bg-blue-900/50">
                                             <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none"

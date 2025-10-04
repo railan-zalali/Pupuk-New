@@ -1,6 +1,6 @@
 <x-app-layout>
     <x-slot name="header">
-        <h2 class="text-xl font-semibold leading-tight text-gray-800">
+        <h2 class="text-xl font-semibold leading-tight text-gray-800 dark:text-gray-200">
             {{ __('Laporan') }}
         </h2>
     </x-slot>
@@ -9,7 +9,7 @@
         <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
                 {{-- Kartu Laporan Penjualan --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-blue-100 rounded-full">
@@ -21,8 +21,8 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Penjualan</h3>
-                                <p class="mt-1 text-sm text-gray-500">Lihat laporan transaksi penjualan secara detail
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Penjualan</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Lihat laporan transaksi penjualan secara detail
                                 </p>
                             </div>
                         </div>
@@ -40,7 +40,7 @@
                 </div>
 
                 {{-- Kartu Laporan Pembelian --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-yellow-100 rounded-full">
@@ -52,8 +52,8 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Pembelian</h3>
-                                <p class="mt-1 text-sm text-gray-500">Lihat laporan transaksi pembelian secara detail</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Pembelian</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Lihat laporan transaksi pembelian secara detail</p>
                             </div>
                         </div>
                         <div class="mt-6">
@@ -67,10 +67,11 @@
                             </a>
                         </div>
                     </div>
-                </div>
+                </div>  
+                
 
                 {{-- Kartu Laporan Stok --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-green-100 rounded-full">
@@ -82,8 +83,8 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Stok</h3>
-                                <p class="mt-1 text-sm text-gray-500">Pantau status inventaris Anda</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Stok</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Pantau status inventaris Anda</p>
                             </div>
                         </div>
                         <div class="mt-6">
@@ -100,7 +101,7 @@
                 </div>
 
                 {{-- Kartu Laporan Stok FIFO --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-teal-100 rounded-full">
@@ -112,13 +113,13 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Stok FIFO</h3>
-                                <p class="mt-1 text-sm text-gray-500">Valuasi stok dengan metode First In First Out</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Stok FIFO</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Valuasi stok dengan metode First In First Out</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('reports.fifo-stock') }}"
-                                class="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-500">
+                                class="inline-flex items-center text-sm font-medium text-teal-600 hover:text-teal-500 dark:text-gray-200">
                                 Lihat Laporan
                                 <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -130,7 +131,7 @@
                 </div>
 
                 {{-- Kartu Laporan FEFO --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-orange-100 rounded-full">
@@ -142,13 +143,13 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Stok FEFO</h3>
-                                <p class="mt-1 text-sm text-gray-500">Analisis stok berdasarkan tanggal kadaluarsa (First Expired First Out)</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Stok FEFO</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Analisis stok berdasarkan tanggal kadaluarsa (First Expired First Out)</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('reports.fefo-stock') }}"
-                                class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                class="inline-flex items-center text-sm font-medium text-indigo-600 hover:text-indigo-500 dark:text-gray-200">
                                 Lihat Laporan
                                 <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -160,7 +161,7 @@
                 </div>
 
                 {{-- Kartu Laporan Laba/Rugi --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-purple-100 rounded-full">
@@ -172,13 +173,13 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Laba/Rugi</h3>
-                                <p class="mt-1 text-sm text-gray-500">Tinjau kinerja keuangan</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Laba/Rugi</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Tinjau kinerja keuangan</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('reports.profit-loss') }}"
-                                class="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-500">
+                                class="inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-500 dark:text-gray-200">
                                 Lihat Laporan
                                 <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -190,7 +191,7 @@
                 </div>
 
                 {{-- Kartu Laporan Arus Kas --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-indigo-100 rounded-full">
@@ -202,8 +203,8 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Arus Kas</h3>
-                                <p class="mt-1 text-sm text-gray-500">Pantau pergerakan kas masuk dan keluar</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Arus Kas</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Pantau pergerakan kas masuk dan keluar</p>
                             </div>
                         </div>
                         <div class="mt-6">
@@ -220,7 +221,7 @@
                 </div>
 
                 {{-- Kartu Laporan Hutang Piutang --}}
-                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow">
+                <div class="overflow-hidden rounded-lg bg-white shadow-sm hover:shadow-md transition-shadow dark:bg-gray-800 dark:hover:shadow-dark-md">
                     <div class="p-6">
                         <div class="flex items-center">
                             <div class="flex-shrink-0 p-3 bg-pink-100 rounded-full">
@@ -232,13 +233,13 @@
                                 </svg>
                             </div>
                             <div class="ml-4">
-                                <h3 class="text-lg font-medium text-gray-900">Laporan Hutang Piutang</h3>
-                                <p class="mt-1 text-sm text-gray-500">Kelola hutang dan piutang</p>
+                                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-200">Laporan Hutang Piutang</h3>
+                                <p class="mt-1 text-sm text-gray-500 dark:text-gray-300">Kelola hutang dan piutang</p>
                             </div>
                         </div>
                         <div class="mt-6">
                             <a href="{{ route('reports.accounts') }}"
-                                class="inline-flex items-center text-sm font-medium text-pink-600 hover:text-pink-500">
+                                class="inline-flex items-center text-sm font-medium text-pink-600 hover:text-pink-500 dark:text-gray-200">
                                 Lihat Laporan
                                 <svg class="ml-1 w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"

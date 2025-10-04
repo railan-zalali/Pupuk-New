@@ -70,16 +70,16 @@
                                         class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                         Nama</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Telepon</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Alamat</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Total Pembelian</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Aksi</th>
                                 </tr>
                             </thead>
@@ -89,9 +89,9 @@
                                         <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $supplier->name }}</p>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4">{{ $supplier->phone }}</td>
-                                        <td class="px-6 py-4">{{ Str::limit($supplier->address, 50) }}</td>
-                                        <td class="px-6 py-4">{{ $supplier->purchases_count }}</td>
+                                        <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $supplier->phone }}</td>
+                                        <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ Str::limit($supplier->address, 50) }}</td>
+                                        <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $supplier->purchases_count }}</td>
                                         <td class="whitespace-nowrap px-6 py-4">
                                             <div class="flex items-center space-x-3">
                                             <a href="{{ route('suppliers.show', $supplier) }}"

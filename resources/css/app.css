@@ -1,6 +1,125 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Global Smooth Transitions */
+* {
+    @apply transition-colors duration-200 ease-in-out;
+}
+
+/* Enhanced Button Animations */
+.btn, button, [role="button"] {
+    @apply transition-all duration-200 ease-in-out transform;
+}
+
+.btn:hover, button:hover, [role="button"]:hover {
+    @apply scale-105;
+}
+
+.btn:active, button:active, [role="button"]:active {
+    @apply scale-95;
+}
+
+/* Card Hover Effects */
+.card, .content-card {
+    @apply transition-all duration-300 ease-in-out;
+}
+
+.card:hover, .content-card:hover {
+    @apply shadow-lg transform translate-y-[-2px];
+}
+
+/* Form Input Focus Animations */
+input, textarea, select {
+    @apply transition-all duration-200 ease-in-out;
+}
+
+input:focus, textarea:focus, select:focus {
+    @apply transform scale-[1.02];
+}
+
+/* Link Hover Effects */
+a {
+    @apply transition-all duration-200 ease-in-out;
+}
+
+/* Table Row Hover Effects */
+tr {
+    @apply transition-all duration-150 ease-in-out;
+}
+
+/* Loading Animation */
+@keyframes pulse-slow {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.5; }
+}
+
+.animate-pulse-slow {
+    animation: pulse-slow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Fade In Animation */
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Slide In Animation */
+@keyframes slideIn {
+    from { transform: translateX(-100%); }
+    to { transform: translateX(0); }
+}
+
+.animate-slide-in {
+    animation: slideIn 0.3s ease-out;
+}
+
+/* Responsive Design Improvements */
+@media (max-width: 768px) {
+    /* Mobile-specific adjustments */
+    .card:hover, .content-card:hover {
+        @apply shadow-md transform translate-y-[-1px];
+    }
+    
+    .btn:hover, button:hover, [role="button"]:hover {
+        @apply scale-[1.02];
+    }
+    
+    /* Reduce animations on mobile for better performance */
+    .animate-fade-in {
+        animation: none;
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@media (max-width: 640px) {
+    /* Small mobile adjustments */
+    input:focus, textarea:focus, select:focus {
+        @apply transform scale-100;
+    }
+}
+
+/* Print styles */
+@media print {
+    .sidebar, .app-header, .no-print {
+        display: none !important;
+    }
+    
+    .main-content {
+        margin-left: 0 !important;
+        width: 100% !important;
+    }
+    
+    * {
+        transition: none !important;
+        animation: none !important;
+    }
+}
 /* Custom Scrollbar */
 ::-webkit-scrollbar {
     width: 8px;
@@ -94,11 +213,102 @@
 }
 
 .sidebar {
-    @apply bg-white dark:bg-gray-800 transition-all duration-300 ease-in-out fixed lg:static z-50;
+    @apply bg-white dark:bg-gray-800 transition-all duration-300 ease-in-out z-50;
+    width: 280px;
 }
 
-.sidebar.collapsed {
-    @apply w-20;
+/* Desktop - sidebar is always visible and static */
+@media (min-width: 1024px) {
+    .sidebar {
+        @apply static;
+    }
+    
+    .sidebar.collapsed {
+        @apply w-20;
+    }
+    
+    .main-content {
+        margin-left: 280px;
+        transition: margin-left 0.3s ease-in-out;
+    }
+    
+    .main-content.expanded {
+        margin-left: 80px;
+    }
+}
+
+/* Desktop - normal sidebar behavior */
+@media (min-width: 1024px) {
+    .sidebar {
+        @apply relative transform-none flex-shrink-0;
+        width: 280px;
+        transition: width 0.3s ease-in-out;
+    }
+    
+    .sidebar.collapsed {
+        width: 80px;
+    }
+    
+    .main-content {
+        @apply flex-1;
+        margin-left: 0;
+        transition: all 0.3s ease-in-out;
+    }
+}
+
+/* Tablet - sidebar overlay with backdrop */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .sidebar {
+        @apply fixed left-0 top-0 h-full transform -translate-x-full;
+        width: 280px;
+    }
+    
+    .sidebar.open {
+        @apply translate-x-0;
+    }
+    
+    .sidebar.collapsed {
+        @apply -translate-x-full;
+        width: 280px;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* Mobile - sidebar overlay with backdrop */
+@media (max-width: 767px) {
+    .sidebar {
+        @apply fixed left-0 top-0 h-full transform -translate-x-full;
+        width: 280px;
+    }
+    
+    .sidebar.open {
+        @apply translate-x-0;
+    }
+    
+    .sidebar.collapsed {
+        @apply -translate-x-full;
+        width: 280px;
+    }
+    
+    .main-content {
+        margin-left: 0;
+        width: 100%;
+    }
+}
+
+/* Backdrop overlay for mobile and tablet */
+.sidebar-backdrop {
+    @apply fixed inset-0 bg-black bg-opacity-50 z-40 transition-opacity duration-300;
+}
+
+@media (min-width: 1024px) {
+    .sidebar-backdrop {
+        display: none !important;
+    }
 }
 
 .nav-group {

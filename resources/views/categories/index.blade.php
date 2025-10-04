@@ -70,13 +70,13 @@
                                         class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                         Nama</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Deskripsi</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Jumlah Produk</th>
                                     <th
-                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500">
+                                        class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-500 dark:text-gray-300">
                                         Aksi</th>
                                 </tr>
                             </thead>
@@ -86,8 +86,8 @@
                                         <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $category->name }}</p>
                                             </div>
                                         </td>
-                                        <td class="px-6 py-4">{{ $category->description ?? '-' }}</td>
-                                        <td class="px-6 py-4">{{ $category->products_count }}</td>
+                                        <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $category->description ?? '-' }}</td>
+                                        <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $category->products_count }}</td>
                                         <td class="whitespace-nowrap px-6 py-4">
                                             <div class="flex items-center space-x-3">
                                             <a href="{{ route('categories.show', $category) }}"

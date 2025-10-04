@@ -41,6 +41,8 @@ Route::middleware('auth')->group(function () {
     Route::middleware(['auth', 'role:admin'])->group(function () {
         Route::resource('categories', CategoryController::class);
         Route::resource('users', UserController::class);
+        Route::post('users/{user}/approve', [UserController::class, 'approve'])->name('users.approve');
+        Route::post('users/{user}/reject', [UserController::class, 'reject'])->name('users.reject');
         Route::resource('roles', RoleController::class);
     });
 

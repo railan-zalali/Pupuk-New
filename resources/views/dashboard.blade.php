@@ -58,7 +58,7 @@
         <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             <!-- Daily Sales Card -->
             <div
-                class="overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                class="animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105">
                 <div class="px-6 py-5 relative">
                     <div class="absolute right-0 top-0 opacity-10">
                         <svg class="h-32 w-32 -mr-6 -mt-6" fill="currentColor" viewBox="0 0 24 24">
@@ -69,7 +69,7 @@
                     <div class="relative">
                         <h3 class="text-sm font-medium text-blue-100 opacity-90">Penjualan Harian</h3>
                         <div class="mt-2 flex items-baseline">
-                            <p class="text-3xl font-bold">
+                            <p class="text-md font-bold">
                                 Rp {{ number_format($data['totalSalesToday'], 0, ',', '.') }}
                             </p>
                         </div>
@@ -112,7 +112,8 @@
 
             <!-- Monthly Sales Card -->
             <div
-                class="overflow-hidden rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                class="animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br from-green-500 to-green-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
+                style="animation-delay: 0.1s;">
                 <div class="px-6 py-5 relative">
                     <div class="absolute right-0 top-0 opacity-10">
                         <svg class="h-32 w-32 -mr-6 -mt-6" fill="currentColor" viewBox="0 0 24 24">
@@ -123,7 +124,7 @@
                     <div class="relative">
                         <h3 class="text-sm font-medium text-green-100 opacity-90">Penjualan Bulanan</h3>
                         <div class="mt-2 flex items-baseline">
-                            <p class="text-3xl font-bold">
+                            <p class="text-3x font-bold">
                                 Rp {{ number_format($data['totalSalesThisMonth'], 0, ',', '.') }}
                             </p>
                         </div>
@@ -167,7 +168,8 @@
 
             <!-- Products Card -->
             <div
-                class="overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                class="animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
+                style="animation-delay: 0.2s;">
                 <div class="px-6 py-5 relative">
                     <div class="absolute right-0 top-0 opacity-10">
                         <svg class="h-32 w-32 -mr-6 -mt-6" fill="currentColor" viewBox="0 0 24 24">
@@ -178,7 +180,7 @@
                     <div class="relative">
                         <h3 class="text-sm font-medium text-indigo-100 opacity-90">Total Produk</h3>
                         <div class="mt-2 flex items-baseline">
-                            <p class="text-3xl font-bold">
+                            <p class="text-3x font-bold">
                                 {{ number_format($data['totalProducts']) }}
                             </p>
                         </div>
@@ -221,7 +223,8 @@
 
             <!-- Credit Card -->
             <div
-                class="overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl">
+                class="animate-fade-in overflow-hidden rounded-xl bg-gradient-to-br from-orange-500 to-orange-600 text-white shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
+                style="animation-delay: 0.3s;">
                 <div class="px-6 py-5 relative">
                     <div class="absolute right-0 top-0 opacity-10">
                         <svg class="h-32 w-32 -mr-6 -mt-6" fill="currentColor" viewBox="0 0 24 24">
@@ -231,7 +234,7 @@
                     <div class="relative">
                         <h3 class="text-sm font-medium text-orange-100 opacity-90">Kredit Bulanan</h3>
                         <div class="mt-2 flex items-baseline">
-                            <p class="text-3xl font-bold">
+                            <p class="text-3x font-bold">
                                 Rp {{ number_format($data['totalCreditAmount'], 0, ',', '.') }}
                             </p>
                         </div>
@@ -291,7 +294,7 @@
                 <div class="p-6">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Stok Keluar Harian</h3>
                     <div class="mt-2">
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white">
+                        <p class="text-3x font-bold text-gray-900 dark:text-white">
                             {{ number_format($data['dailyOutgoingStock'], 0, ',', '.') }} unit
                         </p>
                     </div>
@@ -336,7 +339,7 @@
                 <div class="p-6">
                     <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Stok Masuk Harian</h3>
                     <div class="mt-2">
-                        <p class="text-3xl font-bold text-gray-900 dark:text-white">
+                        <p class="text-3x font-bold text-gray-900 dark:text-white">
                             {{ number_format($data['dailyIncomingStock'], 0, ',', '.') }} unit
                         </p>
                     </div>
@@ -580,6 +583,37 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination for Low Stock Alerts -->
+                        @if($data['lowStockAlerts']->hasPages())
+                            <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Menampilkan {{ $data['lowStockAlerts']->firstItem() ?? 0 }} sampai {{ $data['lowStockAlerts']->lastItem() ?? 0 }} dari {{ $data['lowStockAlerts']->total() }} produk
+                                    </div>
+                                    <div class="flex space-x-1">
+                                        @if ($data['lowStockAlerts']->onFirstPage())
+                                            <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Sebelumnya</span>
+                                        @else
+                                            <a href="{{ $data['lowStockAlerts']->previousPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Sebelumnya</a>
+                                        @endif
+                                        
+                                        @foreach ($data['lowStockAlerts']->getUrlRange(1, $data['lowStockAlerts']->lastPage()) as $page => $url)
+                                            @if ($page == $data['lowStockAlerts']->currentPage())
+                                                <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded">{{ $page }}</span>
+                                            @else
+                                                <a href="{{ $url }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">{{ $page }}</a>
+                                            @endif
+                                        @endforeach
+                                        
+                                        @if ($data['lowStockAlerts']->hasMorePages())
+                                            <a href="{{ $data['lowStockAlerts']->nextPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Selanjutnya</a>
+                                        @else
+                                            <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Selanjutnya</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -789,6 +823,37 @@
                                 </tbody>
                             </table>
                         </div>
+                        <!-- Pagination for Recent Transactions -->
+                        @if($data['recentTransactions']->hasPages())
+                            <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+                                <div class="flex items-center justify-between">
+                                    <div class="text-sm text-gray-500 dark:text-gray-400">
+                                        Menampilkan {{ $data['recentTransactions']->firstItem() ?? 0 }} sampai {{ $data['recentTransactions']->lastItem() ?? 0 }} dari {{ $data['recentTransactions']->total() }} transaksi
+                                    </div>
+                                    <div class="flex space-x-1">
+                                        @if ($data['recentTransactions']->onFirstPage())
+                                            <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Sebelumnya</span>
+                                        @else
+                                            <a href="{{ $data['recentTransactions']->previousPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Sebelumnya</a>
+                                        @endif
+                                        
+                                        @foreach ($data['recentTransactions']->getUrlRange(1, $data['recentTransactions']->lastPage()) as $page => $url)
+                                            @if ($page == $data['recentTransactions']->currentPage())
+                                                <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded">{{ $page }}</span>
+                                            @else
+                                                <a href="{{ $url }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">{{ $page }}</a>
+                                            @endif
+                                        @endforeach
+                                        
+                                        @if ($data['recentTransactions']->hasMorePages())
+                                            <a href="{{ $data['recentTransactions']->nextPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Selanjutnya</a>
+                                        @else
+                                            <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Selanjutnya</span>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        @endif
                     </div>
                 </div>
             </div>
@@ -935,6 +1000,37 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Pagination for Expired Products -->
+                    @if($data['expiredProducts']->hasPages())
+                        <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    Menampilkan {{ $data['expiredProducts']->firstItem() ?? 0 }} sampai {{ $data['expiredProducts']->lastItem() ?? 0 }} dari {{ $data['expiredProducts']->total() }} produk
+                                </div>
+                                <div class="flex space-x-1">
+                                    @if ($data['expiredProducts']->onFirstPage())
+                                        <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Sebelumnya</span>
+                                    @else
+                                        <a href="{{ $data['expiredProducts']->previousPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Sebelumnya</a>
+                                    @endif
+                                    
+                                    @foreach ($data['expiredProducts']->getUrlRange(1, $data['expiredProducts']->lastPage()) as $page => $url)
+                                        @if ($page == $data['expiredProducts']->currentPage())
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded">{{ $page }}</span>
+                                        @else
+                                            <a href="{{ $url }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">{{ $page }}</a>
+                                        @endif
+                                    @endforeach
+                                    
+                                    @if ($data['expiredProducts']->hasMorePages())
+                                        <a href="{{ $data['expiredProducts']->nextPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Selanjutnya</a>
+                                    @else
+                                        <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Selanjutnya</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>
@@ -1097,6 +1193,37 @@
                             </tbody>
                         </table>
                     </div>
+                    <!-- Pagination for Expiring Products -->
+                    @if($data['expiringProducts']->hasPages())
+                        <div class="px-6 py-3 border-t border-gray-200 dark:border-gray-700">
+                            <div class="flex items-center justify-between">
+                                <div class="text-sm text-gray-500 dark:text-gray-400">
+                                    Menampilkan {{ $data['expiringProducts']->firstItem() ?? 0 }} sampai {{ $data['expiringProducts']->lastItem() ?? 0 }} dari {{ $data['expiringProducts']->total() }} produk
+                                </div>
+                                <div class="flex space-x-1">
+                                    @if ($data['expiringProducts']->onFirstPage())
+                                        <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Sebelumnya</span>
+                                    @else
+                                        <a href="{{ $data['expiringProducts']->previousPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Sebelumnya</a>
+                                    @endif
+                                    
+                                    @foreach ($data['expiringProducts']->getUrlRange(1, $data['expiringProducts']->lastPage()) as $page => $url)
+                                        @if ($page == $data['expiringProducts']->currentPage())
+                                            <span class="px-3 py-1 text-sm bg-blue-600 text-white rounded">{{ $page }}</span>
+                                        @else
+                                            <a href="{{ $url }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded">{{ $page }}</a>
+                                        @endif
+                                    @endforeach
+                                    
+                                    @if ($data['expiringProducts']->hasMorePages())
+                                        <a href="{{ $data['expiringProducts']->nextPageUrl() }}" class="px-3 py-1 text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300">Selanjutnya</a>
+                                    @else
+                                        <span class="px-3 py-1 text-sm text-gray-400 dark:text-gray-600 cursor-not-allowed">Selanjutnya</span>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                    @endif
                 </div>
             </div>
         </div>

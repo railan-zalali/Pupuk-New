@@ -39,12 +39,22 @@ class RegisteredUserController extends Controller
             'name' => $request->name,
             'email' => $request->email,
             'password' => Hash::make($request->password),
+            'approval_status' => 'pending',
         ]);
 
         event(new Registered($user));
 
-        Auth::login($user);
+        // Don't automatically log in the user
+        // Auth::login($user);
 
-        return redirect(route('dashboard', absolute: false));
+        return redirect(route('registration.pending'))->with('success', 'Akun Anda telah dibuat dan menunggu persetujuan admin.');
+    }
+
+    /**
+     * Display the pending approval page.
+     */
+    public function pending(): View
+    {
+        return view('auth.pending-approval');
     }
 }

@@ -31,7 +31,7 @@
         }
 
         .app-header {
-            @apply bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 px-4 py-3;
+            /* Header styles are now inline for better control */
         }
 
         .content-card {
@@ -71,60 +71,131 @@
     </style>
 </head>
 
-<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100" x-data="{ sidebarOpen: true }">
+<body class="bg-gray-50 dark:bg-gray-900 text-gray-800 dark:text-gray-100" 
+    x-data="{ 
+        sidebarOpen: true,
+        sidebarCollapsed: false,
+        isMobile: window.innerWidth < 1024,
+        init() {
+            this.handleResize();
+            window.addEventListener('resize', () => this.handleResize());
+        },
+        handleResize() {
+            this.isMobile = window.innerWidth < 1024;
+            if (window.innerWidth >= 1024) {
+                // Desktop: sidebar is always visible, just toggle collapsed state
+                this.sidebarOpen = true;
+            } else {
+                // Mobile/Tablet: sidebar can be hidden/shown
+                this.sidebarOpen = false;
+                this.sidebarCollapsed = false;
+            }
+        },
+        toggleSidebar() {
+            if (this.isMobile) {
+                // Mobile/Tablet: toggle visibility
+                this.sidebarOpen = !this.sidebarOpen;
+            } else {
+                // Desktop: toggle collapsed state
+                this.sidebarCollapsed = !this.sidebarCollapsed;
+            }
+        },
+        closeSidebar() {
+            if (this.isMobile) {
+                this.sidebarOpen = false;
+            }
+        }
+    }">
     <div class="flex h-screen overflow-hidden">
+        <!-- Backdrop for mobile/tablet -->
+        <div x-show="sidebarOpen && isMobile" 
+             x-transition:enter="transition-opacity ease-out duration-300"
+             x-transition:enter-start="opacity-0"
+             x-transition:enter-end="opacity-100"
+             x-transition:leave="transition-opacity ease-in duration-200"
+             x-transition:leave-start="opacity-100"
+             x-transition:leave-end="opacity-0"
+             @click="closeSidebar()"
+             class="sidebar-backdrop"></div>
+
         <!-- Sidebar -->
         @include('layouts.sidebar')
 
         <!-- Main Content -->
-        <div class="flex-1 flex flex-col h-screen overflow-y-auto"
-            :class="sidebarOpen ? 'main-content' : 'main-content expanded'">
+        <div class="flex-1 flex flex-col h-screen overflow-y-auto main-content">
 
             <!-- Header -->
-            <header class="app-header sticky top-0 z-10">
-                <div class="max-w-7xl mx-auto flex items-center justify-between">
-                    <div class="flex items-center gap-4">
+            <header class="app-header sticky top-0 z-10 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 border-b border-gray-200/50 dark:border-gray-700/50">
+                <div class="max-w-7xl mx-auto flex items-center justify-between px-3 sm:px-4 py-3">
+                    <div class="flex items-center gap-2 sm:gap-4">
                         <!-- Toggle Sidebar Button -->
-                        <button @click="sidebarOpen = !sidebarOpen"
-                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <i class="ti ti-menu-2 text-xl text-gray-500 dark:text-gray-400"></i>
+                        <button @click="toggleSidebar()"
+                            class="p-2 sm:p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 group">
+                            <i class="ti ti-menu-2 text-lg sm:text-xl text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-200" 
+                               :class="{ 'rotate-90': !sidebarOpen }"></i>
                         </button>
 
                         <!-- Page title -->
-                        {{-- <span class="text-lg font-semibold hidden md:block">{{ config('app.name', 'Laravel') }}</span> --}}
+                        <div class="hidden sm:flex items-center gap-2">
+                            <div class="w-7 h-7 sm:w-8 sm:h-8 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 flex items-center justify-center">
+                                <i class="ti ti-leaf text-white text-sm sm:text-lg"></i>
+                            </div>
+                            <span class="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-200">{{ config('app.name', 'Laravel') }}</span>
+                        </div>
+                        
+                        <!-- Mobile page title -->
+                        <div class="flex sm:hidden items-center gap-2">
+                            <div class="w-6 h-6 rounded-lg bg-gradient-to-r from-indigo-500 to-violet-500 flex items-center justify-center">
+                                <i class="ti ti-leaf text-white text-xs"></i>
+                            </div>
+                            <span class="text-sm font-semibold text-gray-800 dark:text-gray-200">{{ substr(config('app.name', 'Laravel'), 0, 10) }}</span>
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-3">
-                        <!-- Search -->
-                        <div class="hidden md:flex items-center relative mx-2">
-                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                <i class="ti ti-search text-gray-400"></i>
-                            </div>
-                            <input type="text" placeholder="Cari..."
-                                class="border border-gray-200 dark:border-gray-700 rounded-lg pl-10 pr-4 py-2 text-sm w-64 bg-gray-50 dark:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-indigo-500">
-                        </div>
+                    <div class="flex items-center gap-1 sm:gap-3">
+
 
                         <!-- Dark mode toggle -->
                         <button @click="darkMode = !darkMode"
-                            class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
-                            <i x-show="!darkMode" class="ti ti-sun text-xl text-amber-500"></i>
-                            <i x-show="darkMode" class="ti ti-moon text-xl text-blue-400"></i>
+                            class="p-2 sm:p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 hover:scale-105 active:scale-95 group">
+                            <i x-show="!darkMode" 
+                               x-transition:enter="transition ease-out duration-200"
+                               x-transition:enter-start="opacity-0 rotate-90"
+                               x-transition:enter-end="opacity-100 rotate-0"
+                               x-transition:leave="transition ease-in duration-200"
+                               x-transition:leave-start="opacity-100 rotate-0"
+                               x-transition:leave-end="opacity-0 rotate-90"
+                               class="ti ti-sun text-lg sm:text-xl text-amber-500 group-hover:text-amber-600 transition-colors duration-200"></i>
+                            <i x-show="darkMode" 
+                               x-transition:enter="transition ease-out duration-200"
+                               x-transition:enter-start="opacity-0 rotate-90"
+                               x-transition:enter-end="opacity-100 rotate-0"
+                               x-transition:leave="transition ease-in duration-200"
+                               x-transition:leave-start="opacity-100 rotate-0"
+                               x-transition:leave-end="opacity-0 rotate-90"
+                               class="ti ti-moon text-lg sm:text-xl text-blue-400 group-hover:text-blue-500 transition-colors duration-200"></i>
                         </button>
 
                         <!-- Notifications -->
                         <div class="relative" x-data="{ open: false }">
-                            <button @click="open = !open"
-                                class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors relative">
-                                <i class="ti ti-bell text-xl text-gray-500 dark:text-gray-400"></i>
+                            <button id="notification-btn"
+                                class="p-2 sm:p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative group hover:scale-105 active:scale-95">
+                                <i class="ti ti-bell text-lg sm:text-xl text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200"></i>
                                 <span
-                                    class="absolute top-1 right-1 h-2.5 w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800"></span>
+                                    class="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800 animate-pulse"></span>
                             </button>
 
                             <!-- Notifications dropdown -->
                             <div x-show="open" @click.away="open = false"
-                                class="absolute right-0 mt-2 w-80 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
-                                x-cloak x-transition>
-                                <div class="px-4 py-2.5 font-semibold border-b border-gray-100 dark:border-gray-700">
+                                class="absolute right-0 mt-2 w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700"
+                                x-cloak 
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 scale-95 translate-y-1">
+                                <div class="px-4 py-3 font-semibold border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100">
                                     Notifikasi
                                 </div>
                                 <div class="p-4 text-sm text-center text-gray-500 dark:text-gray-400">
@@ -133,22 +204,30 @@
                             </div>
                         </div>
 
+
                         <!-- User profile -->
                         <div class="relative" x-data="{ open: false }">
                             <button @click="open = !open"
-                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors">
+                                class="flex items-center gap-3 p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 group hover:scale-105 active:scale-95">
                                 <div
-                                    class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 flex items-center justify-center text-white font-medium shadow-sm">
+                                    class="w-8 h-8 rounded-full bg-gradient-to-r from-indigo-500 to-violet-500 flex items-center justify-center text-white font-medium shadow-sm group-hover:shadow-md transition-shadow duration-200">
                                     {{ substr(Auth::user()->name, 0, 1) }}
                                 </div>
-                                <span class="hidden md:block font-medium">{{ Auth::user()->name }}</span>
-                                <i class="ti ti-chevron-down text-gray-500 dark:text-gray-400"></i>
+                                <span class="hidden md:block font-medium text-gray-700 dark:text-gray-300 group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">{{ Auth::user()->name }}</span>
+                                <i class="ti ti-chevron-down text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-all duration-200" 
+                                   :class="{ 'rotate-180': open }"></i>
                             </button>
 
                             <!-- Profile dropdown -->
                             <div x-show="open" @click.away="open = false"
-                                class="absolute right-0 mt-2 w-60 bg-white dark:bg-gray-800 rounded-xl shadow-lg py-2 z-50 border border-gray-200 dark:border-gray-700"
-                                x-cloak x-transition>
+                                class="absolute right-0 mt-2 w-60 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700"
+                                x-cloak 
+                                x-transition:enter="transition ease-out duration-200"
+                                x-transition:enter-start="opacity-0 scale-95 translate-y-1"
+                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave="transition ease-in duration-150"
+                                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
+                                x-transition:leave-end="opacity-0 scale-95 translate-y-1">
                                 <div class="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                                     <div class="text-sm font-medium text-gray-700 dark:text-gray-300">
                                         {{ Auth::user()->name }}
@@ -158,22 +237,22 @@
                                     </div>
                                 </div>
                                 <a href="{{ route('profile.edit') }}"
-                                    class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <i class="ti ti-user text-gray-500 dark:text-gray-400"></i>
-                                    <span>{{ __('Profile') }}</span>
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 group">
+                                    <i class="ti ti-user text-gray-500 dark:text-gray-400 group-hover:text-indigo-500 transition-colors duration-200"></i>
+                                    <span class="group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">{{ __('Profile') }}</span>
                                 </a>
                                 <a href="#"
-                                    class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors">
-                                    <i class="ti ti-settings text-gray-500 dark:text-gray-400"></i>
-                                    <span>{{ __('Settings') }}</span>
+                                    class="flex items-center gap-3 px-4 py-2.5 text-sm hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-all duration-200 group">
+                                    <i class="ti ti-settings text-gray-500 dark:text-gray-400 group-hover:text-gray-600 dark:group-hover:text-gray-300 transition-colors duration-200"></i>
+                                    <span class="group-hover:text-gray-900 dark:group-hover:text-gray-100 transition-colors duration-200">{{ __('Settings') }}</span>
                                 </a>
                                 <div class="border-t border-gray-100 dark:border-gray-700 my-1"></div>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
                                     <button type="submit"
-                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-colors">
-                                        <i class="ti ti-logout"></i>
-                                        <span>{{ __('Log Out') }}</span>
+                                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 dark:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 transition-all duration-200 group">
+                                        <i class="ti ti-logout group-hover:scale-110 transition-transform duration-200"></i>
+                                        <span class="group-hover:text-red-700 dark:group-hover:text-red-400 transition-colors duration-200">{{ __('Log Out') }}</span>
                                     </button>
                                 </form>
                             </div>
@@ -183,16 +262,16 @@
             </header>
 
             <!-- Page Content -->
-            <main class="flex-grow p-4 md:p-6">
+            <main class="flex-grow p-3 md:p-4 lg:p-6">
                 <!-- Page header -->
                 @isset($header)
-                    <div class="max-w-7xl mx-auto mb-6" style="zoom: 0.8;">
-                        <h1 class="text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $header }}</h1>
+                    <div class="max-w-7xl mx-auto mb-4 lg:mb-6">
+                        <h1 class="text-xl lg:text-2xl font-bold text-gray-900 dark:text-gray-100">{{ $header }}</h1>
                     </div>
                 @endisset
 
                 <!-- Content area -->
-                <div class="max-w-7xl mx-auto" style="zoom: 0.8;">
+                <div class="max-w-7xl mx-auto">
                     {{ $slot }}
                 </div>
             </main>

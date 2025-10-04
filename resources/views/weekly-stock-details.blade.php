@@ -64,6 +64,8 @@
                                             <td class="p-2 customer-name">
                                                 @if($movement->reference_type === 'initial')
                                                     Stok Awal
+                                                @elseif($movement->reference_type === 'adjustment')
+                                                    Penyesuaian Stok
                                                 @elseif($movement->reference && ($movement->reference_type === 'App\Models\Sale' || $movement->reference_type === 'sale') && $movement->reference->customer)
                                                     {{ $movement->reference->customer->name ?? 'Tidak ada' }}
                                                 @else
@@ -116,6 +118,8 @@
                                             <td class="p-2 user-name">
                                                 @if($movement->reference_type === 'initial')
                                                     Stok Awal
+                                                @elseif($movement->reference_type === 'adjustment')
+                                                    Penyesuaian Stok
                                                 @elseif($movement->reference && $movement->reference_type === 'App\Models\Purchase' && $movement->reference->user)
                                                     {{ $movement->reference->user->name ?? 'Tidak ada' }}
                                                 @else

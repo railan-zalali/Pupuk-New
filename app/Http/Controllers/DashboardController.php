@@ -12,8 +12,15 @@ use Illuminate\Support\Facades\Cache;
 
 class DashboardController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
+        // Pagination parameters
+        $lowStockPage = $request->get('low_stock_page', 1);
+        $transactionsPage = $request->get('transactions_page', 1);
+        $expiredPage = $request->get('expired_page', 1);
+        $expiringPage = $request->get('expiring_page', 1);
+        $perPage = 5; // Items per page for each section
+
         // Data untuk cards
         $totalSalesToday = Sale::whereDate('created_at', Carbon::today())->sum('total_amount');
         $totalSalesYesterday = Sale::whereDate('created_at', Carbon::yesterday())->sum('total_amount');
@@ -23,8 +30,11 @@ class DashboardController extends Controller
         $data['totalProducts'] = Product::count();
         $data['totalSalesToday'] = $totalSalesToday;
         $data['totalSalesThisMonth'] = $totalSalesThisMonth;
-        $data['lowStockProducts'] = Product::where('actual_stock', '>', 0)
-            ->whereColumn('actual_stock', '<=', 'min_stock')
+        // Calculate low stock products using subquery for actual stock from batches
+        $data['lowStockProducts'] = Product::whereHas('batches', function($query) {
+                $query->where('remaining_quantity', '>', 0);
+            })
+            ->whereRaw('(SELECT COALESCE(SUM(remaining_quantity), 0) FROM product_batches WHERE product_id = products.id) <= min_stock')
             ->count();
 
         // Menghitung persentase perubahan harian
@@ -61,17 +71,20 @@ class DashboardController extends Controller
             ->where('due_date', '<=', Carbon::now()->addMonth())
             ->sum('remaining_amount');
 
-        // Data untuk tabel
-        $data['lowStockAlerts'] = Product::where('actual_stock', '>', 0)
-            ->whereColumn('actual_stock', '<=', 'min_stock')
-            ->latest()
-            ->limit(5)
-            ->get();
+        // Data untuk tabel - Get low stock products with pagination
+        $lowStockQuery = Product::with(['batches', 'category'])
+            ->whereHas('batches', function($query) {
+                $query->where('remaining_quantity', '>', 0);
+            })
+            ->whereRaw('(SELECT COALESCE(SUM(remaining_quantity), 0) FROM product_batches WHERE product_id = products.id) <= min_stock')
+            ->latest();
+        
+        $data['lowStockAlerts'] = $lowStockQuery->paginate($perPage, ['*'], 'low_stock_page', $lowStockPage);
+        $data['lowStockAlerts']->appends($request->except('low_stock_page'));
 
-        $data['recentTransactions'] = Sale::with('user')
-            ->latest()
-            ->limit(5)
-            ->get();
+        $recentTransactionsQuery = Sale::with('user')->latest();
+        $data['recentTransactions'] = $recentTransactionsQuery->paginate($perPage, ['*'], 'transactions_page', $transactionsPage);
+        $data['recentTransactions']->appends($request->except('transactions_page'));
 
         // Data untuk grafik - Menggunakan pendekatan yang lebih sederhana
         $dates = collect();
@@ -125,9 +138,8 @@ class DashboardController extends Controller
             ->whereDate('created_at', Carbon::today())
             ->sum('quantity');
 
-        // Get products that will expire in the next 30 days
-        // Hanya menampilkan produk yang memiliki stok dan akan expire dalam 30 hari
-        $data['expiringProducts'] = Product::whereHas('productBatches', function ($query) {
+        // Get products that will expire in the next 30 days with pagination
+        $expiringProductsQuery = Product::whereHas('productBatches', function ($query) {
                 $query->whereNotNull('expiry_date')
                     ->where('expiry_date', '>=', now())
                     ->where('expiry_date', '<=', now()->addDays(30))
@@ -139,11 +151,13 @@ class DashboardController extends Controller
                     ->where('expiry_date', '<=', now()->addDays(30))
                     ->where('remaining_quantity', '>', 0)
                     ->orderBy('expiry_date');
-            }])
-            ->get();
+            }]);
+        
+        $data['expiringProducts'] = $expiringProductsQuery->paginate($perPage, ['*'], 'expiring_page', $expiringPage);
+        $data['expiringProducts']->appends($request->except('expiring_page'));
 
-        // Get products that are already expired
-        $data['expiredProducts'] = Product::whereHas('productBatches', function ($query) {
+        // Get products that are already expired with pagination
+        $expiredProductsQuery = Product::whereHas('productBatches', function ($query) {
                 $query->whereNotNull('expiry_date')
                     ->where('expiry_date', '<', now())
                     ->where('remaining_quantity', '>', 0);
@@ -153,8 +167,10 @@ class DashboardController extends Controller
                     ->where('expiry_date', '<', now())
                     ->where('remaining_quantity', '>', 0)
                     ->orderBy('expiry_date');
-            }])
-            ->get();
+            }]);
+        
+        $data['expiredProducts'] = $expiredProductsQuery->paginate($perPage, ['*'], 'expired_page', $expiredPage);
+        $data['expiredProducts']->appends($request->except('expired_page'));
 
         // Pastikan produk yang akan kadaluarsa ditampilkan terlepas dari status stok
 
@@ -185,34 +201,71 @@ class DashboardController extends Controller
     }
     public function dailyStockDetails()
     {
-        $outgoingStockDetails = StockMovement::where('type', 'out')
-            ->whereDate('created_at', Carbon::today())
-            ->with(['product'])
-            ->get();
+        try {
+            $outgoingStockDetails = StockMovement::where('type', 'out')
+                ->whereDate('created_at', Carbon::today())
+                ->with(['product'])
+                ->get();
 
-        // Load reference only for non-initial movements
-        $outgoingStockDetails->each(function ($movement) {
-            if ($movement->reference_type && $movement->reference_type !== 'initial') {
-                $movement->load('reference');
-            }
-        });
+            // Load reference only for non-initial movements with proper error handling
+            $outgoingStockDetails->each(function ($movement) {
+                if ($movement->reference_type && $movement->reference_type !== 'initial' && $movement->reference_type !== 'adjustment') {
+                    try {
+                        $movement->load('reference');
+                        // Load nested relationships based on reference type
+                        if ($movement->reference) {
+                            if (in_array($movement->reference_type, ['sale', 'App\Models\Sale']) && method_exists($movement->reference, 'customer')) {
+                                $movement->reference->load('customer');
+                            }
+                            if (in_array($movement->reference_type, ['purchase', 'App\Models\Purchase']) && method_exists($movement->reference, 'user')) {
+                                $movement->reference->load('user');
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Log error but continue processing
+                        \Log::warning('Failed to load reference for stock movement: ' . $e->getMessage());
+                    }
+                }
+            });
 
-        $incomingStockDetails = StockMovement::where('type', 'in')
-            ->whereDate('created_at', Carbon::today())
-            ->with(['product'])
-            ->get();
+            $incomingStockDetails = StockMovement::where('type', 'in')
+                ->whereDate('created_at', Carbon::today())
+                ->with(['product'])
+                ->get();
 
-        // Load reference only for non-initial movements
-        $incomingStockDetails->each(function ($movement) {
-            if ($movement->reference_type && $movement->reference_type !== 'initial') {
-                $movement->load('reference');
-            }
-        });
+            // Load reference only for non-initial movements with proper error handling
+            $incomingStockDetails->each(function ($movement) {
+                if ($movement->reference_type && $movement->reference_type !== 'initial' && $movement->reference_type !== 'adjustment') {
+                    try {
+                        $movement->load('reference');
+                        // Load nested relationships based on reference type
+                        if ($movement->reference) {
+                            if (in_array($movement->reference_type, ['purchase', 'App\Models\Purchase']) && method_exists($movement->reference, 'user')) {
+                                $movement->reference->load('user');
+                            }
+                            if (in_array($movement->reference_type, ['purchase_receipt', 'App\Models\PurchaseReceipt']) && method_exists($movement->reference, 'user')) {
+                                $movement->reference->load('user');
+                            }
+                        }
+                    } catch (\Exception $e) {
+                        // Log error but continue processing
+                        \Log::warning('Failed to load reference for stock movement: ' . $e->getMessage());
+                    }
+                }
+            });
 
-        return view('stock-details', [
-            'outgoingStockDetails' => $outgoingStockDetails,
-            'incomingStockDetails' => $incomingStockDetails,
-        ]);
+            return view('stock-details', [
+                'outgoingStockDetails' => $outgoingStockDetails,
+                'incomingStockDetails' => $incomingStockDetails,
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Error in dailyStockDetails: ' . $e->getMessage());
+            return view('stock-details', [
+                'outgoingStockDetails' => collect(),
+                'incomingStockDetails' => collect(),
+                'error' => 'Terjadi kesalahan saat memuat data stok harian.'
+            ]);
+        }
     }
     public function weeklyStockDetails()
     {
@@ -224,9 +277,9 @@ class DashboardController extends Controller
                 ->with(['product'])
                 ->get();
                 
-            // Load reference only for non-initial movements
+            // Load reference only for non-initial and non-adjustment movements
             $outgoingStock->each(function ($movement) {
-                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                if ($movement->reference_type && $movement->reference_type !== 'initial' && $movement->reference_type !== 'adjustment') {
                     $movement->load('reference');
                 }
             });
@@ -236,9 +289,9 @@ class DashboardController extends Controller
                 ->with(['product'])
                 ->get();
                 
-            // Load reference only for non-initial movements
+            // Load reference only for non-initial and non-adjustment movements
             $incomingStock->each(function ($movement) {
-                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                if ($movement->reference_type && $movement->reference_type !== 'initial' && $movement->reference_type !== 'adjustment') {
                     $movement->load('reference');
                 }
             });
@@ -269,9 +322,9 @@ class DashboardController extends Controller
                 ->with(['product'])
                 ->get();
                 
-            // Load reference only for non-initial movements
+            // Load reference only for non-initial and non-adjustment movements
             $outgoingStock->each(function ($movement) {
-                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                if ($movement->reference_type && $movement->reference_type !== 'initial' && $movement->reference_type !== 'adjustment') {
                     $movement->load('reference');
                 }
             });
@@ -281,9 +334,9 @@ class DashboardController extends Controller
                 ->with(['product'])
                 ->get();
                 
-            // Load reference only for non-initial movements
+            // Load reference only for non-initial and non-adjustment movements
             $incomingStock->each(function ($movement) {
-                if ($movement->reference_type && $movement->reference_type !== 'initial') {
+                if ($movement->reference_type && $movement->reference_type !== 'initial' && $movement->reference_type !== 'adjustment') {
                     $movement->load('reference');
                 }
             });

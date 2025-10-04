@@ -49,6 +49,22 @@ class LoginRequest extends FormRequest
             ]);
         }
 
+        // Check if the user's account is approved
+        $user = Auth::user();
+        if ($user && !$user->isApproved()) {
+            Auth::logout(); // Log out the user immediately
+            
+            $message = match($user->approval_status) {
+                'pending' => 'Akun Anda masih menunggu persetujuan admin. Silakan tunggu konfirmasi lebih lanjut.',
+                'rejected' => 'Akun Anda telah ditolak oleh admin. Silakan hubungi administrator untuk informasi lebih lanjut.',
+                default => 'Akun Anda belum disetujui. Silakan hubungi administrator.'
+            };
+
+            throw ValidationException::withMessages([
+                'email' => $message,
+            ]);
+        }
+
         RateLimiter::clear($this->throttleKey());
     }
 

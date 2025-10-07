@@ -111,7 +111,7 @@ class PurchaseProductSelector {
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2 2v-5m16 0h-2M4 13h2m13-8V4a1 1 0 00-1-1H7a1 1 0 00-1 1v1m8 0V4.5"></path>
                     </svg>
                     <h3 class="mt-2 text-sm font-medium text-gray-900 dark:text-gray-100">Tidak ada produk</h3>
-                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Pilih supplier terlebih dahulu atau ubah filter pencarian.</p>
+                    <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Tidak ada produk yang ditemukan. Coba ubah filter pencarian.</p>
                 </div>
             </div>
         `;
@@ -147,19 +147,18 @@ class PurchaseProductSelector {
     }
 
     async loadProducts() {
-        if (!this.supplierId) {
-            this.showEmptyState();
-            return;
-        }
-
         this.showLoading();
 
         try {
             const params = new URLSearchParams({
                 per_page: this.options.perPage,
-                supplier_id: this.supplierId,
                 page: this.currentPage
             });
+
+            // Only add supplier_id if it's specified
+            if (this.supplierId) {
+                params.append('supplier_id', this.supplierId);
+            }
 
             const search = document.getElementById('product-search').value.trim();
             if (search) {

@@ -91,6 +91,7 @@ Route::middleware('auth')->group(function () {
         Route::get('purchases/product-units/{productId}', [PurchaseController::class, 'getProductUnits']);
         Route::get('purchases/search-products', [PurchaseController::class, 'searchProducts']);
         Route::get('purchases/find-by-barcode', [PurchaseController::class, 'findByBarcode']);
+        Route::get('/purchases/group/{purchaseGroup}', [PurchaseController::class, 'showGroup'])->name('purchases.group.show');
         Route::resource('purchases', PurchaseController::class);
         Route::get('/purchases/products-by-supplier/{supplier}', [PurchaseController::class, 'getProductsBySupplier'])
             ->name('purchases.products-by-supplier');

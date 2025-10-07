@@ -220,26 +220,6 @@ tr {
 /* Desktop - sidebar is always visible and static */
 @media (min-width: 1024px) {
     .sidebar {
-        @apply static;
-    }
-    
-    .sidebar.collapsed {
-        @apply w-20;
-    }
-    
-    .main-content {
-        margin-left: 280px;
-        transition: margin-left 0.3s ease-in-out;
-    }
-    
-    .main-content.expanded {
-        margin-left: 80px;
-    }
-}
-
-/* Desktop - normal sidebar behavior */
-@media (min-width: 1024px) {
-    .sidebar {
         @apply relative transform-none flex-shrink-0;
         width: 280px;
         transition: width 0.3s ease-in-out;
@@ -337,4 +317,91 @@ tr {
 
 .badge-primary {
     @apply bg-indigo-100 dark:bg-indigo-900/50 text-indigo-600 dark:text-indigo-400;
+}
+
+/* Tooltip untuk sidebar collapsed */
+.nav-tooltip {
+    @apply absolute left-full ml-2 px-3 py-2 bg-gray-900 dark:bg-gray-700 text-white text-sm rounded-lg shadow-lg opacity-0 pointer-events-none transition-all duration-200 z-50;
+    white-space: nowrap;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.nav-item:hover .nav-tooltip {
+    @apply opacity-100;
+}
+
+/* Animasi untuk collapsed state */
+.sidebar.collapsed .nav-item {
+    @apply justify-center px-2;
+}
+
+.sidebar.collapsed .nav-icon {
+    @apply text-2xl;
+}
+
+.sidebar.collapsed .nav-title {
+    @apply hidden;
+}
+
+/* Logo collapsed state */
+.sidebar.collapsed .logo-text {
+    @apply hidden;
+}
+
+.sidebar.collapsed .logo-container {
+    @apply justify-center px-4;
+}
+
+/* Category-specific styling */
+.nav-group {
+    @apply mb-6;
+}
+
+.nav-group:last-child {
+    @apply mb-0;
+}
+
+/* Main menu styling */
+.nav-group .nav-title {
+    @apply text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3 px-6;
+}
+
+/* Admin menu styling */
+.nav-group:has(.nav-title:contains("ADMIN")) .nav-item {
+    @apply border-l-2 border-transparent hover:border-orange-400;
+}
+
+.nav-group:has(.nav-title:contains("ADMIN")) .nav-item.active {
+    @apply border-l-2 border-orange-500 bg-orange-50 dark:bg-orange-900/20;
+}
+
+.nav-group:has(.nav-title:contains("ADMIN")) .nav-icon {
+    @apply text-orange-600 dark:text-orange-400;
+}
+
+/* System menu styling */
+.nav-group:has(.nav-title:contains("SISTEM")) .nav-item {
+    @apply border-l-2 border-transparent hover:border-purple-400;
+}
+
+.nav-group:has(.nav-title:contains("SISTEM")) .nav-item.active {
+    @apply border-l-2 border-purple-500 bg-purple-50 dark:bg-purple-900/20;
+}
+
+.nav-group:has(.nav-title:contains("SISTEM")) .nav-icon {
+    @apply text-purple-600 dark:text-purple-400;
+}
+
+/* Reports menu styling */
+.nav-group:has(.nav-title:contains("LAPORAN")) .nav-item {
+    @apply border-l-2 border-transparent hover:border-green-400;
+}
+
+.nav-group:has(.nav-title:contains("LAPORAN")) .nav-item.active {
+    @apply border-l-2 border-green-500 bg-green-50 dark:bg-green-900/20;
+}
+
+.nav-group:has(.nav-title:contains("LAPORAN")) .nav-icon {
+    @apply text-green-600 dark:text-green-400;
 }

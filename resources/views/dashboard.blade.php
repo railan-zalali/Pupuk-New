@@ -549,7 +549,7 @@
                                             </td>
                                             <td class="whitespace-nowrap px-6 py-3 text-sm">
                                                 <span
-                                                    class="font-bold text-red-600 dark:text-red-400">{{ $product->stock }}</span>
+                                                    class="font-bold text-red-600 dark:text-red-400">{{ $product->batches->sum('remaining_quantity') }}</span>
                                             </td>
                                             <td
                                                 class="whitespace-nowrap px-6 py-3 text-sm text-gray-500 dark:text-gray-400">

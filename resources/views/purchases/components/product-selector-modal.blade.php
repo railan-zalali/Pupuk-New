@@ -23,7 +23,7 @@
                                 Pilih Produk untuk Pembelian
                             </h3>
                             <p class="text-sm text-gray-500 dark:text-gray-400">
-                                Pilih produk yang ingin dibeli dari supplier yang dipilih
+                                Pilih produk yang ingin dibeli. Produk akan dikelompokkan otomatis berdasarkan supplier.
                             </p>
                         </div>
                     </div>
@@ -99,11 +99,6 @@ class PurchaseProductSelectorModal {
     open(supplierId, onProductsSelected = null) {
         this.currentSupplierId = supplierId;
         this.onProductsSelected = onProductsSelected;
-        
-        if (!supplierId) {
-            alert('Pilih supplier terlebih dahulu');
-            return;
-        }
 
         // Show modal
         this.modal.classList.remove('hidden');

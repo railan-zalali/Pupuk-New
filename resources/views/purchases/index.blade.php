@@ -83,6 +83,9 @@
                                 Supplier</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
+                                Group</th>
+                            <th scope="col"
+                                class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
                                 Total</th>
                             <th scope="col"
                                 class="px-6 py-3 text-left text-xs font-medium uppercase tracking-wider text-gray-700 dark:text-gray-300">
@@ -103,6 +106,19 @@
                                 <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $purchase->invoice_number }}
                                 </td>
                                 <td class="px-6 py-4 text-gray-900 dark:text-gray-100">{{ $purchase->supplier->name }}
+                                </td>
+                                <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
+                                    @if($purchase->purchaseGroup)
+                                        <a href="{{ route('purchases.group.show', $purchase->purchaseGroup) }}" 
+                                           class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-200 text-xs">
+                                            {{ $purchase->purchaseGroup->group_number }}
+                                        </a>
+                                        <div class="text-xs text-gray-500 dark:text-gray-400">
+                                            {{ $purchase->purchaseGroup->purchases->count() }} PO(s)
+                                        </div>
+                                    @else
+                                        <span class="text-gray-400 dark:text-gray-500 text-xs">No Group</span>
+                                    @endif
                                 </td>
                                 <td class="px-6 py-4 text-gray-900 dark:text-gray-100">
                                     Rp {{ number_format($purchase->total_amount, 0, ',', '.') }}
@@ -187,7 +203,7 @@
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
+                                <td colspan="7" class="px-6 py-10 text-center text-gray-500 dark:text-gray-400">
                                     <div class="flex flex-col items-center justify-center">
                                         <svg class="h-10 w-10 text-gray-400 dark:text-gray-500 mb-3" fill="none"
                                             stroke="currentColor" viewBox="0 0 24 24">

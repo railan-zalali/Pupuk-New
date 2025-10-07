@@ -11,7 +11,8 @@ class Purchase extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
-        'invoice_number',
+        'purchase_number',
+        'purchase_group_id',
         'supplier_id',
         'user_id',
         'date',
@@ -40,6 +41,11 @@ class Purchase extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function purchaseGroup()
+    {
+        return $this->belongsTo(PurchaseGroup::class);
     }
 
     public function receipts()

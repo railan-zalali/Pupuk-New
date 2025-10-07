@@ -54,13 +54,7 @@
                     Informasi Pembelian
                 </h3>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <div>
-                        <x-input-label for="invoice_number" value="Nomor Faktur" />
-                        <x-text-input id="invoice_number" name="invoice_number" type="text"
-                            class="mt-1 block w-full bg-gray-50 dark:bg-gray-700" :value="$invoiceNumber" readonly />
-                    </div>
-
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div>
                         <x-input-label for="date" value="Tanggal" />
                         <x-text-input id="date" name="date" type="date" class="mt-1 block w-full"
@@ -72,26 +66,25 @@
                         <x-text-input id="due_date" name="due_date" type="date" class="mt-1 block w-full"
                             :value="old('due_date', date('Y-m-d', strtotime('+30 days')))" required />
                     </div>
+                </div>
 
-                    <div>
-                        <x-input-label for="supplier_id" value="Supplier" />
-                        <select id="supplier_id" name="supplier_id"
-                            class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
-                            required>
-                            <option value="">Pilih Supplier</option>
-                            @foreach ($suppliers as $supplier)
-                                <option value="{{ $supplier->id }}"
-                                    {{ old('supplier_id') == $supplier->id ? 'selected' : '' }}>
-                                    {{ $supplier->name }}
-                                </option>
-                            @endforeach
-                        </select>
-                    </div>
-
-                    <div>
-                        <x-input-label for="reference_number" value="Nomor Referensi" />
-                        <x-text-input id="reference_number" name="reference_number" type="text"
-                            class="mt-1 block w-full" :value="old('reference_number')" />
+                <div class="mt-4">
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4">
+                        <div class="flex">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-blue-400" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-blue-800 dark:text-blue-200">
+                                    Sistem Pembelian Otomatis
+                                </h3>
+                                <div class="mt-2 text-sm text-blue-700 dark:text-blue-300">
+                                    <p>Pilih produk yang ingin dibeli. Sistem akan secara otomatis mengelompokkan produk berdasarkan supplier dan membuat purchase order terpisah untuk setiap supplier.</p>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -224,6 +217,16 @@
             </div>
 
             <!-- Form Actions -->
+            <!-- Notes Section -->
+            <div class="mt-6">
+                <div>
+                    <x-input-label for="notes" value="Catatan (Opsional)" />
+                    <textarea id="notes" name="notes" rows="3"
+                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+                        placeholder="Tambahkan catatan untuk pembelian ini...">{{ old('notes') }}</textarea>
+                </div>
+            </div>
+
             <div class="flex justify-end space-x-3 mt-6">
                 <button type="button" onclick="window.history.back()"
                     class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -245,6 +248,9 @@
             <td class="px-6 py-4">
                 <select name="product_id[]" required class="product-select w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-800 dark:text-gray-300" onchange="updateProductDetails(this)">
                     <option value="">Pilih Produk</option>
+                    @foreach ($products as $product)
+                        <option value="{{ $product->id }}" data-stock="{{ $product->actual_stock }}" data-min-stock="{{ $product->min_stock }}">{{ $product->name }}</option>
+                    @endforeach
                 </select>
                 <div class="product-info mt-1 text-xs"></div>
             </td>
@@ -304,68 +310,75 @@
                 return 'Rp ' + Math.round(number).toLocaleString('id-ID');
             }
 
-            function updateProductOptions(selectElement = null) {
-                const supplierId = document.getElementById('supplier_id').value;
-
-                if (!supplierId) {
-                    document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
-                        select.innerHTML = '<option value="">Pilih Produk</option>';
-                        select.closest('tr').querySelector('.product-info').innerHTML = '';
-                    });
-                    return;
+            // Utility functions untuk error handling
+            function showError(message, duration = 5000) {
+                // Hapus error sebelumnya jika ada
+                const existingError = document.querySelector('.error-notification');
+                if (existingError) {
+                    existingError.remove();
                 }
 
-                // Show loading state
-                if (selectElement) {
-                    selectElement.innerHTML = '<option value="">Loading...</option>';
-                    selectElement.disabled = true;
-                } else {
-                    document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
-                        select.innerHTML = '<option value="">Loading...</option>';
-                        select.disabled = true;
-                    });
-                }
+                // Buat error notification
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'error-notification fixed top-4 right-4 bg-red-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                errorDiv.textContent = message;
+                document.body.appendChild(errorDiv);
 
-                fetch(`/purchases/products-by-supplier/${supplierId}`)
-                    .then(response => {
-                        if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
-                        return response.json();
-                    })
-                    .then(products => {
-                        let optionsHtml = '<option value="">Pilih Produk</option>';
-                        products.forEach(product => {
-                            const price = product.purchase_price || 0;
-                            const stockClass = product.stock < product.min_stock ? 'text-red-600' : '';
-                            optionsHtml +=
-                                `<option value="${product.id}" data-price="${price}" data-stock="${product.stock}" data-min-stock="${product.min_stock}" class="${stockClass}">${product.name}</option>`;
-                        });
-
-                        if (selectElement) {
-                            selectElement.innerHTML = optionsHtml;
-                            selectElement.disabled = false;
-                        } else {
-                            document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
-                                select.innerHTML = optionsHtml;
-                                select.disabled = false;
-                            });
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error fetching products:', error);
-                        alert('Gagal memuat daftar produk. Silakan coba lagi.');
-
-                        // Reset selects
-                        if (selectElement) {
-                            selectElement.innerHTML = '<option value="">Pilih Produk</option>';
-                            selectElement.disabled = false;
-                        } else {
-                            document.querySelectorAll('select[name="product_id[]"]').forEach(select => {
-                                select.innerHTML = '<option value="">Pilih Produk</option>';
-                                select.disabled = false;
-                            });
-                        }
-                    });
+                // Auto remove setelah duration
+                setTimeout(() => {
+                    if (errorDiv.parentNode) {
+                        errorDiv.remove();
+                    }
+                }, duration);
             }
+
+            function showSuccess(message, duration = 3000) {
+                // Hapus success sebelumnya jika ada
+                const existingSuccess = document.querySelector('.success-notification');
+                if (existingSuccess) {
+                    existingSuccess.remove();
+                }
+
+                // Buat success notification
+                const successDiv = document.createElement('div');
+                successDiv.className = 'success-notification fixed top-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg z-50';
+                successDiv.textContent = message;
+                document.body.appendChild(successDiv);
+
+                // Auto remove setelah duration
+                setTimeout(() => {
+                    if (successDiv.parentNode) {
+                        successDiv.remove();
+                    }
+                }, duration);
+            }
+
+            function handleAjaxError(error, context = '') {
+                console.error(`Error in ${context}:`, error);
+                let message = 'Terjadi kesalahan. Silakan coba lagi.';
+                
+                if (error.message) {
+                    message = error.message;
+                } else if (error.status) {
+                    switch (error.status) {
+                        case 404:
+                            message = 'Data tidak ditemukan.';
+                            break;
+                        case 500:
+                            message = 'Terjadi kesalahan server. Silakan coba lagi.';
+                            break;
+                        case 403:
+                            message = 'Anda tidak memiliki akses untuk melakukan tindakan ini.';
+                            break;
+                        default:
+                            message = `Terjadi kesalahan (${error.status}). Silakan coba lagi.`;
+                    }
+                }
+                
+                showError(message);
+            }
+
+            // Fungsi updateProductOptions tidak lagi diperlukan karena semua produk sudah dimuat di HTML
 
             function updateConversionFactor(select) {
                 const tr = select.closest('tr');
@@ -436,7 +449,7 @@
                 // Listener untuk supplier
                 const supplierSelect = document.getElementById('supplier_id');
                 supplierSelect.addEventListener('change', function() {
-                    updateProductOptions();
+                    // Tidak perlu updateProductOptions karena semua produk sudah dimuat
 
                     // Reset form items jika supplier berubah
                     if (document.querySelectorAll('#purchaseItems tr').length > 1) {
@@ -509,7 +522,7 @@
                 // Check if supplier is selected
                 const supplierId = document.getElementById('supplier_id').value;
                 if (!supplierId) {
-                    alert('Pilih supplier terlebih dahulu');
+                    showError('Pilih supplier terlebih dahulu');
                     return;
                 }
 
@@ -519,7 +532,13 @@
                 searchResults.innerHTML = '<div class="p-4 text-gray-500">Mencari produk...</div>';
 
                 // Find product by barcode
-                fetch(`/products/find-by-barcode?barcode=${barcode}&supplier_id=${supplierId}`)
+                fetch(`/products/find-by-barcode?barcode=${barcode}&supplier_id=${supplierId}`, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
                     .then(response => {
                         if (!response.ok) throw new Error('Produk tidak ditemukan');
                         return response.json();
@@ -568,11 +587,9 @@
                         }
                     })
                     .catch(error => {
-                        searchResults.innerHTML = `<div class="p-4 text-red-500">Error: ${error.message}</div>`;
-                        setTimeout(() => {
-                            searchResults.innerHTML = '';
-                            searchResults.classList.add('hidden');
-                        }, 3000);
+                        handleAjaxError(error, 'processBarcode');
+                        searchResults.innerHTML = '';
+                        searchResults.classList.add('hidden');
                     });
             }
 
@@ -714,20 +731,30 @@
                     const qty = document.querySelectorAll('input[name="quantity[]"]')[index];
                     const price = document.querySelectorAll('input[name="purchase_price[]"]')[index];
 
-                    if (!qty.value || parseFloat(qty.value) <= 0) {
+                    // Validasi quantity
+                    const qtyValue = parseFloat(qty.value);
+                    if (!qty.value || isNaN(qtyValue) || qtyValue <= 0 || qtyValue > 999999) {
                         qty.classList.add('border-red-500');
+                        if (qtyValue > 999999) {
+                            errorMessages.push('Jumlah tidak boleh lebih dari 999,999');
+                        }
                         valid = false;
                     }
 
-                    if (!price.value || parseFloat(price.value) <= 0) {
+                    // Validasi price
+                    const priceValue = parseFloat(price.value);
+                    if (!price.value || isNaN(priceValue) || priceValue <= 0 || priceValue > 999999999) {
                         price.classList.add('border-red-500');
+                        if (priceValue > 999999999) {
+                            errorMessages.push('Harga tidak boleh lebih dari 999,999,999');
+                        }
                         valid = false;
                     }
                 });
 
                 // Tampilkan error jika ada
                 if (!valid && errorMessages.length > 0) {
-                    alert('Mohon perbaiki kesalahan berikut:\n- ' + errorMessages.join('\n- '));
+                    showError('Mohon perbaiki kesalahan berikut:\n- ' + errorMessages.join('\n- '));
                 }
 
                 return valid;
@@ -735,10 +762,21 @@
 
             function validateNumber(input) {
                 const value = parseFloat(input.value);
+                const maxValue = input.name.includes('quantity') ? 999999 : 999999999;
+                
                 if (isNaN(value) || value < 0) {
                     input.value = 0;
-                    calculateSubtotal(input);
+                    input.classList.add('border-red-500');
+                    setTimeout(() => input.classList.remove('border-red-500'), 3000);
+                } else if (value > maxValue) {
+                    input.value = maxValue;
+                    input.classList.add('border-red-500');
+                    setTimeout(() => input.classList.remove('border-red-500'), 3000);
+                } else {
+                    input.classList.remove('border-red-500');
                 }
+                
+                calculateSubtotal(input);
             }
 
             function clearAllItems() {
@@ -755,9 +793,8 @@
                 tbody.insertAdjacentHTML('beforeend', itemRow);
                 const newRow = tbody.lastElementChild;
 
-                // Initialize product options
+                // Product options sudah dimuat di HTML, tidak perlu updateProductOptions
                 const productSelect = newRow.querySelector('select[name="product_id[]"]');
-                updateProductOptions(productSelect);
 
                 // Add focus
                 productSelect.focus();
@@ -798,22 +835,33 @@
                 priceInput.value = defaultPrice;
                 calculateSubtotal(priceInput);
 
-                // Show stock status
+                // Show product name and stock status
+                const productName = selectedOption?.text || '';
                 const stock = parseInt(selectedOption?.dataset.stock) || 0;
                 const minStock = parseInt(selectedOption?.dataset.minStock) || 0;
 
+                let productInfo = `<div class="font-medium text-gray-700 dark:text-gray-300">${productName}</div>`;
+                
                 if (stock <= minStock) {
-                    productInfoDiv.innerHTML = `<span class="text-red-500">Stok rendah: ${stock} tersisa</span>`;
+                    productInfo += `<span class="text-red-500">Stok rendah: ${stock} tersisa</span>`;
                 } else {
-                    productInfoDiv.innerHTML = `<span class="text-green-500">Stok: ${stock}</span>`;
+                    productInfo += `<span class="text-green-500">Stok: ${stock}</span>`;
                 }
+                
+                productInfoDiv.innerHTML = productInfo;
 
                 // Store product data for stock calculations
                 tr.dataset.baseStock = stock;
                 tr.dataset.minStock = minStock;
 
                 // Fetch product units dan detail lainnya
-                fetch(`/purchases/product-units/${productId}`)
+                fetch(`/purchases/product-units/${productId}`, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
                     .then(response => {
                         if (!response.ok) throw new Error(`HTTP error! Status: ${response.status}`);
                         return response.json();
@@ -899,12 +947,12 @@
                         calculateSubtotal(priceInput);
                     })
                     .catch(error => {
-                        console.error('Error fetching product details:', error);
+                        handleAjaxError(error, 'updateConversionFactor');
                         // Fallback
                         unitSelect.innerHTML = '<option value="">Unit</option>';
                         unitSelect.disabled = false;
                         priceInput.disabled = false;
-                        productInfoDiv.innerHTML = `<span class="text-red-500">Error: ${error.message}</span>`;
+                        productInfoDiv.innerHTML = `<span class="text-red-500">Gagal memuat data produk</span>`;
                     });
             }
 
@@ -982,7 +1030,13 @@
             function fetchSearchResults(query, supplierId) {
                 const searchResults = document.querySelector('.search-results');
 
-                fetch(`/purchases/search-products?query=${encodeURIComponent(query)}&supplier_id=${supplierId}`)
+                fetch(`/purchases/search-products?query=${encodeURIComponent(query)}&supplier_id=${supplierId}`, {
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json'
+                        }
+                    })
                     .then(response => {
                         if (!response.ok) throw new Error('Gagal memuat hasil pencarian');
                         return response.json();
@@ -1030,7 +1084,8 @@
                         });
                     })
                     .catch(error => {
-                        searchResults.innerHTML = `<div class="p-4 text-red-500">Error: ${error.message}</div>`;
+                        handleAjaxError(error, 'fetchSearchResults');
+                        searchResults.innerHTML = `<div class="p-4 text-red-500">Gagal memuat hasil pencarian</div>`;
                     });
             }
 
@@ -1055,20 +1110,12 @@
             // Initialize product selector modal integration
             document.addEventListener('DOMContentLoaded', function() {
                 const openSelectorBtn = document.getElementById('open-product-selector');
-                const supplierSelect = document.getElementById('supplier_id');
                 
                 // Open product selector modal
                 openSelectorBtn.addEventListener('click', function() {
-                    const supplierId = supplierSelect.value;
-                    
-                    if (!supplierId) {
-                        alert('Pilih supplier terlebih dahulu');
-                        supplierSelect.focus();
-                        return;
-                    }
-                    
-                    // Open modal with selected supplier
-                    window.purchaseProductSelectorModal.open(supplierId, function(selectedProducts) {
+                    // Since we now group by supplier automatically, we can open the modal without supplier constraint
+                    // Pass null as supplier ID to show all products
+                    window.purchaseProductSelectorModal.open(null, function(selectedProducts) {
                         // Add selected products to purchase items
                         selectedProducts.forEach(product => {
                             addProductToTable(product);
@@ -1083,7 +1130,7 @@
                     const productSelect = newRow.querySelector('select[name="product_id[]"]');
                     const quantityInput = newRow.querySelector('input[name="quantity[]"]');
                     const unitSelect = newRow.querySelector('select[name="unit_id[]"]');
-                    const priceInput = newRow.querySelector('input[name="price[]"]');
+                    const priceInput = newRow.querySelector('input[name="purchase_price[]"]');
                     
                     // Wait for options to load
                     setTimeout(() => {

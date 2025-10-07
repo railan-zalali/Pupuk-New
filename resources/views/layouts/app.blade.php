@@ -177,32 +177,7 @@
                         </button>
 
                         <!-- Notifications -->
-                        <div class="relative" x-data="{ open: false }">
-                            <button id="notification-btn"
-                                class="p-2 sm:p-2.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-200 relative group hover:scale-105 active:scale-95">
-                                <i class="ti ti-bell text-lg sm:text-xl text-gray-500 dark:text-gray-400 group-hover:text-gray-700 dark:group-hover:text-gray-300 transition-colors duration-200"></i>
-                                <span
-                                    class="absolute top-1 sm:top-1.5 right-1 sm:right-1.5 h-2 w-2 sm:h-2.5 sm:w-2.5 rounded-full bg-red-500 ring-2 ring-white dark:ring-gray-800 animate-pulse"></span>
-                            </button>
-
-                            <!-- Notifications dropdown -->
-                            <div x-show="open" @click.away="open = false"
-                                class="absolute right-0 mt-2 w-80 bg-white/95 dark:bg-gray-800/95 backdrop-blur-sm rounded-xl shadow-xl py-2 z-50 border border-gray-200 dark:border-gray-700"
-                                x-cloak 
-                                x-transition:enter="transition ease-out duration-200"
-                                x-transition:enter-start="opacity-0 scale-95 translate-y-1"
-                                x-transition:enter-end="opacity-100 scale-100 translate-y-0"
-                                x-transition:leave="transition ease-in duration-150"
-                                x-transition:leave-start="opacity-100 scale-100 translate-y-0"
-                                x-transition:leave-end="opacity-0 scale-95 translate-y-1">
-                                <div class="px-4 py-3 font-semibold border-b border-gray-100 dark:border-gray-700 text-gray-900 dark:text-gray-100">
-                                    Notifikasi
-                                </div>
-                                <div class="p-4 text-sm text-center text-gray-500 dark:text-gray-400">
-                                    Tidak ada notifikasi baru
-                                </div>
-                            </div>
-                        </div>
+                        
 
 
                         <!-- User profile -->

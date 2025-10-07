@@ -28,7 +28,7 @@ class PurchaseController extends Controller
     public function index()
     {
         // Eager load relationships to avoid N+1 queries
-        $purchases = Purchase::with(['supplier', 'user'])
+        $purchases = Purchase::with(['supplier', 'user', 'purchaseGroup'])
             ->orderBy('date', 'desc')
             ->paginate(15);
 
@@ -42,41 +42,8 @@ class PurchaseController extends Controller
     {
         $suppliers = Supplier::orderBy('name')->get();
 
-        // Ambil semua produk dengan relasi units dan category
-        $products = Product::with(['units', 'category'])->get();
-
-        // Convert products ke format yang lebih mudah digunakan di JavaScript
-        $productsForJs = $products->map(function ($product) {
-            // Identifikasi unit dasar
-            $baseUnit = $product->units->where('pivot.is_default', true)->first()
-                ?? $product->units->first();
-
-            return [
-                'id' => $product->id,
-                'name' => $product->name,
-                'code' => $product->code,
-                'image' => $product->image ? asset('storage/' . $product->image) : asset('img/product-placeholder.png'),
-                'category_id' => $product->category_id,
-                'category_name' => $product->category->name,
-                'supplier_id' => $product->supplier_id,
-                'stock' => $product->actual_stock,
-                'min_stock' => $product->min_stock,
-                'base_unit' => $baseUnit ? $baseUnit->abbreviation : '',
-                'description' => $product->description,
-                'units' => $product->units->map(function ($unit) {
-                    return [
-                        'id' => $unit->id,
-                        'name' => $unit->name,
-                        'abbreviation' => $unit->abbreviation,
-                        'conversion_factor' => $unit->pivot->conversion_factor,
-                        'purchase_price' => $unit->pivot->purchase_price,
-                        'selling_price' => $unit->pivot->selling_price,
-                        'barcode' => $unit->pivot->barcode,
-                        'is_default' => (bool)$unit->pivot->is_default,
-                    ];
-                })->toArray(),
-            ];
-        })->toArray();
+        // Ambil semua produk seperti di SalesController - tanpa filter supplier
+        $products = Product::orderBy('name')->get();
 
         // Generate invoice number
         $lastPurchase = Purchase::orderBy('id', 'desc')->first();
@@ -85,7 +52,7 @@ class PurchaseController extends Controller
 
         $invoiceNumber = 'PO-' . date('Ymd') . '-' . str_pad($nextId, 4, '0', STR_PAD_LEFT);
 
-        return view('purchases.create', compact('suppliers', 'products', 'productsForJs', 'invoiceNumber'));
+        return view('purchases.create', compact('suppliers', 'products', 'invoiceNumber'));
     }
 
 
@@ -95,14 +62,18 @@ class PurchaseController extends Controller
     public function store(Request $request)
     {
         try {
+            // Log the incoming request for debugging
+            Log::info('Purchase store method called', [
+                'request_data' => $request->all(),
+                'user_id' => Auth::id()
+            ]);
+
             // Mulai transaksi database
             DB::beginTransaction();
 
             $validated = $request->validate([
-                'supplier_id' => 'required|exists:suppliers,id',
                 'date' => 'required|date',
                 'due_date' => 'required|date|after_or_equal:date',
-                'reference_number' => 'nullable|string|max:255',
                 'product_id' => 'required|array',
                 'product_id.*' => 'required|exists:products,id',
                 'quantity' => 'required|array',
@@ -115,6 +86,8 @@ class PurchaseController extends Controller
                 'conversion_factor.*' => 'required|numeric|min:0',
                 'notes' => 'nullable|string',
             ]);
+
+            Log::info('Purchase validation passed', ['validated_data' => $validated]);
 
             // Validasi tidak ada duplikat produk + unit yang identik
             $productUnitPairs = [];
@@ -129,87 +102,176 @@ class PurchaseController extends Controller
                 $productUnitPairs[] = $pair;
             }
 
-            // Create purchase
-            $purchase = Purchase::create([
-                'invoice_number' => $this->generateInvoiceNumber(),
-                'supplier_id' => $request->supplier_id,
+            // Group products by supplier
+            Log::info('Starting to group products by supplier');
+            $supplierGroups = [];
+            
+            foreach ($request->product_id as $index => $productId) {
+                Log::info('Processing product', ['product_id' => $productId, 'index' => $index]);
+                
+                $product = Product::find($productId);
+                
+                // Get supplier for this product
+                $supplierId = null;
+                
+                // First check if product has a direct supplier_id
+                if ($product->supplier_id) {
+                    $supplierId = $product->supplier_id;
+                    Log::info('Product supplier', [
+                        'product_id' => $productId, 
+                        'supplier_id' => $supplierId,
+                        'from_pivot' => false,
+                        'from_product' => $product->supplier_id
+                    ]);
+                } else {
+                    // Check pivot table for supplier relationship
+                    $supplierRelation = $product->suppliers()->first();
+                    if ($supplierRelation) {
+                        $supplierId = $supplierRelation->id;
+                        Log::info('Product supplier', [
+                            'product_id' => $productId, 
+                            'supplier_id' => $supplierId,
+                            'from_pivot' => true
+                        ]);
+                    }
+                }
+
+                // If no supplier found, create a default "Unknown Supplier" entry
+                if (!$supplierId) {
+                    $supplierId = 'unknown';
+                    Log::warning('No supplier found for product', ['product_id' => $productId]);
+                }
+
+                // Group by supplier
+                if (!isset($supplierGroups[$supplierId])) {
+                    $supplierGroups[$supplierId] = [];
+                }
+
+                $supplierGroups[$supplierId][] = [
+                    'product_id' => $productId,
+                    'quantity' => $request->quantity[$index],
+                    'unit_id' => $request->unit_id[$index],
+                    'purchase_price' => $request->purchase_price[$index],
+                    'conversion_factor' => $request->conversion_factor[$index],
+                ];
+            }
+
+            Log::info('Products grouped by supplier', ['groups' => array_keys($supplierGroups)]);
+
+            // Create a purchase group first
+            $purchaseGroup = \App\Models\PurchaseGroup::create([
+                'group_number' => $this->generateGroupNumber(),
                 'user_id' => Auth::id(),
                 'date' => $request->date,
                 'due_date' => $request->due_date,
-                'reference_number' => $request->reference_number,
-                'status' => 'pending',
                 'notes' => $request->notes,
                 'total_amount' => 0,
+                'status' => 'draft'
             ]);
 
-            $totalAmount = 0;
+            $groupTotalAmount = 0;
+            $createdPurchases = [];
 
-            // Add purchase details
-            foreach ($request->product_id as $index => $productId) {
-                $quantity = $request->quantity[$index];
-                $unitId = $request->unit_id[$index];
-                $purchasePrice = $request->purchase_price[$index];
-                $conversionFactor = $request->conversion_factor[$index];
+            // Create separate purchase orders for each supplier
+            foreach ($supplierGroups as $supplierId => $products) {
+                Log::info('Creating purchase for supplier', ['supplier_id' => $supplierId, 'product_count' => count($products)]);
 
-                $productUnit = ProductUnit::where('product_id', $productId)
-                    ->where('unit_id', $unitId)
-                    ->first();
-
-                if (!$productUnit) {
-                    DB::rollBack();
-                    return back()->withInput()->withErrors([
-                        "unit_id.{$index}" => "Unit ini tidak valid untuk produk tersebut"
-                    ]);
-                }
-
-                // Periksa kecocokan conversion factor
-                if (abs($productUnit->conversion_factor - $request->conversion_factor[$index]) > 0.00001) {
-                    DB::rollBack();
-                    return back()->withInput()->withErrors([
-                        "conversion_factor.{$index}" => "Faktor konversi tidak cocok dengan yang terdaftar ({$productUnit->conversion_factor})"
-                    ]);
-                }
-
-                // Calculate base quantity (in the product's base unit)
-                $baseQuantity = $quantity * $conversionFactor;
-
-                $subtotal = $quantity * $purchasePrice;
-                $totalAmount += $subtotal;
-
-                $purchase->purchaseDetails()->create([
-                    'product_id' => $productId,
-                    'unit_id' => $unitId,
-                    'quantity' => $quantity,
-                    'base_quantity' => $baseQuantity,
-                    'received_quantity' => 0,
-                    'purchase_price' => $purchasePrice,
-                    'subtotal' => $subtotal,
-                    'conversion_factor' => $conversionFactor,
+                $purchase = Purchase::create([
+                    'purchase_number' => $this->generatePurchaseNumber($supplierId),
+                    'purchase_group_id' => $purchaseGroup->id,
+                    'supplier_id' => $supplierId === 'unknown' ? null : $supplierId,
+                    'user_id' => Auth::id(),
+                    'date' => $request->date,
+                    'due_date' => $request->due_date,
+                    'status' => 'pending',
+                    'notes' => $request->notes,
+                    'total_amount' => 0,
                 ]);
 
-                // Update product supplier price if needed
-                $product = Product::find($productId);
-                $supplier = Supplier::find($request->supplier_id);
+                $purchaseTotalAmount = 0;
 
-                // Check if relationship exists and update price
-                if (!$supplier->products()->where('product_id', $productId)->exists()) {
-                    $supplier->products()->attach($productId, [
-                        'purchase_price' => $purchasePrice
+                // Add purchase details for this supplier
+                foreach ($products as $productData) {
+                    $productUnit = ProductUnit::where('product_id', $productData['product_id'])
+                        ->where('unit_id', $productData['unit_id'])
+                        ->first();
+
+                    if (!$productUnit) {
+                        DB::rollBack();
+                        return back()->withInput()->withErrors([
+                            "unit_id" => "Unit tidak valid untuk produk tersebut"
+                        ]);
+                    }
+
+                    // Periksa kecocokan conversion factor
+                    if (abs($productUnit->conversion_factor - $productData['conversion_factor']) > 0.00001) {
+                        DB::rollBack();
+                        return back()->withInput()->withErrors([
+                            "conversion_factor" => "Faktor konversi tidak cocok dengan yang terdaftar ({$productUnit->conversion_factor})"
+                        ]);
+                    }
+
+                    // Calculate base quantity (in the product's base unit)
+                    $baseQuantity = $productData['quantity'] * $productData['conversion_factor'];
+
+                    $subtotal = $productData['quantity'] * $productData['purchase_price'];
+                    $purchaseTotalAmount += $subtotal;
+
+                    $purchase->purchaseDetails()->create([
+                        'product_id' => $productData['product_id'],
+                        'unit_id' => $productData['unit_id'],
+                        'quantity' => $productData['quantity'],
+                        'base_quantity' => $baseQuantity,
+                        'received_quantity' => 0,
+                        'purchase_price' => $productData['purchase_price'],
+                        'subtotal' => $subtotal,
+                        'conversion_factor' => $productData['conversion_factor'],
                     ]);
-                } else {
-                    // Update the pivot if price has changed
-                    $supplier->products()->updateExistingPivot($productId, [
-                        'purchase_price' => $purchasePrice
-                    ]);
+
+                    // Update product supplier price if needed and supplier exists
+                    if ($supplierId !== 'unknown') {
+                        $supplier = Supplier::find($supplierId);
+                        if ($supplier) {
+                            // Check if relationship exists and update price
+                            if (!$supplier->products()->where('product_id', $productData['product_id'])->exists()) {
+                                $supplier->products()->attach($productData['product_id'], [
+                                    'purchase_price' => $productData['purchase_price']
+                                ]);
+                            } else {
+                                // Update the pivot if price has changed
+                                $supplier->products()->updateExistingPivot($productData['product_id'], [
+                                    'purchase_price' => $productData['purchase_price']
+                                ]);
+                            }
+                        }
+                    }
                 }
+
+                // Update purchase total amount
+                $purchase->update(['total_amount' => $purchaseTotalAmount]);
+                $groupTotalAmount += $purchaseTotalAmount;
+                $createdPurchases[] = $purchase;
+
+                Log::info('Purchase created', [
+                    'purchase_id' => $purchase->id,
+                    'supplier_id' => $supplierId,
+                    'total_amount' => $purchaseTotalAmount
+                ]);
             }
 
-            // Update total amount
-            $purchase->update(['total_amount' => $totalAmount]);
+            // Update purchase group total amount
+            $purchaseGroup->update(['total_amount' => $groupTotalAmount]);
 
             DB::commit();
-            return redirect()->route('purchases.show', $purchase)
-                ->with('success', 'Pembelian berhasil dibuat.');
+
+            Log::info('Purchase group created successfully', [
+                'group_id' => $purchaseGroup->id,
+                'total_purchases' => count($createdPurchases),
+                'total_amount' => $groupTotalAmount
+            ]);
+
+            return redirect()->route('purchases.group.show', $purchaseGroup)
+                ->with('success', 'Pembelian berhasil dibuat. ' . count($createdPurchases) . ' purchase order telah dibuat untuk ' . count($supplierGroups) . ' supplier.');
         } catch (\Exception $e) {
             DB::rollBack();
             Log::error('Purchase creation error: ' . $e->getMessage());
@@ -226,6 +288,21 @@ class PurchaseController extends Controller
         $purchase->load(['supplier', 'user', 'purchaseDetails.product', 'receipts.receiptDetails']);
 
         return view('purchases.show', compact('purchase'));
+    }
+
+    /**
+     * Display the specified purchase group.
+     */
+    public function showGroup(\App\Models\PurchaseGroup $purchaseGroup)
+    {
+        $purchaseGroup->load([
+            'purchases.supplier', 
+            'purchases.purchaseDetails.product', 
+            'purchases.purchaseDetails.unit',
+            'user'
+        ]);
+        
+        return view('purchases.group-show', compact('purchaseGroup'));
     }
 
     /**
@@ -450,8 +527,7 @@ class PurchaseController extends Controller
                     // Store the current stock before updating
                     $beforeStock = $product->actual_stock;
 
-                    // Update product stock field and sync with batches
-                    $product->increment('stock', $baseQuantityReceived);
+                    // Sync product stock with batches (FifoService already handles batch creation)
                     $product->syncStockFromBatches();
                     $product->refresh(); // Refresh to get updated actual_stock
 
@@ -518,6 +594,78 @@ class PurchaseController extends Controller
         }
 
         return $invoiceNumber;
+    }
+
+    private function generateGroupNumber()
+    {
+        $today = now()->format('Ymd');
+        $prefix = 'PG-' . $today;
+
+        // Cari nomor terakhir untuk hari ini
+        $lastGroup = \App\Models\PurchaseGroup::where('group_number', 'like', $prefix . '%')
+            ->orderBy('group_number', 'desc')
+            ->first();
+
+        if (!$lastGroup) {
+            $number = 1;
+        } else {
+            // Ambil 4 digit terakhir dan tambahkan 1
+            $lastNumber = (int) substr($lastGroup->group_number, -4);
+            $number = $lastNumber + 1;
+        }
+
+        $groupNumber = $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+        // Pastikan nomor unik
+        while (\App\Models\PurchaseGroup::where('group_number', $groupNumber)->exists()) {
+            $number++;
+            $groupNumber = $prefix . str_pad($number, 4, '0', STR_PAD_LEFT);
+        }
+
+        return $groupNumber;
+    }
+
+    private function generatePurchaseNumber($supplierId)
+    {
+        $today = now()->format('Ymd');
+        
+        // Get supplier code for prefix
+        $supplierCode = 'UNK'; // Default for unknown supplier
+        if ($supplierId !== 'unknown' && $supplierId) {
+            $supplier = Supplier::find($supplierId);
+            if ($supplier) {
+                // Use first 3 characters of supplier name or code
+                $supplierCode = strtoupper(substr(preg_replace('/[^A-Za-z0-9]/', '', $supplier->name), 0, 3));
+                if (strlen($supplierCode) < 3) {
+                    $supplierCode = str_pad($supplierCode, 3, '0', STR_PAD_RIGHT);
+                }
+            }
+        }
+        
+        $prefix = 'PO-' . $supplierCode . '-' . $today;
+
+        // Cari nomor terakhir untuk supplier dan hari ini
+        $lastPurchase = Purchase::where('purchase_number', 'like', $prefix . '%')
+            ->orderBy('purchase_number', 'desc')
+            ->first();
+
+        if (!$lastPurchase) {
+            $number = 1;
+        } else {
+            // Ambil 4 digit terakhir dan tambahkan 1
+            $lastNumber = (int) substr($lastPurchase->purchase_number, -4);
+            $number = $lastNumber + 1;
+        }
+
+        $purchaseNumber = $prefix . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+
+        // Pastikan nomor unik
+        while (Purchase::where('purchase_number', $purchaseNumber)->exists()) {
+            $number++;
+            $purchaseNumber = $prefix . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
+        }
+
+        return $purchaseNumber;
     }
     // public function getProductsBySupplier($supplierId)
     // {

@@ -99,7 +99,7 @@
             </div>
         </div>
 
-        <!-- Register Link -->
+        <!-- Register Link
         <div class="text-center">
             <p class="text-white/70 text-sm">
                 Belum memiliki akun?
@@ -108,7 +108,7 @@
                     Daftar sekarang
                 </a>
             </p>
-        </div>
+        </div> -->
     </form>
 
     <!-- Additional Info -->

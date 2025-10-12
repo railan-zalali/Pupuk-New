@@ -40,7 +40,7 @@ class ProductController extends Controller
         $categories = Category::all();
         $suppliers = Supplier::all();
         $units = UnitOfMeasure::all();
-        $productCode = 'PRD' . date('Ymd') . rand(1000, 9999);
+        $productCode = 'PRD-' . date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
 
         return view('products.create', compact('categories', 'suppliers', 'units', 'productCode'));
     }
@@ -80,19 +80,24 @@ class ProductController extends Controller
                 $request->units[0]['is_default'] = true;
             }
 
+            // Generate product code if not provided or empty
+            if (empty($validated['code'])) {
+                $validated['code'] = 'PRD-' . date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT);
+            }
+
             // Create product
             $product = Product::create([
                 'category_id' => $validated['category_id'],
                 'supplier_id' => $validated['supplier_id'],
                 'name' => $validated['name'],
                 'code' => $validated['code'],
-                'description' => $validated['description'],
+                'description' => $validated['description'] ?? null,
                 'image_path' => $validated['image_path'] ?? null,
                 'purchase_price' => $request->units[$baseUnitIndex]['purchase_price'],
                 'selling_price' => $request->units[$baseUnitIndex]['selling_price'],
-                'stock' => $validated['stock'],
+                'stock' => $validated['stock'] ?? 0,
                 'min_stock' => $validated['min_stock'],
-                'stock_method' => $validated['stock_method'],
+                'stock_method' => $validated['stock_method'] ?? 'fifo',
                 'requires_expiry_date' => $request->boolean('requires_expiry_date'),
                 'is_perishable' => $request->boolean('is_perishable'),
                 'expiry_warning_days' => $validated['expiry_warning_days'] ?? 30,
@@ -216,22 +221,29 @@ class ProductController extends Controller
 
             foreach ($request->products as $index => $productData) {
                 // Generate new code for each product
-                $newNumber = ++$lastNumber;
+            $newNumber = ++$lastNumber;
+            $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+
+            // Make sure it's unique
+            while (Product::withTrashed()->where('code', $productCode)->exists()) {
+                $newNumber++;
                 $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+            }
 
-                // Make sure it's unique
-                while (Product::withTrashed()->where('code', $productCode)->exists()) {
-                    $newNumber++;
-                    $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-                }
-
-                // Log produk yang sedang dibuat
-                Log::info('Membuat produk batch #' . ($index + 1), [
-                    'product_name' => $productData['name'],
-                    'product_code' => $productCode,
-                    'category_id' => $productData['category_id'],
-                    'unit_id' => $productData['unit_id']
-                ]);
+            // Log produk yang sedang dibuat
+            Log::info('Membuat produk batch #' . ($index + 1), [
+                'product_name' => $productData['name'],
+                'product_code' => $productCode,
+                'category_id' => $productData['category_id'],
+                'unit_id' => $productData['unit_id']
+            ]);
+            
+            // Log kode produk batch dibuat
+            Log::info('Kode produk batch dibuat', [
+                'product_code' => $productCode,
+                'category_id' => $productData['category_id'],
+                'unit_id' => $productData['unit_id']
+            ]);
 
                 // Create the product
                 $product = Product::create([

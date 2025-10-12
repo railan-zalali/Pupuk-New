@@ -22,7 +22,7 @@ class StoreProductRequest extends FormRequest
         return [
             'category_id' => 'required|exists:categories,id',
             'name' => 'required|string|max:255',
-            'code' => 'required|string|max:50|unique:products,code',
+            'code' => 'nullable|string|max:50|unique:products,code',
             'description' => 'nullable|string|max:1000',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
             'purchase_price' => 'required|numeric|min:0',

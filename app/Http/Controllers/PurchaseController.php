@@ -186,6 +186,7 @@ class PurchaseController extends Controller
                     'status' => 'pending',
                     'notes' => $request->notes,
                     'total_amount' => 0,
+                    'invoice_number' => 'INV-' . date('Ymd') . '-' . str_pad(rand(1, 9999), 4, '0', STR_PAD_LEFT),
                 ]);
 
                 $purchaseTotalAmount = 0;

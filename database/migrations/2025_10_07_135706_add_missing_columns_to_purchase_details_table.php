@@ -12,8 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_details', function (Blueprint $table) {
-            $table->decimal('base_quantity', 10, 2)->default(0)->after('quantity');
-            $table->decimal('conversion_factor', 10, 4)->default(1)->after('subtotal');
+            if (!Schema::hasColumn('purchase_details', 'base_quantity')) {
+                $table->decimal('base_quantity', 10, 2)->default(0)->after('quantity');
+            }
+            if (!Schema::hasColumn('purchase_details', 'conversion_factor')) {
+                $table->decimal('conversion_factor', 10, 4)->default(1)->after('subtotal');
+            }
         });
     }
 

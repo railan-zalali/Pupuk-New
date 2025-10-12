@@ -11,8 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('purchase_groups', function (Blueprint $table) {
-            $table->date('due_date')->nullable()->after('date');
+        Schema::table('purchases', function (Blueprint $table) {
+            //
         });
     }
 
@@ -21,8 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('purchase_groups', function (Blueprint $table) {
-            $table->dropColumn('due_date');
+        Schema::table('purchases', function (Blueprint $table) {
+            //
         });
     }
 };

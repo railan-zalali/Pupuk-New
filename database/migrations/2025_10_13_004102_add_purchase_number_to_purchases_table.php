@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('improved_purchases_system', function (Blueprint $table) {
-            $table->id();
-            $table->timestamps();
+        Schema::table('purchases', function (Blueprint $table) {
+            //
         });
     }
 
@@ -22,6 +21,8 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('improved_purchases_system');
+        Schema::table('purchases', function (Blueprint $table) {
+            //
+        });
     }
 };

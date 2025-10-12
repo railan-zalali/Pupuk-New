@@ -12,6 +12,7 @@ class Purchase extends Model
 
     protected $fillable = [
         'purchase_number',
+        'invoice_number',
         'purchase_group_id',
         'supplier_id',
         'user_id',

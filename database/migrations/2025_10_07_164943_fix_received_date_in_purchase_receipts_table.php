@@ -12,8 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_receipts', function (Blueprint $table) {
-            // Make received_date nullable to fix the constraint issue
-            $table->datetime('received_date')->nullable()->change();
+            // Check if received_date column exists before modifying it
+            if (Schema::hasColumn('purchase_receipts', 'received_date')) {
+                $table->datetime('received_date')->nullable()->change();
+            } else {
+                // Add the column if it doesn't exist
+                $table->datetime('received_date')->nullable();
+            }
         });
     }
 
@@ -23,8 +28,10 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('purchase_receipts', function (Blueprint $table) {
-            // Revert received_date back to NOT NULL
-            $table->datetime('received_date')->nullable(false)->change();
+            // Only revert if the column exists
+            if (Schema::hasColumn('purchase_receipts', 'received_date')) {
+                $table->datetime('received_date')->nullable(false)->change();
+            }
         });
     }
 };

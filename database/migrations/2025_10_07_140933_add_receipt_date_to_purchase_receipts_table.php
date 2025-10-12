@@ -12,8 +12,10 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchase_receipts', function (Blueprint $table) {
-            // Add receipt_date column (the model expects this field)
-            $table->date('receipt_date')->nullable()->after('user_id');
+            // Add receipt_date column if it doesn't exist
+            if (!Schema::hasColumn('purchase_receipts', 'receipt_date')) {
+                $table->date('receipt_date')->nullable()->after('user_id');
+            }
             
             // Add receipt_file column if it doesn't exist
             if (!Schema::hasColumn('purchase_receipts', 'receipt_file')) {

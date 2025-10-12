@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('purchases', function (Blueprint $table) {
-            $table->string('purchase_number')->nullable()->after('id');
+            if (!Schema::hasColumn('purchases', 'purchase_group_id')) {
+                $table->foreignId('purchase_group_id')->nullable()->after('purchase_number');
+            }
         });
     }
 
@@ -22,7 +24,9 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('purchases', function (Blueprint $table) {
-            $table->dropColumn('purchase_number');
+            if (Schema::hasColumn('purchases', 'purchase_group_id')) {
+                $table->dropColumn('purchase_group_id');
+            }
         });
     }
 };

@@ -21,6 +21,7 @@ class StoreProductRequest extends FormRequest
     {
         return [
             'category_id' => 'required|exists:categories,id',
+            'supplier_id' => 'required|exists:suppliers,id',
             'name' => 'required|string|max:255',
             'code' => 'nullable|string|max:50|unique:products,code',
             'description' => 'nullable|string|max:1000',
@@ -33,10 +34,10 @@ class StoreProductRequest extends FormRequest
             
             // Product units validation
             'units' => 'required|array|min:1',
-            'units.*.name' => 'required|string|max:50',
+            'units.*.unit_id' => 'required|exists:unit_of_measures,id',
             'units.*.conversion_factor' => 'required|numeric|min:0.01',
             'units.*.barcode' => 'nullable|string|max:100|unique:product_units,barcode',
-            'units.*.is_base_unit' => 'boolean',
+            'units.*.is_default' => 'boolean',
         ];
     }
 
@@ -48,6 +49,8 @@ class StoreProductRequest extends FormRequest
         return [
             'category_id.required' => 'Kategori produk harus dipilih.',
             'category_id.exists' => 'Kategori yang dipilih tidak valid.',
+            'supplier_id.required' => 'Supplier harus dipilih.',
+            'supplier_id.exists' => 'Supplier yang dipilih tidak valid.',
             'name.required' => 'Nama produk harus diisi.',
             'name.max' => 'Nama produk maksimal 255 karakter.',
             'code.required' => 'Kode produk harus diisi.',
@@ -70,8 +73,8 @@ class StoreProductRequest extends FormRequest
             'units.required' => 'Minimal satu unit produk harus ditambahkan.',
             'units.array' => 'Format unit produk tidak valid.',
             'units.min' => 'Minimal satu unit produk harus ditambahkan.',
-            'units.*.name.required' => 'Nama unit harus diisi.',
-            'units.*.name.max' => 'Nama unit maksimal 50 karakter.',
+            'units.*.unit_id.required' => 'Unit harus dipilih.',
+            'units.*.unit_id.exists' => 'Unit yang dipilih tidak valid.',
             'units.*.conversion_factor.required' => 'Faktor konversi harus diisi.',
             'units.*.conversion_factor.numeric' => 'Faktor konversi harus berupa angka.',
             'units.*.conversion_factor.min' => 'Faktor konversi minimal 0.01.',
@@ -85,18 +88,18 @@ class StoreProductRequest extends FormRequest
     public function withValidator($validator)
     {
         $validator->after(function ($validator) {
-            // Ensure at least one base unit exists
+            // Ensure at least one default unit exists
             $units = $this->input('units', []);
-            $hasBaseUnit = false;
+            $hasDefaultUnit = false;
             
             foreach ($units as $unit) {
-                if (isset($unit['is_base_unit']) && $unit['is_base_unit']) {
-                    $hasBaseUnit = true;
+                if (isset($unit['is_default']) && $unit['is_default']) {
+                    $hasDefaultUnit = true;
                     break;
                 }
             }
             
-            if (!$hasBaseUnit) {
+            if (!$hasDefaultUnit) {
                 $validator->errors()->add('units', 'Minimal satu unit harus dijadikan unit dasar.');
             }
         });

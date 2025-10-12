@@ -646,8 +646,10 @@ class PurchaseController extends Controller
         $prefix = 'PO-' . $supplierCode . '-' . $today;
 
         // Cari nomor terakhir untuk supplier dan hari ini
-        $lastPurchase = Purchase::where('purchase_number', 'like', $prefix . '%')
-            ->orderBy('purchase_number', 'desc')
+        $lastPurchase = Purchase::where(function($query) use ($prefix) {
+            $query->whereRaw("purchase_number LIKE ?", [$prefix . '%']);
+        })
+            ->orderBy('id', 'desc')
             ->first();
 
         if (!$lastPurchase) {
@@ -661,7 +663,7 @@ class PurchaseController extends Controller
         $purchaseNumber = $prefix . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
 
         // Pastikan nomor unik
-        while (Purchase::where('purchase_number', $purchaseNumber)->exists()) {
+        while (Purchase::whereRaw("purchase_number = ?", [$purchaseNumber])->exists()) {
             $number++;
             $purchaseNumber = $prefix . '-' . str_pad($number, 4, '0', STR_PAD_LEFT);
         }

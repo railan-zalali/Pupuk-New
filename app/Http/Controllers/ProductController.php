@@ -118,18 +118,17 @@ class ProductController extends Controller
                 ]);
             }
 
-            // Create initial stock movement
+
             StockMovement::create([
                 'product_id' => $product->id,
                 'type' => 'in',
-                'quantity' => $validated['stock'],
+                'quantity' => $request->stock, // Ganti $validated['stock'] dengan $request->stock
                 'before_stock' => 0,
-                'after_stock' => $validated['stock'],
+                'after_stock' => $request->stock, // Ganti $validated['stock'] dengan $request->stock
                 'reference_type' => 'initial',
                 'reference_id' => $product->id,
                 'notes' => 'Initial stock'
             ]);
-
             DB::commit();
 
             return redirect()->route('products.index')
@@ -169,8 +168,10 @@ class ProductController extends Controller
             // Add conditional validation for perishable products
             if ($request->has('products')) {
                 foreach ($request->products as $index => $product) {
-                    if (isset($product['is_perishable']) && $product['is_perishable'] || 
-                        isset($product['requires_expiry_date']) && $product['requires_expiry_date']) {
+                    if (
+                        isset($product['is_perishable']) && $product['is_perishable'] ||
+                        isset($product['requires_expiry_date']) && $product['requires_expiry_date']
+                    ) {
                         $rules["products.{$index}.expiry_warning_days"] = 'required|integer|min:1|max:365';
                         $rules["products.{$index}.expire_date"] = 'required|date|after:today';
                     }
@@ -221,29 +222,29 @@ class ProductController extends Controller
 
             foreach ($request->products as $index => $productData) {
                 // Generate new code for each product
-            $newNumber = ++$lastNumber;
-            $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-
-            // Make sure it's unique
-            while (Product::withTrashed()->where('code', $productCode)->exists()) {
-                $newNumber++;
+                $newNumber = ++$lastNumber;
                 $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
-            }
 
-            // Log produk yang sedang dibuat
-            Log::info('Membuat produk batch #' . ($index + 1), [
-                'product_name' => $productData['name'],
-                'product_code' => $productCode,
-                'category_id' => $productData['category_id'],
-                'unit_id' => $productData['unit_id']
-            ]);
-            
-            // Log kode produk batch dibuat
-            Log::info('Kode produk batch dibuat', [
-                'product_code' => $productCode,
-                'category_id' => $productData['category_id'],
-                'unit_id' => $productData['unit_id']
-            ]);
+                // Make sure it's unique
+                while (Product::withTrashed()->where('code', $productCode)->exists()) {
+                    $newNumber++;
+                    $productCode = $baseCode . str_pad($newNumber, 4, '0', STR_PAD_LEFT);
+                }
+
+                // Log produk yang sedang dibuat
+                Log::info('Membuat produk batch #' . ($index + 1), [
+                    'product_name' => $productData['name'],
+                    'product_code' => $productCode,
+                    'category_id' => $productData['category_id'],
+                    'unit_id' => $productData['unit_id']
+                ]);
+
+                // Log kode produk batch dibuat
+                Log::info('Kode produk batch dibuat', [
+                    'product_code' => $productCode,
+                    'category_id' => $productData['category_id'],
+                    'unit_id' => $productData['unit_id']
+                ]);
 
                 // Create the product
                 $product = Product::create([
@@ -330,23 +331,23 @@ class ProductController extends Controller
         $product = Product::with(['category', 'stockMovements' => function ($query) {
             $query->latest();
         }])->findOrFail($product->id);
-        
+
         // Ambil batch produk dengan metode FIFO (First In First Out)
         $batches = $product->availableBatches()->get();
-        
+
         return view('products.show', compact('product', 'batches'));
     }
 
     public function showBatches(Product $product)
     {
         $product->load(['category', 'supplier', 'units']);
-        
+
         // Ambil semua batch produk
         $batches = $product->batches()->orderBy('created_at', 'asc')->get();
-        
+
         // Ambil batch yang masih tersedia (FIFO)
         $availableBatches = $product->availableBatches()->get();
-        
+
         return view('products.batches', compact('product', 'batches', 'availableBatches'));
     }
 
@@ -559,12 +560,12 @@ class ProductController extends Controller
         if ($validated['adjustment_type'] === 'add') {
             $product->increment('stock', $quantity);
             $type = 'in';
-            
+
             // Jika menambah stok dan ada tanggal kadaluarsa, perbarui atau tambahkan di ProductUnit
             if (isset($validated['expire_date'])) {
                 // Cari ProductUnit default untuk produk ini
                 $productUnit = $product->productUnits()->where('is_default', true)->first();
-                
+
                 if ($productUnit) {
                     // Update tanggal kadaluarsa pada unit default
                     $productUnit->update([
@@ -572,7 +573,7 @@ class ProductController extends Controller
                     ]);
                 }
             }
-            
+
             // Jika menggunakan FIFO, tambahkan batch baru dengan tanggal kadaluarsa
             if (class_exists('\App\Services\FifoService')) {
                 $fifoService = new \App\Services\FifoService();
@@ -589,7 +590,7 @@ class ProductController extends Controller
             if ($product->actual_stock < $quantity) {
                 return back()->with('error', "Stok tidak cukup untuk dikurangi. Stok tersedia: {$product->actual_stock}, diminta: {$quantity}");
             }
-            
+
             // Gunakan FifoService untuk mengurangi stok dari batch
             if (class_exists('\App\Services\FifoService')) {
                 try {
@@ -609,10 +610,10 @@ class ProductController extends Controller
                 // Fallback jika FifoService tidak tersedia
                 $product->decrement('stock', $quantity);
             }
-            
+
             $type = 'out';
         }
-        
+
         // Sync stock from batches to ensure consistency
         $product->syncStockFromBatches();
         $product->refresh(); // Refresh to get updated actual_stock
@@ -742,7 +743,7 @@ class ProductController extends Controller
             if (class_exists('FifoService') && $product->stock_method === 'fifo') {
                 $fifoService = new FifoService();
                 $batches = $fifoService->getAvailableBatches($product->id);
-                
+
                 // Transform batches for frontend consumption
                 $transformedBatches = collect($batches)->map(function ($batch) {
                     return [
@@ -754,43 +755,43 @@ class ProductController extends Controller
                         'remaining_quantity' => $batch->remaining_quantity,
                         'purchase_price' => $batch->purchase_price,
                         'created_at' => $batch->created_at,
-                        'days_to_expiry' => $batch->expire_date ? 
+                        'days_to_expiry' => $batch->expire_date ?
                             now()->diffInDays($batch->expire_date, false) : null,
-                        'is_expired' => $batch->expire_date ? 
+                        'is_expired' => $batch->expire_date ?
                             now()->isAfter($batch->expire_date) : false,
                         'expiry_status' => $this->getExpiryStatus($batch->expire_date)
                     ];
                 });
-                
+
                 // Sort by FEFO logic (First Expired, First Out)
                 $sortedBatches = $transformedBatches->sort(function ($a, $b) {
                     // First, prioritize by expiry date (earliest first)
                     if ($a['expiry_date'] && $b['expiry_date']) {
                         $dateA = \Carbon\Carbon::parse($a['expiry_date']);
                         $dateB = \Carbon\Carbon::parse($b['expiry_date']);
-                        
+
                         if (!$dateA->equalTo($dateB)) {
                             return $dateA->lt($dateB) ? -1 : 1;
                         }
                     }
-                    
+
                     // If one has expiry date and other doesn't, prioritize the one with expiry date
                     if ($a['expiry_date'] && !$b['expiry_date']) return -1;
                     if (!$a['expiry_date'] && $b['expiry_date']) return 1;
-                    
+
                     // If both don't have expiry dates, sort by production date (FIFO)
                     if ($a['production_date'] && $b['production_date']) {
                         $prodA = \Carbon\Carbon::parse($a['production_date']);
                         $prodB = \Carbon\Carbon::parse($b['production_date']);
                         return $prodA->lt($prodB) ? -1 : 1;
                     }
-                    
+
                     // Finally, sort by creation date (FIFO)
                     $createdA = \Carbon\Carbon::parse($a['created_at']);
                     $createdB = \Carbon\Carbon::parse($b['created_at']);
                     return $createdA->lt($createdB) ? -1 : 1;
                 })->values();
-                
+
                 return response()->json([
                     'status' => 'success',
                     'batches' => $sortedBatches,
@@ -799,13 +800,13 @@ class ProductController extends Controller
                     'fefo_enabled' => true
                 ]);
             }
-            
+
             // Fallback: return simple batch info from product units
             $productUnits = $product->productUnits()
                 ->with('unit')
                 ->where('is_default', true)
                 ->get();
-            
+
             $simpleBatches = $productUnits->map(function ($unit) use ($product) {
                 return [
                     'id' => $unit->id,
@@ -813,17 +814,17 @@ class ProductController extends Controller
                     'production_date' => $unit->created_at->format('Y-m-d'),
                     'expiry_date' => $unit->expire_date,
                     'quantity' => $product->actual_stock,
-                'remaining_quantity' => $product->actual_stock,
+                    'remaining_quantity' => $product->actual_stock,
                     'purchase_price' => $product->purchase_price,
                     'created_at' => $unit->created_at,
-                    'days_to_expiry' => $unit->expire_date ? 
+                    'days_to_expiry' => $unit->expire_date ?
                         now()->diffInDays($unit->expire_date, false) : null,
-                    'is_expired' => $unit->expire_date ? 
+                    'is_expired' => $unit->expire_date ?
                         now()->isAfter($unit->expire_date) : false,
                     'expiry_status' => $this->getExpiryStatus($unit->expire_date)
                 ];
             });
-            
+
             return response()->json([
                 'status' => 'success',
                 'batches' => $simpleBatches,
@@ -831,10 +832,9 @@ class ProductController extends Controller
                 'batch_count' => $simpleBatches->count(),
                 'fefo_enabled' => false
             ]);
-            
         } catch (\Exception $e) {
             Log::error('Error fetching product batches: ' . $e->getMessage());
-            
+
             return response()->json([
                 'status' => 'error',
                 'message' => 'Failed to fetch product batches',
@@ -842,7 +842,7 @@ class ProductController extends Controller
             ], 500);
         }
     }
-    
+
     /**
      * Get expiry status for a batch
      */
@@ -851,9 +851,9 @@ class ProductController extends Controller
         if (!$expiryDate) {
             return 'no_expiry';
         }
-        
+
         $daysToExpiry = now()->diffInDays($expiryDate, false);
-        
+
         if ($daysToExpiry < 0) {
             return 'expired';
         } elseif ($daysToExpiry === 0) {

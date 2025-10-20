@@ -119,12 +119,25 @@ class ProductController extends Controller
             }
 
 
+            // Buat batch untuk stok awal
+            $initialBatch = ProductBatch::create([
+                'product_id' => $product->id,
+                'batch_number' => 'INITIAL-' . date('YmdHis'),
+                'quantity' => $request->stock,
+                'remaining_quantity' => $request->stock,
+                'production_date' => now(),
+                'expiry_date' => $product->requires_expiry_date ? now()->addYear() : null,
+                'purchase_price' => $product->purchase_price
+            ]);
+            
+            // Catat pergerakan stok dengan batch_id
             StockMovement::create([
                 'product_id' => $product->id,
+                'batch_id' => $initialBatch->id,
                 'type' => 'in',
-                'quantity' => $request->stock, // Ganti $validated['stock'] dengan $request->stock
+                'quantity' => $request->stock,
                 'before_stock' => 0,
-                'after_stock' => $request->stock, // Ganti $validated['stock'] dengan $request->stock
+                'after_stock' => $request->stock,
                 'reference_type' => 'initial',
                 'reference_id' => $product->id,
                 'notes' => 'Initial stock'

@@ -48,93 +48,93 @@
                                 d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                         </svg>
                         @if ($draft)
-                            {{ __('Proses Draft Penjualan') }}
+                        {{ __('Proses Draft Penjualan') }}
                         @else
-                            {{ __('Buat Penjualan Baru') }}
+                        {{ __('Buat Penjualan Baru') }}
                         @endif
                     </h2>
                     <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">
                         @if ($draft)
-                            Anda sedang memproses draft penjualan dengan nomor invoice <span
-                                class="font-medium">{{ $draft->invoice_number }}</span>
+                        Anda sedang memproses draft penjualan dengan nomor invoice <span
+                            class="font-medium">{{ $draft->invoice_number }}</span>
                         @else
-                            Isi informasi detail untuk transaksi penjualan baru
+                        Isi informasi detail untuk transaksi penjualan baru
                         @endif
                     </p>
                 </div>
                 <div class="mt-4 flex md:mt-0 md:ml-4 space-x-3">
                     @if ($draft)
-                        <a href="{{ route('sales.drafts') }}"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Kembali ke Daftar Draft
-                        </a>
+                    <a href="{{ route('sales.drafts') }}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Kembali ke Daftar Draft
+                    </a>
                     @else
-                        <a href="{{ route('sales.index') }}"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Kembali
-                        </a>
+                    <a href="{{ route('sales.index') }}"
+                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-offset-gray-800 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="-ml-1 mr-2 h-5 w-5" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                        Kembali
+                    </a>
                     @endif
                 </div>
             </div>
         </div>
 
         @if ($draft)
-            <!-- Draft Info Banner -->
-            <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-md">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm text-yellow-700 dark:text-yellow-200">
-                            Anda sedang memproses draft penjualan. Periksa data dan selesaikan transaksi dengan menekan
-                            tombol <strong>Simpan Transaksi</strong>. Jika ingin tetap menyimpan sebagai draft, gunakan
-                            tombol <strong>Simpan Sebagai Draft</strong>.
-                        </p>
-                    </div>
+        <!-- Draft Info Banner -->
+        <div class="mb-6 bg-yellow-50 dark:bg-yellow-900/30 border-l-4 border-yellow-400 dark:border-yellow-500 p-4 rounded-md">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-yellow-400 dark:text-yellow-300" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                        fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <p class="text-sm text-yellow-700 dark:text-yellow-200">
+                        Anda sedang memproses draft penjualan. Periksa data dan selesaikan transaksi dengan menekan
+                        tombol <strong>Simpan Transaksi</strong>. Jika ingin tetap menyimpan sebagai draft, gunakan
+                        tombol <strong>Simpan Sebagai Draft</strong>.
+                    </p>
                 </div>
             </div>
+        </div>
         @endif
 
         <!-- Error Messages -->
         @if ($errors->any())
-            <div class="rounded-lg bg-red-50 dark:bg-red-900/30 p-4 mb-6 border border-red-200 dark:border-red-800">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Ada kesalahan dalam pengisian
-                            form:</h3>
-                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                            <ul class="list-disc pl-5 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
-                        </div>
+        <div class="rounded-lg bg-red-50 dark:bg-red-900/30 p-4 mb-6 border border-red-200 dark:border-red-800">
+            <div class="flex">
+                <div class="flex-shrink-0">
+                    <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <div class="ml-3">
+                    <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Ada kesalahan dalam pengisian
+                        form:</h3>
+                    <div class="mt-2 text-sm text-red-700 dark:text-red-300">
+                        <ul class="list-disc pl-5 space-y-1">
+                            @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                            @endforeach
+                        </ul>
                     </div>
                 </div>
             </div>
+        </div>
         @endif
 
         <form action="{{ route('sales.store') }}" method="POST" id="saleForm" class="space-y-6">
@@ -208,8 +208,9 @@
                                     class="select2 mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
                                     <option value="">-- Pilih Pelanggan atau Ketik Nama Baru --</option>
                                     @foreach ($customers as $customer)
-                                        <option value="{{ $customer->id }}">{{ $customer->nama }} -
-                                            {{ $customer->kecamatan_nama }}, {{ $customer->kabupaten_nama }}</option>
+                                    <option value="{{ $customer->id }}">{{ $customer->nama }} -
+                                        {{ $customer->kecamatan_nama }}, {{ $customer->kabupaten_nama }}
+                                    </option>
                                     @endforeach
                                 </select>
                                 <p class="mt-1 text-xs text-gray-500 dark:text-gray-400">Pilih pelanggan yang ada atau
@@ -579,11 +580,11 @@
                                 d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                         <span>
-                        @if ($draft)
+                            @if ($draft)
                             Perbarui Draft
-                        @else
+                            @else
                             Simpan sebagai Draft
-                        @endif
+                            @endif
                         </span>
                     </button>
                     <div
@@ -606,11 +607,11 @@
                                 d="M5 13l4 4L19 7" />
                         </svg>
                         <span>
-                        @if ($draft)
+                            @if ($draft)
                             Selesaikan Transaksi
-                        @else
+                            @else
                             Proses Transaksi
-                        @endif
+                            @endif
                         </span>
                     </button>
                     <div
@@ -634,494 +635,498 @@
     <x-batch-selector />
 
     @push('scripts')
-        <script src="{{ asset('js/product-selector.js') }}"></script>
-        <script src="{{ asset('js/batch-selector.js') }}"></script>
-        <!-- Modal Histori Pembelian Pelanggan -->
-        <div id="shortcuts-modal" class="fixed inset-0 overflow-y-auto hidden z-50" aria-labelledby="modal-title"
-            role="dialog" aria-modal="true">
-            <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-                <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 transition-opacity"
-                    aria-hidden="true"></div>
-                <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+    <script src="{{ asset('js/product-selector.js') }}"></script>
+    <script src="{{ asset('js/batch-selector.js') }}"></script>
+    <!-- Modal Histori Pembelian Pelanggan -->
+    <div id="shortcuts-modal" class="fixed inset-0 overflow-y-auto hidden z-50" aria-labelledby="modal-title"
+        role="dialog" aria-modal="true">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 dark:bg-gray-900 dark:bg-opacity-75 transition-opacity"
+                aria-hidden="true"></div>
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            <div
+                class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
+                <!-- Modal Header -->
                 <div
-                    class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-3xl sm:w-full">
-                    <!-- Modal Header -->
-                    <div
-                        class="bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-900 dark:to-indigo-700 px-4 py-4 sm:px-6 flex justify-between items-center">
-                        <div class="flex items-center">
-                            <div class="flex-shrink-0 bg-white dark:bg-indigo-800 rounded-full p-2 mr-3">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-white"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                            </div>
-                            <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
-                                Histori Pembelian Pelanggan
-                            </h3>
-                        </div>
-                        <button type="button" id="close-shortcuts-modal"
-                            class="bg-indigo-700 hover:bg-indigo-800 dark:bg-indigo-800 dark:hover:bg-indigo-900 rounded-full p-1 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-offset-indigo-900">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
-                                stroke="currentColor">
+                    class="bg-gradient-to-r from-indigo-600 to-indigo-800 dark:from-indigo-900 dark:to-indigo-700 px-4 py-4 sm:px-6 flex justify-between items-center">
+                    <div class="flex items-center">
+                        <div class="flex-shrink-0 bg-white dark:bg-indigo-800 rounded-full p-2 mr-3">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-indigo-600 dark:text-white"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M6 18L18 6M6 6l12 12" />
+                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                             </svg>
-                        </button>
+                        </div>
+                        <h3 class="text-lg leading-6 font-medium text-white" id="modal-title">
+                            Histori Pembelian Pelanggan
+                        </h3>
+                    </div>
+                    <button type="button" id="close-shortcuts-modal"
+                        class="bg-indigo-700 hover:bg-indigo-800 dark:bg-indigo-800 dark:hover:bg-indigo-900 rounded-full p-1 text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-white dark:focus:ring-offset-indigo-900">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24"
+                            stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Modal Content -->
+                <div class="bg-white dark:bg-gray-800 px-4 pt-4 pb-4 sm:p-6 sm:pb-4">
+                    <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-lg"
+                        id="customer-history-info">
+                        <div class="flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                            </svg>
+                            <span>Silakan pilih pelanggan terlebih dahulu untuk melihat histori pembelian</span>
+                        </div>
                     </div>
 
-                    <!-- Modal Content -->
-                    <div class="bg-white dark:bg-gray-800 px-4 pt-4 pb-4 sm:p-6 sm:pb-4">
-                        <div class="text-sm text-gray-500 dark:text-gray-400 mb-4 p-3 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-lg"
-                            id="customer-history-info">
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2"
-                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                <span>Silakan pilih pelanggan terlebih dahulu untuk melihat histori pembelian</span>
+                    <!-- Loading Indicator -->
+                    <div id="customer-history-loading" class="hidden flex justify-center p-8">
+                        <div class="flex flex-col items-center">
+                            <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg"
+                                fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10"
+                                    stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor"
+                                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
+                                </path>
+                            </svg>
+                            <span class="mt-3 text-indigo-600 dark:text-indigo-400 font-medium">Memuat histori
+                                pembelian...</span>
+                        </div>
+                    </div>
+
+                    <!-- Empty State -->
+                    <div id="customer-history-empty" class="hidden">
+                        <div class="bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-5 sm:p-6 text-center">
+                            <svg xmlns="http://www.w3.org/2000/svg"
+                                class="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500" fill="none"
+                                viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                            </svg>
+                            <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">Belum ada histori
+                                pembelian</h3>
+                            <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
+                                Pelanggan ini belum pernah melakukan transaksi sebelumnya. Ini akan menjadi transaksi
+                                pertama mereka!
+                            </p>
+                            <div class="mt-5">
+                                <button type="button" onclick="$('#shortcuts-modal').addClass('hidden')"
+                                    class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                    Lanjutkan Transaksi
+                                </button>
                             </div>
                         </div>
+                    </div>
 
-                        <!-- Loading Indicator -->
-                        <div id="customer-history-loading" class="hidden flex justify-center p-8">
-                            <div class="flex flex-col items-center">
-                                <svg class="animate-spin h-8 w-8 text-indigo-600" xmlns="http://www.w3.org/2000/svg"
-                                    fill="none" viewBox="0 0 24 24">
-                                    <circle class="opacity-25" cx="12" cy="12" r="10"
-                                        stroke="currentColor" stroke-width="4"></circle>
-                                    <path class="opacity-75" fill="currentColor"
-                                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z">
-                                    </path>
-                                </svg>
-                                <span class="mt-3 text-indigo-600 dark:text-indigo-400 font-medium">Memuat histori
-                                    pembelian...</span>
-                            </div>
-                        </div>
-
-                        <!-- Empty State -->
-                        <div id="customer-history-empty" class="hidden">
-                            <div class="bg-gray-50 dark:bg-gray-700 rounded-lg px-4 py-5 sm:p-6 text-center">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="mx-auto h-16 w-16 text-gray-400 dark:text-gray-500" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                                </svg>
-                                <h3 class="mt-4 text-lg font-medium text-gray-900 dark:text-gray-100">Belum ada histori
-                                    pembelian</h3>
-                                <p class="mt-2 text-sm text-gray-500 dark:text-gray-400">
-                                    Pelanggan ini belum pernah melakukan transaksi sebelumnya. Ini akan menjadi transaksi
-                                    pertama mereka!
-                                </p>
-                                <div class="mt-5">
-                                    <button type="button" onclick="$('#shortcuts-modal').addClass('hidden')"
-                                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                                        Lanjutkan Transaksi
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- History Content -->
-                        <div id="customer-history-content" class="hidden">
-                            <!-- Transaksi Terakhir -->
-                            <div class="mb-5">
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Transaksi Terakhir
-                                </h4>
-                                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
-                                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
-                                        <thead class="bg-gray-100 dark:bg-gray-700">
-                                            <tr>
-                                                <th scope="col"
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Tanggal
-                                                </th>
-                                                <th scope="col"
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    No. Faktur
-                                                </th>
-                                                <th scope="col"
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Total
-                                                </th>
-                                                <th scope="col"
-                                                    class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Status
-                                                </th>
-                                                <th scope="col"
-                                                    class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                                    Aksi
-                                                </th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="customer-history-table"
-                                            class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
-                                            <!-- Konten akan diisi secara dinamis -->
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-
-                            <!-- Produk Favorit -->
-                            <div>
-                                <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                                    </svg>
-                                    Produk Favorit
-                                </h4>
-                                <div
-                                    class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
-                                    <div id="customer-favorite-products" class="grid grid-cols-1 md:grid-cols-2 gap-2">
-                                        <!-- Konten akan diisi secara dinamis -->
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Keyboard Shortcuts Section -->
-                        <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                    <!-- History Content -->
+                    <div id="customer-history-content" class="hidden">
+                        <!-- Transaksi Terakhir -->
+                        <div class="mb-5">
                             <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
                                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500"
                                     fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M9 7V5a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9" />
+                                        d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
-                                Pintasan Keyboard
+                                Transaksi Terakhir
                             </h4>
-                            <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
-                                <div
-                                    class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
-                                    <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Tambah
-                                        item</span>
-                                    <span
-                                        class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+A</span>
+                            <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700">
+                                <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                                    <thead class="bg-gray-100 dark:bg-gray-700">
+                                        <tr>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Tanggal
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                No. Faktur
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Total
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Status
+                                            </th>
+                                            <th scope="col"
+                                                class="px-4 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                                                Aksi
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="customer-history-table"
+                                        class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-600">
+                                        <!-- Konten akan diisi secara dinamis -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+
+                        <!-- Produk Favorit -->
+                        <div>
+                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                                </svg>
+                                Produk Favorit
+                            </h4>
+                            <div
+                                class="bg-gray-50 dark:bg-gray-700 rounded-lg p-3 border border-gray-200 dark:border-gray-700">
+                                <div id="customer-favorite-products" class="grid grid-cols-1 md:grid-cols-2 gap-2">
+                                    <!-- Konten akan diisi secara dinamis -->
                                 </div>
-                                {{-- <div
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Keyboard Shortcuts Section -->
+                    <div class="mt-6 pt-4 border-t border-gray-200 dark:border-gray-700">
+                        <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100 mb-3 flex items-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-indigo-500"
+                                fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M9 7H6a2 2 0 00-2 2v9a2 2 0 002 2h9a2 2 0 002-2v-3M9 7V5a2 2 0 012-2h6a2 2 0 012 2v6a2 2 0 01-2 2H9" />
+                            </svg>
+                            Pintasan Keyboard
+                        </h4>
+                        <div class="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs">
+                            <div
+                                class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
+                                <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Tambah
+                                    item</span>
+                                <span
+                                    class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+A</span>
+                            </div>
+                            {{-- <div
                                     class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
                                     <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Scan
                                         barcode</span>
                                     <span
                                         class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+B</span>
                                 </div> --}}
-                                <div
-                                    class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
-                                    <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Proses
-                                        transaksi</span>
-                                    <span
-                                        class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+S</span>
-                                </div>
-                                <div
-                                    class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
-                                    <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Simpan
-                                        draft</span>
-                                    <span
-                                        class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+D</span>
-                                </div>
+                            <div
+                                class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
+                                <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Proses
+                                    transaksi</span>
+                                <span
+                                    class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+S</span>
+                            </div>
+                            <div
+                                class="bg-gray-100 dark:bg-gray-700 p-2 rounded-md border border-gray-200 dark:border-gray-600">
+                                <span class="block text-gray-700 dark:text-gray-300 mb-1 font-medium">Simpan
+                                    draft</span>
+                                <span
+                                    class="px-2 py-1 bg-indigo-100 dark:bg-indigo-900/40 rounded text-indigo-700 dark:text-indigo-300 font-mono">Alt+D</span>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Floating Action Buttons -->
-        <div class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-40">
-            <div id="history-button" class="tooltip-container">
-                <button type="button"
-                    class="inline-flex items-center justify-center p-3 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
-                    title="Histori Pelanggan (Alt+H)" onclick="showCustomerHistory()">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                </button>
-            </div>
-
-            
-
-            <div id="help-button" class="tooltip-container">
-                <button type="button"
-                    class="inline-flex items-center justify-center p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
-                    title="Pintasan Keyboard">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                </button>
-            </div>
+    <!-- Floating Action Buttons -->
+    <div class="fixed bottom-6 right-6 flex flex-col items-end space-y-2 z-40">
+        <div id="history-button" class="tooltip-container">
+            <button type="button"
+                class="inline-flex items-center justify-center p-3 rounded-full bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors"
+                title="Histori Pelanggan (Alt+H)" onclick="showCustomerHistory()">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+            </button>
         </div>
 
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
 
-        <script>
-            let isDraftSubmission = false;
-            let currentDraftId = null;
-            let autoSaveTimer;
-            let isDraftSaved = false;
-            $(document).ready(function() {
-                // Check if we have a draft to load
-                @if (isset($draft) && $draft)
-                    loadDraftData();
-                @endif
 
-                // Initialize Select2 for customer select
-                initializeCustomerSelect();
+        <div id="help-button" class="tooltip-container">
+            <button type="button"
+                class="inline-flex items-center justify-center p-3 rounded-full bg-blue-600 text-white shadow-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-colors"
+                title="Pintasan Keyboard">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </button>
+        </div>
+    </div>
 
-                // Initialize the first item row on page load if no items exist
-                if ($('#saleItems tr').length === 0) {
-                    addItem();
-                } else {
-                    // Initialize Select2 for existing item rows
-                    $('#saleItems tr').each(function() {
-                        initializeProductSelect($(this));
-                    });
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.0.13/dist/js/select2.min.js"></script>
+
+    <script>
+        let isDraftSubmission = false;
+        let currentDraftId = null;
+        let autoSaveTimer;
+        let isDraftSaved = false;
+        $(document).ready(function() {
+            // Check if we have a draft to load
+            @if(isset($draft) && $draft)
+            loadDraftData();
+            @endif
+
+            // Initialize Select2 for customer select
+            initializeCustomerSelect();
+
+            // Initialize the first item row on page load if no items exist
+            if ($('#saleItems tr').length === 0) {
+                addItem();
+            } else {
+                // Initialize Select2 for existing item rows
+                $('#saleItems tr').each(function() {
+                    initializeProductSelect($(this));
+                });
+            }
+
+            // Update payment sections based on initial payment method
+            updatePaymentSections();
+
+            // Add input validations
+            addInputValidations();
+
+            // Event listeners
+            $('#payment_method').on('change', updatePaymentSections);
+            $('#discount').on('input', calculateFinalTotal);
+            $('#paid_amount').on('input', calculateChange);
+            $('#down_payment').on('input', calculateRemainingAmount);
+            $('#set_exact_amount').on('click', setExactAmount);
+            $('#set_dp_percentage_10').on('click', function() {
+                setDownPayment(10);
+            });
+            $('#set_dp_percentage_25').on('click', function() {
+                setDownPayment(25);
+            });
+            $('#set_dp_percentage_50').on('click', function() {
+                setDownPayment(50);
+            });
+            $('#add_item').on('click', addItem);
+
+            // Event delegation for dynamically added rows
+            $('#saleItems').on('change', 'select[name="product_id[]"]', function() {
+                updateProductInfo($(this));
+            });
+            $('#saleItems').on('change', 'select[name="unit_id[]"]', function() {
+                updatePrice($(this));
+            });
+            $('#saleItems').on('input', 'input[name="quantity[]"], input[name="selling_price[]"]', function() {
+                calculateSubtotal($(this).closest('tr'));
+            });
+            $('#saleItems').on('click', '.remove-item', function() {
+                removeItem($(this).closest('tr'));
+            });
+
+            // Help button
+            $('#help-button').on('click', function() {
+                $('#shortcuts-modal').removeClass('hidden');
+            });
+            $('#history-button').on('click', function() {
+                showCustomerHistory();
+            });
+            $('#close-shortcuts-modal').on('click', function() {
+                $('#shortcuts-modal').addClass('hidden');
+            });
+
+            // Additional keyboard shortcuts
+            $(document).on('keydown', function(e) {
+                // Alt+H: Show customer history
+                if (e.altKey && e.which === 72) { // 'H' key
+                    e.preventDefault();
+                    showCustomerHistory();
                 }
 
-                // Update payment sections based on initial payment method
-                updatePaymentSections();
-
-                // Add input validations
-                addInputValidations();
-
-                // Event listeners
-                $('#payment_method').on('change', updatePaymentSections);
-                $('#discount').on('input', calculateFinalTotal);
-                $('#paid_amount').on('input', calculateChange);
-                $('#down_payment').on('input', calculateRemainingAmount);
-                $('#set_exact_amount').on('click', setExactAmount);
-                $('#set_dp_percentage_10').on('click', function() {
-                    setDownPayment(10);
-                });
-                $('#set_dp_percentage_25').on('click', function() {
-                    setDownPayment(25);
-                });
-                $('#set_dp_percentage_50').on('click', function() {
-                    setDownPayment(50);
-                });
-                $('#add_item').on('click', addItem);
-
-                // Event delegation for dynamically added rows
-                $('#saleItems').on('change', 'select[name="product_id[]"]', function() {
-                    updateProductInfo($(this));
-                });
-                $('#saleItems').on('change', 'select[name="unit_id[]"]', function() {
-                    updatePrice($(this));
-                });
-                $('#saleItems').on('input', 'input[name="quantity[]"], input[name="selling_price[]"]', function() {
-                    calculateSubtotal($(this).closest('tr'));
-                });
-                $('#saleItems').on('click', '.remove-item', function() {
-                    removeItem($(this).closest('tr'));
-                });
-
-                // Help button
-                $('#help-button').on('click', function() {
-                    $('#shortcuts-modal').removeClass('hidden');
-                });
-                $('#history-button').on('click', function() {
-                    showCustomerHistory();
-                });
-                $('#close-shortcuts-modal').on('click', function() {
-                    $('#shortcuts-modal').addClass('hidden');
-                });
-
-                // Additional keyboard shortcuts
-                $(document).on('keydown', function(e) {
-                    // Alt+H: Show customer history
-                    if (e.altKey && e.which === 72) { // 'H' key
-                        e.preventDefault();
-                        showCustomerHistory();
+                // Alt+A: Add item
+                if (e.altKey && e.which === 65) { // 'A' key
+                    e.preventDefault();
+                    addItem();
+                }
+                // Alt+S: Submit form (process transaction)
+                if (e.altKey && e.which === 83) { // 'S' key
+                    e.preventDefault();
+                    isDraftSubmission = false;
+                    if (validateForm()) {
+                        $('#saleForm').submit();
                     }
+                }
 
-                    // Alt+A: Add item
-                    if (e.altKey && e.which === 65) { // 'A' key
-                        e.preventDefault();
-                        addItem();
-                    }
-                    // Alt+S: Submit form (process transaction)
-                    if (e.altKey && e.which === 83) { // 'S' key
-                        e.preventDefault();
-                        isDraftSubmission = false;
-                        if (validateForm()) {
-                            $('#saleForm').submit();
-                        }
-                    }
-
-                    // Alt+D: Save as draft
-                    if (e.altKey && e.which === 68) { // 'D' key
-                        e.preventDefault();
-                        isDraftSubmission = true;
-                        $('#payment_method').removeAttr('required');
-
-                        // Ensure the save_draft parameter is included
-                        if (!$('input[name="save_draft"]').length) {
-                            $('#saleForm').append('<input type="hidden" name="save_draft" value="1">');
-                        }
-
-                        $('button[name="save_draft"]').click();
-                    }
-                });
-
-                $('button[name="save_draft"]').on('click', function(e) {
+                // Alt+D: Save as draft
+                if (e.altKey && e.which === 68) { // 'D' key
+                    e.preventDefault();
                     isDraftSubmission = true;
-                    // Temporarily remove HTML5 validation
                     $('#payment_method').removeAttr('required');
-                    $('#date').removeAttr('required');
-                    $('input[name="quantity[]"]').removeAttr('required');
-                    $('input[name="selling_price[]"]').removeAttr('required');
-                    $('select[name="product_id[]"]').removeAttr('required');
-                    $('select[name="unit_id[]"]').removeAttr('required');
 
                     // Ensure the save_draft parameter is included
                     if (!$('input[name="save_draft"]').length) {
                         $('#saleForm').append('<input type="hidden" name="save_draft" value="1">');
                     }
-                });
 
-                $('button[type="submit"]:not([name="save_draft"])').on('click', function(e) {
-                    isDraftSubmission = false;
-                    // Restore HTML5 validation
-                    $('#payment_method').attr('required', true);
-                    $('#date').attr('required', true);
-                    $('input[name="quantity[]"]').attr('required', true);
-                    $('input[name="selling_price[]"]').attr('required', true);
-                    $('select[name="product_id[]"]').attr('required', true);
-                    $('select[name="unit_id[]"]').attr('required', true);
-                });
-
-                // Form submission validation
-                $('#saleForm').on('submit', function(e) {
-                    if (isDraftSubmission) {
-                        // Only validate basic requirements for draft
-                        if (!validateDraftForm()) {
-                            e.preventDefault();
-                            return false;
-                        }
-                    } else {
-                        if (!validateForm()) {
-                            e.preventDefault();
-                        }
-                    }
-                    // Show loading state
-                    const submitBtn = $(document.activeElement);
-                    const originalText = submitBtn.html();
-
-                    submitBtn.prop('disabled', true)
-                        .html(
-                            '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...'
-                        );
-                });
-
-                $('#saleForm').on('reset', function() {
-                    isDraftSubmission = false;
-                });
-                // Show keyboard shortcuts notification on page load
-                setTimeout(() => {
-                    showNotification('Gunakan Alt+H untuk melihat histori pembelian pelanggan', 'info');
-                }, 1000);
-
-                // Set currentDraftId if we loaded from a draft
-                @if (isset($draft) && $draft)
-                    currentDraftId = {{ $draft->id }};
-                @endif
-
-                // Initialize auto-save
-                initializeAutoSave();
+                    $('button[name="save_draft"]').click();
+                }
             });
 
-            function validateForm() {
-                const tbody = $('#saleItems');
-                if (tbody.children('tr').length === 0) {
-                    alert('Tambahkan setidaknya satu item');
-                    return false;
+            $('button[name="save_draft"]').on('click', function(e) {
+                isDraftSubmission = true;
+                // Temporarily remove HTML5 validation
+                $('#payment_method').removeAttr('required');
+                $('#date').removeAttr('required');
+                $('input[name="quantity[]"]').removeAttr('required');
+                $('input[name="selling_price[]"]').removeAttr('required');
+                $('select[name="product_id[]"]').removeAttr('required');
+                $('select[name="unit_id[]"]').removeAttr('required');
+
+                // Ensure the save_draft parameter is included
+                if (!$('input[name="save_draft"]').length) {
+                    $('#saleForm').append('<input type="hidden" name="save_draft" value="1">');
                 }
+            });
 
-                // Skip stock validation for drafts
-                if (!isDraftSubmission && !validateProductStock()) {
-                    return false;
-                }
+            $('button[type="submit"]:not([name="save_draft"])').on('click', function(e) {
+                isDraftSubmission = false;
+                // Restore HTML5 validation
+                $('#payment_method').attr('required', true);
+                $('#date').attr('required', true);
+                $('input[name="quantity[]"]').attr('required', true);
+                $('input[name="selling_price[]"]').attr('required', true);
+                $('select[name="product_id[]"]').attr('required', true);
+                $('select[name="unit_id[]"]').attr('required', true);
+            });
 
-                const paymentMethod = $('#payment_method').val();
-
-                // Only validate payment for non-draft submissions
-                if (!isDraftSubmission) {
-                    if (!paymentMethod) {
-                        alert('Pilih metode pembayaran');
+            // Form submission validation
+            $('#saleForm').on('submit', function(e) {
+                if (isDraftSubmission) {
+                    // Only validate basic requirements for draft
+                    if (!validateDraftForm()) {
+                        e.preventDefault();
                         return false;
                     }
+                } else {
+                    if (!validateForm()) {
+                        e.preventDefault();
+                    }
+                }
+                // Show loading state
+                const submitBtn = $(document.activeElement);
+                const originalText = submitBtn.html();
 
-                    const finalText = $('#finalAmount').text();
-                    const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                    const paid = parseFloat($('#paid_amount').val()) || 0;
+                submitBtn.prop('disabled', true)
+                    .html(
+                        '<svg class="animate-spin -ml-1 mr-2 h-5 w-5 inline-block" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg> Memproses...'
+                    );
+            });
 
-                    // Validation for paid amount for non-credit methods
-                    if (paymentMethod !== 'credit' && paid < finalTotal) {
-                        alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
+            $('#saleForm').on('reset', function() {
+                isDraftSubmission = false;
+            });
+            // Show keyboard shortcuts notification on page load
+            setTimeout(() => {
+                showNotification('Gunakan Alt+H untuk melihat histori pembelian pelanggan', 'info');
+            }, 1000);
+
+            // Set currentDraftId if we loaded from a draft
+            @if(isset($draft) && $draft)
+            currentDraftId = {
+                {
+                    $draft-> id
+                }
+            };
+            @endif
+
+            // Initialize auto-save
+            initializeAutoSave();
+        });
+
+        function validateForm() {
+            const tbody = $('#saleItems');
+            if (tbody.children('tr').length === 0) {
+                alert('Tambahkan setidaknya satu item');
+                return false;
+            }
+
+            // Skip stock validation for drafts
+            if (!isDraftSubmission && !validateProductStock()) {
+                return false;
+            }
+
+            const paymentMethod = $('#payment_method').val();
+
+            // Only validate payment for non-draft submissions
+            if (!isDraftSubmission) {
+                if (!paymentMethod) {
+                    alert('Pilih metode pembayaran');
+                    return false;
+                }
+
+                const finalText = $('#finalAmount').text();
+                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+                const paid = parseFloat($('#paid_amount').val()) || 0;
+
+                // Validation for paid amount for non-credit methods
+                if (paymentMethod !== 'credit' && paid < finalTotal) {
+                    alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
+                    return false;
+                }
+
+                // Validation for customer selection for credit payments
+                if (paymentMethod === 'credit') {
+                    if (!$('#customer_select').val()) {
+                        alert('Transaksi kredit harus memilih pelanggan');
                         return false;
                     }
-
-                    // Validation for customer selection for credit payments
-                    if (paymentMethod === 'credit') {
-                        if (!$('#customer_select').val()) {
-                            alert('Transaksi kredit harus memilih pelanggan');
-                            return false;
-                        }
-                    }
                 }
-
-                return true;
             }
 
-            function validateDraftForm() {
-                const tbody = $('#saleItems');
-                if (tbody.children('tr').length === 0) {
-                    alert('Tambahkan setidaknya satu item untuk menyimpan draft');
-                    return false;
-                }
+            return true;
+        }
 
-                // Check if at least one product is selected
-                const hasProductSelected = $('#saleItems select[name="product_id[]"]').filter(function() {
-                    return $(this).val();
-                }).length > 0;
-
-                if (!hasProductSelected) {
-                    alert('Pilih setidaknya satu produk untuk menyimpan draft');
-                    return false;
-                }
-
-                return true;
+        function validateDraftForm() {
+            const tbody = $('#saleItems');
+            if (tbody.children('tr').length === 0) {
+                alert('Tambahkan setidaknya satu item untuk menyimpan draft');
+                return false;
             }
 
+            // Check if at least one product is selected
+            const hasProductSelected = $('#saleItems select[name="product_id[]"]').filter(function() {
+                return $(this).val();
+            }).length > 0;
 
-            // Auto-save functions
-            function initializeAutoSave() {
-                // Add auto-save indicator to header
-                addAutoSaveIndicator();
-
-                // Start auto-save timer
-                startAutoSaveTimer();
-
-                // Watch for changes
-                watchForChanges();
+            if (!hasProductSelected) {
+                alert('Pilih setidaknya satu produk untuk menyimpan draft');
+                return false;
             }
 
-            function addAutoSaveIndicator() {
-                const indicator = `
+            return true;
+        }
+
+
+        // Auto-save functions
+        function initializeAutoSave() {
+            // Add auto-save indicator to header
+            addAutoSaveIndicator();
+
+            // Start auto-save timer
+            startAutoSaveTimer();
+
+            // Watch for changes
+            watchForChanges();
+        }
+
+        function addAutoSaveIndicator() {
+            const indicator = `
                     <div id="auto-save-indicator" class="fixed top-20 right-6 bg-white dark:bg-gray-800 px-4 py-2 rounded-lg shadow-lg border border-gray-200 dark:border-gray-700 hidden">
                         <div class="flex items-center space-x-2">
                             <svg class="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -1141,355 +1146,414 @@
                         </div>
                     </div>
                 `;
-                $('body').append(indicator);
+            $('body').append(indicator);
+        }
+
+        function startAutoSaveTimer() {
+            // Clear existing timer
+            if (autoSaveTimer) {
+                clearInterval(autoSaveTimer);
             }
 
-            function startAutoSaveTimer() {
-                // Clear existing timer
-                if (autoSaveTimer) {
-                    clearInterval(autoSaveTimer);
+            // Auto-save every 3 minutes (180000 ms)
+            autoSaveTimer = setInterval(function() {
+                if (shouldAutoSave()) {
+                    performAutoSave();
                 }
+            }, 180000); // 3 minutes
+        }
 
-                // Auto-save every 3 minutes (180000 ms)
-                autoSaveTimer = setInterval(function() {
-                    if (shouldAutoSave()) {
-                        performAutoSave();
+        function watchForChanges() {
+            // Watch all form inputs for changes
+            $('#saleForm').on('change input', 'input, select, textarea', function() {
+                isDraftSaved = false;
+            });
+        }
+
+        function shouldAutoSave() {
+            // Check if there are items and form has been modified
+            const hasItems = $('#saleItems tr').length > 0;
+            const hasProductSelected = $('#saleItems select[name="product_id[]"]').filter(function() {
+                return $(this).val();
+            }).length > 0;
+
+            return hasItems && hasProductSelected && !isDraftSaved;
+        }
+
+        function performAutoSave() {
+            // Show saving indicator
+            $('#auto-save-indicator').removeClass('hidden');
+            $('#auto-save-success').addClass('hidden');
+
+            // Collect form data
+            const formData = collectFormData();
+
+            // Add CSRF token
+            formData._token = $('meta[name="csrf-token"]').attr('content');
+
+            // Add draft ID if exists
+            if (currentDraftId) {
+                formData.draft_id = currentDraftId;
+            }
+
+            // Add save_draft flag
+            formData.save_draft = 1;
+
+            // Set isDraftSubmission flag
+            isDraftSubmission = true;
+
+            // Send AJAX request to save draft
+            $.ajax({
+                url: '/sales',
+                type: 'POST',
+                data: formData,
+                success: function(response) {
+                    // Hide saving indicator
+                    $('#auto-save-indicator').addClass('hidden');
+
+                    // Show success message
+                    $('#auto-save-success').removeClass('hidden');
+                    $('#save-time').text('(' + new Date().toLocaleTimeString() + ')');
+
+                    // Set draft as saved
+                    isDraftSaved = true;
+
+                    // Reset isDraftSubmission flag after auto-save is complete
+                    isDraftSubmission = false;
+
+                    // Store draft ID for future updates
+                    if (response.draft_id) {
+                        currentDraftId = response.draft_id;
                     }
-                }, 180000); // 3 minutes
+
+                    // Hide success message after 3 seconds
+                    setTimeout(function() {
+                        $('#auto-save-success').addClass('hidden');
+                    }, 3000);
+                },
+                error: function(xhr) {
+                    // Hide saving indicator
+                    $('#auto-save-indicator').addClass('hidden');
+
+                    // Reset isDraftSubmission flag even if there's an error
+                    isDraftSubmission = false;
+
+                    // Show error in console
+                    console.error('Error saving draft:', xhr.responseText);
+                }
+            });
+        }
+
+        function collectFormData() {
+            const items = [];
+
+            // Collect items data
+            $('#saleItems tr').each(function() {
+                const row = $(this);
+                const productId = row.find('select[name="product_id[]"]').val();
+                const unitId = row.find('select[name="unit_id[]"]').val();
+                const quantity = row.find('input[name="quantity[]"]').val();
+                const price = row.find('input[name="selling_price[]"]').val();
+
+                if (productId && unitId) {
+                    items.push({
+                        product_id: productId,
+                        unit_id: unitId,
+                        quantity: quantity || 1,
+                        selling_price: price || 0
+                    });
+                }
+            });
+
+            return {
+                invoice_number: $('#invoice_number').val(),
+                customer_id: $('#customer_select').val(),
+                payment_method: $('#payment_method').val(),
+                vehicle_type: $('#vehicle_type').val(),
+                vehicle_number: $('#vehicle_number').val(),
+                discount: $('#discount').val() || 0,
+                notes: $('#notes').val(),
+                items: items
+            };
+        }
+
+        // Manual save draft function
+        function saveAsDraft() {
+            // Use the validateDraftForm function for validation
+            if (!validateDraftForm()) {
+                return false;
             }
 
-            function watchForChanges() {
-                // Watch all form inputs for changes
-                $('#saleForm').on('change input', 'input, select, textarea', function() {
-                    isDraftSaved = false;
-                });
+            // Show confirmation if draft already exists
+            if (currentDraftId && !confirm('Draft sudah ada. Apakah Anda ingin memperbarui draft yang ada?')) {
+                return false;
             }
 
-            function shouldAutoSave() {
-                // Check if there are items and form has been modified
-                const hasItems = $('#saleItems tr').length > 0;
-                const hasProductSelected = $('#saleItems select[name="product_id[]"]').filter(function() {
-                    return $(this).val();
-                }).length > 0;
+            // Set form submission flag
+            isDraftSubmission = true;
 
-                return hasItems && hasProductSelected && !isDraftSaved;
-            }
+            // Perform auto save
+            performAutoSave();
 
-            function performAutoSave() {
-                // Show saving indicator
-                $('#auto-save-indicator').removeClass('hidden');
-                $('#auto-save-success').addClass('hidden');
+            return false; // Prevent form submission
+        }
 
-                // Collect form data
-                const formData = collectFormData();
 
-                // Add CSRF token
-                formData._token = $('meta[name="csrf-token"]').attr('content');
+        function loadDraftData() {
+            @if(isset($draft) && $draft)
+            // Set currentDraftId
+            currentDraftId = {
+                {
+                    $draft-> id
+                }
+            };
 
-                // Add draft ID if exists
-                if (currentDraftId) {
-                    formData.draft_id = currentDraftId;
+            // Set customer if available
+            @if($draft-> customer_id)
+            $('#customer_select').val({
+                {
+                    $draft-> customer_id
+                }
+            }).trigger('change');
+            @endif
+
+            // Set payment method if available
+            @if($draft-> payment_method)
+            $('#payment_method').val('{{ $draft->payment_method }}').trigger('change');
+            @endif
+
+            // Set other fields
+            @if($draft-> discount)
+            $('#discount').val({
+                {
+                    $draft-> discount
+                }
+            });
+            @endif
+
+            @if($draft-> paid_amount)
+            $('#paid_amount').val({
+                {
+                    $draft-> paid_amount
+                }
+            });
+            @endif
+
+            @if($draft-> down_payment)
+            $('#down_payment').val({
+                {
+                    $draft-> down_payment
+                }
+            });
+            @endif
+
+            @if($draft-> notes)
+            $('#notes').val('{{ $draft->notes }}');
+            @endif
+
+            // Remove any existing items
+            $('#saleItems').empty();
+
+            // Check if draft has sale details
+            @if($draft-> saleDetails && $draft-> saleDetails-> count() > 0)
+            // Add items from draft
+            @foreach($draft-> saleDetails as $detail)
+            try {
+                let newRow = addItem();
+                if (!newRow || newRow.length === 0) {
+                    console.error('Failed to create new row');
+                    return;
                 }
 
-                // Add save_draft flag
-                formData.save_draft = 1;
+                // Ensure product exists in dropdown
+                const productSelect = newRow.find('select[name="product_id[]"]');
+                if (productSelect && productSelect.length > 0) {
+                    if (productSelect.find(`option[value="{{ $detail->product_id }}"]`).length === 0) {
+                        // If product doesn't exist in dropdown, add it
+                        @if($detail-> product)
+                        productSelect.append(new Option('{{ $detail->product->name }}', {
+                            {
+                                $detail-> product_id
+                            }
+                        }, true, true));
+                        @endif
+                    }
 
-                // Set isDraftSubmission flag
-                isDraftSubmission = true;
+                    // Set product and trigger change event
+                    productSelect.val({
+                        {
+                            $detail-> product_id
+                        }
+                    }).trigger('change');
 
-                // Send AJAX request to save draft
-                $.ajax({
-                    url: '/sales',
-                    type: 'POST',
-                    data: formData,
-                    success: function(response) {
-                        // Hide saving indicator
-                        $('#auto-save-indicator').addClass('hidden');
+                    // Log untuk debugging
+                    console.log('Product selected:', {
+                        {
+                            $detail-> product_id
+                        }
+                    });
+                }
 
-                        // Show success message
-                        $('#auto-save-success').removeClass('hidden');
-                        $('#save-time').text('(' + new Date().toLocaleTimeString() + ')');
+                // Store row reference for later use in setTimeout
+                const currentRow = newRow;
 
-                        // Set draft as saved
-                        isDraftSaved = true;
-
-                        // Reset isDraftSubmission flag after auto-save is complete
-                        isDraftSubmission = false;
-
-                        // Store draft ID for future updates
-                        if (response.draft_id) {
-                            currentDraftId = response.draft_id;
+                // Wait for product info to load before setting other values
+                // Increase timeout to ensure product data is fully loaded
+                setTimeout(() => {
+                    try {
+                        if (!currentRow || currentRow.length === 0) {
+                            console.error('Row is no longer available in setTimeout');
+                            return;
                         }
 
-                        // Hide success message after 3 seconds
-                        setTimeout(function() {
-                            $('#auto-save-success').addClass('hidden');
-                        }, 3000);
-                    },
-                    error: function(xhr) {
-                        // Hide saving indicator
-                        $('#auto-save-indicator').addClass('hidden');
-
-                        // Reset isDraftSubmission flag even if there's an error
-                        isDraftSubmission = false;
-
-                        // Show error in console
-                        console.error('Error saving draft:', xhr.responseText);
-                    }
-                });
-            }
-
-            function collectFormData() {
-                const items = [];
-
-                // Collect items data
-                $('#saleItems tr').each(function() {
-                    const row = $(this);
-                    const productId = row.find('select[name="product_id[]"]').val();
-                    const unitId = row.find('select[name="unit_id[]"]').val();
-                    const quantity = row.find('input[name="quantity[]"]').val();
-                    const price = row.find('input[name="selling_price[]"]').val();
-
-                    if (productId && unitId) {
-                        items.push({
-                            product_id: productId,
-                            unit_id: unitId,
-                            quantity: quantity || 1,
-                            selling_price: price || 0
+                        // Log untuk debugging
+                        console.log('Setting unit, quantity, and price for product:', {
+                            {
+                                $detail-> product_id
+                            }
                         });
+
+                        const stockDisplay = currentRow.find('.stock-display');
+                        if (stockDisplay && stockDisplay.length > 0) {
+                            console.log('Current stock display:', stockDisplay.text());
+
+                            // Pastikan stok ditampilkan bahkan jika kosong
+                            if (stockDisplay.text() === '-' || stockDisplay.text() === 'Loading...') {
+                                @if($detail-> product && isset($detail-> product-> stock))
+                                stockDisplay.text('{{ $detail->product->stock }}');
+                                // Tambahkan warna berdasarkan level stok
+                                stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
+                                @if($detail-> product-> stock > 10)
+                                stockDisplay.addClass(
+                                    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
+                                );
+                                @elseif($detail-> product-> stock > 0)
+                                stockDisplay.addClass(
+                                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                );
+                                @else
+                                stockDisplay.addClass(
+                                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                );
+                                @endif
+                                @else
+                                stockDisplay.text('0');
+                                stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
+                                stockDisplay.addClass(
+                                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
+                                );
+                                @endif
+                            }
+                        }
+
+                        const unitSelect = currentRow.find('select[name="unit_id[]"]');
+
+                        if (unitSelect && unitSelect.length > 0) {
+                            // Log unit options
+                            console.log('Available unit options:', unitSelect.find('option').length);
+
+                            // Ensure unit exists in dropdown
+                            if (unitSelect.find(`option[value="{{ $detail->unit_id }}"]`).length ===
+                                0) {
+                                @if($detail-> unit)
+                                console.log(
+                                    'Adding missing unit option: {{ $detail->unit->name }}');
+                                unitSelect.append(new Option('{{ $detail->unit->name }}', {
+                                    {
+                                        $detail-> unit_id
+                                    }
+                                }, true, true));
+                                @endif
+                            }
+
+                            // Delay setting unit value to ensure options are loaded
+                            setTimeout(() => {
+                                unitSelect.val({
+                                    {
+                                        $detail-> unit_id
+                                    }
+                                }).trigger('change');
+                                console.log('Unit selected:', {
+                                    {
+                                        $detail-> unit_id
+                                    }
+                                });
+
+                                // Set quantity after unit is selected
+                                const quantityInput = currentRow.find(
+                                    'input[name="quantity[]"]');
+                                if (quantityInput && quantityInput.length > 0) {
+                                    quantityInput.val({
+                                        {
+                                            $detail-> quantity
+                                        }
+                                    });
+                                    console.log('Quantity set:', {
+                                        {
+                                            $detail-> quantity
+                                        }
+                                    });
+                                    quantityInput.trigger(
+                                        'input'); // Trigger input event to recalculate subtotal
+                                }
+
+                                const priceInput = currentRow.find(
+                                    'input[name="selling_price[]"]');
+                                if (priceInput && priceInput.length > 0) {
+                                    priceInput.val({
+                                        {
+                                            $detail-> price ?? $detail-> selling_price
+                                        }
+                                    });
+                                    console.log('Price set:', {
+                                        {
+                                            $detail-> price ?? $detail-> selling_price
+                                        }
+                                    });
+                                    priceInput.trigger(
+                                        'input'); // Trigger input event to recalculate subtotal
+                                }
+
+                                // Force recalculation of subtotal
+                                calculateSubtotal(currentRow);
+                            }, 500); // Additional delay to ensure unit options are loaded
+                        } else {
+                            console.error('Unit select not found');
+                        }
+                    } catch (error) {
+                        console.error('Error setting item values in setTimeout:', error);
                     }
-                });
-
-                return {
-                    invoice_number: $('#invoice_number').val(),
-                    customer_id: $('#customer_select').val(),
-                    payment_method: $('#payment_method').val(),
-                    vehicle_type: $('#vehicle_type').val(),
-                    vehicle_number: $('#vehicle_number').val(),
-                    discount: $('#discount').val() || 0,
-                    notes: $('#notes').val(),
-                    items: items
-                };
+                }, 1500); // Increased timeout to 1500ms
+            } catch (error) {
+                console.error('Error adding item from draft:', error);
             }
+            @endforeach
 
-            // Manual save draft function
-            function saveAsDraft() {
-                // Use the validateDraftForm function for validation
-                if (!validateDraftForm()) {
-                    return false;
+            // Calculate totals
+            setTimeout(() => {
+                try {
+                    calculateTotal();
+                    calculateFinalTotal();
+                    const paymentMethod = $('#payment_method').val();
+                    if (paymentMethod === 'cash') {
+                        calculateChange();
+                    } else if (paymentMethod === 'credit') {
+                        calculateRemainingAmount();
+                    }
+                    showNotification('Draft berhasil dimuat', 'success');
+                } catch (error) {
+                    console.error('Error calculating totals:', error);
+                    showNotification('Terjadi kesalahan saat memuat draft', 'error');
                 }
+            }, 1000);
+            @else
+            showNotification('Draft tidak memiliki item produk', 'warning');
+            @endif
+            @endif
+        }
 
-                // Show confirmation if draft already exists
-                if (currentDraftId && !confirm('Draft sudah ada. Apakah Anda ingin memperbarui draft yang ada?')) {
-                    return false;
-                }
-
-                // Set form submission flag
-                isDraftSubmission = true;
-
-                // Perform auto save
-                performAutoSave();
-
-                return false; // Prevent form submission
-            }
-
-
-            function loadDraftData() {
-                @if (isset($draft) && $draft)
-                    // Set currentDraftId
-                    currentDraftId = {{ $draft->id }};
-
-                    // Set customer if available
-                    @if ($draft->customer_id)
-                        $('#customer_select').val({{ $draft->customer_id }}).trigger('change');
-                    @endif
-
-                    // Set payment method if available
-                    @if ($draft->payment_method)
-                        $('#payment_method').val('{{ $draft->payment_method }}').trigger('change');
-                    @endif
-
-                    // Set other fields
-                    @if ($draft->discount)
-                        $('#discount').val({{ $draft->discount }});
-                    @endif
-
-                    @if ($draft->paid_amount)
-                        $('#paid_amount').val({{ $draft->paid_amount }});
-                    @endif
-
-                    @if ($draft->down_payment)
-                        $('#down_payment').val({{ $draft->down_payment }});
-                    @endif
-
-                    @if ($draft->notes)
-                        $('#notes').val('{{ $draft->notes }}');
-                    @endif
-
-                    // Remove any existing items
-                    $('#saleItems').empty();
-
-                    // Check if draft has sale details
-                    @if ($draft->saleDetails && $draft->saleDetails->count() > 0)
-                        // Add items from draft
-                        @foreach ($draft->saleDetails as $detail)
-                            try {
-                                let newRow = addItem();
-                                if (!newRow || newRow.length === 0) {
-                                    console.error('Failed to create new row');
-                                    return;
-                                }
-
-                                // Ensure product exists in dropdown
-                                const productSelect = newRow.find('select[name="product_id[]"]');
-                                if (productSelect && productSelect.length > 0) {
-                                    if (productSelect.find(`option[value="{{ $detail->product_id }}"]`).length === 0) {
-                                        // If product doesn't exist in dropdown, add it
-                                        @if ($detail->product)
-                                            productSelect.append(new Option('{{ $detail->product->name }}',
-                                                {{ $detail->product_id }}, true, true));
-                                        @endif
-                                    }
-
-                                    // Set product and trigger change event
-                                    productSelect.val({{ $detail->product_id }}).trigger('change');
-
-                                    // Log untuk debugging
-                                    console.log('Product selected:', {{ $detail->product_id }});
-                                }
-
-                                // Store row reference for later use in setTimeout
-                                const currentRow = newRow;
-
-                                // Wait for product info to load before setting other values
-                                // Increase timeout to ensure product data is fully loaded
-                                setTimeout(() => {
-                                    try {
-                                        if (!currentRow || currentRow.length === 0) {
-                                            console.error('Row is no longer available in setTimeout');
-                                            return;
-                                        }
-
-                                        // Log untuk debugging
-                                        console.log('Setting unit, quantity, and price for product:',
-                                            {{ $detail->product_id }});
-
-                                        const stockDisplay = currentRow.find('.stock-display');
-                                        if (stockDisplay && stockDisplay.length > 0) {
-                                            console.log('Current stock display:', stockDisplay.text());
-
-                                            // Pastikan stok ditampilkan bahkan jika kosong
-                                            if (stockDisplay.text() === '-' || stockDisplay.text() === 'Loading...') {
-                                                @if ($detail->product && isset($detail->product->stock))
-                                                    stockDisplay.text('{{ $detail->product->stock }}');
-                                                    // Tambahkan warna berdasarkan level stok
-                                                    stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
-                                                    @if ($detail->product->stock > 10)
-                                                        stockDisplay.addClass(
-                                                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400'
-                                                        );
-                                                    @elseif ($detail->product->stock > 0)
-                                                        stockDisplay.addClass(
-                                                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400'
-                                                        );
-                                                    @else
-                                                        stockDisplay.addClass(
-                                                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                        );
-                                                    @endif
-                                                @else
-                                                    stockDisplay.text('0');
-                                                    stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
-                                                    stockDisplay.addClass(
-                                                        'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400'
-                                                    );
-                                                @endif
-                                            }
-                                        }
-
-                                        const unitSelect = currentRow.find('select[name="unit_id[]"]');
-
-                                        if (unitSelect && unitSelect.length > 0) {
-                                            // Log unit options
-                                            console.log('Available unit options:', unitSelect.find('option').length);
-
-                                            // Ensure unit exists in dropdown
-                                            if (unitSelect.find(`option[value="{{ $detail->unit_id }}"]`).length ===
-                                                0) {
-                                                @if ($detail->unit)
-                                                    console.log(
-                                                        'Adding missing unit option: {{ $detail->unit->name }}');
-                                                    unitSelect.append(new Option('{{ $detail->unit->name }}',
-                                                        {{ $detail->unit_id }}, true, true));
-                                                @endif
-                                            }
-
-                                            // Delay setting unit value to ensure options are loaded
-                                            setTimeout(() => {
-                                                unitSelect.val({{ $detail->unit_id }}).trigger('change');
-                                                console.log('Unit selected:', {{ $detail->unit_id }});
-
-                                                // Set quantity after unit is selected
-                                                const quantityInput = currentRow.find(
-                                                    'input[name="quantity[]"]');
-                                                if (quantityInput && quantityInput.length > 0) {
-                                                    quantityInput.val({{ $detail->quantity }});
-                                                    console.log('Quantity set:', {{ $detail->quantity }});
-                                                    quantityInput.trigger(
-                                                        'input'); // Trigger input event to recalculate subtotal
-                                                }
-
-                                                const priceInput = currentRow.find(
-                                                    'input[name="selling_price[]"]');
-                                                if (priceInput && priceInput.length > 0) {
-                                                    priceInput.val(
-                                                        {{ $detail->price ?? $detail->selling_price }});
-                                                    console.log('Price set:',
-                                                        {{ $detail->price ?? $detail->selling_price }});
-                                                    priceInput.trigger(
-                                                        'input'); // Trigger input event to recalculate subtotal
-                                                }
-
-                                                // Force recalculation of subtotal
-                                                calculateSubtotal(currentRow);
-                                            }, 500); // Additional delay to ensure unit options are loaded
-                                        } else {
-                                            console.error('Unit select not found');
-                                        }
-                                    } catch (error) {
-                                        console.error('Error setting item values in setTimeout:', error);
-                                    }
-                                }, 1500); // Increased timeout to 1500ms
-                            } catch (error) {
-                                console.error('Error adding item from draft:', error);
-                            }
-                        @endforeach
-
-                        // Calculate totals
-                        setTimeout(() => {
-                            try {
-                                calculateTotal();
-                                calculateFinalTotal();
-                                const paymentMethod = $('#payment_method').val();
-                                if (paymentMethod === 'cash') {
-                                    calculateChange();
-                                } else if (paymentMethod === 'credit') {
-                                    calculateRemainingAmount();
-                                }
-                                showNotification('Draft berhasil dimuat', 'success');
-                            } catch (error) {
-                                console.error('Error calculating totals:', error);
-                                showNotification('Terjadi kesalahan saat memuat draft', 'error');
-                            }
-                        }, 1000);
-                    @else
-                        showNotification('Draft tidak memiliki item produk', 'warning');
-                    @endif
-                @endif
-            }
-
-            function createItemRow() {
-                return `
+        function createItemRow() {
+            return `
                 <tr class="sale-item hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
                     <td class="px-4 py-3">
                         <select name="product_id[]" required class="product-select w-full text-sm rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
@@ -1530,248 +1594,119 @@
                     </td>
                 </tr>
             `;
+        }
+
+        function addItem() {
+            const tbody = $('#saleItems');
+            const newRow = $(createItemRow());
+            tbody.append(newRow);
+            initializeProductSelect(newRow);
+            return newRow;
+        }
+
+        function removeItem(row) {
+            const tbody = $('#saleItems');
+            if (tbody.children('tr').length > 1) {
+                // Destroy Select2 before removing the row
+                row.find('.product-select').select2('destroy');
+                row.remove();
+                calculateTotal();
+            } else {
+                alert('Minimal satu item harus ada');
+            }
+        }
+
+        function initializeProductSelect(row) {
+            if (!row || row.length === 0) {
+                console.error('Invalid row passed to initializeProductSelect');
+                return;
             }
 
-            function addItem() {
-                const tbody = $('#saleItems');
-                const newRow = $(createItemRow());
-                tbody.append(newRow);
-                initializeProductSelect(newRow);
-                return newRow;
-            }
-
-            function removeItem(row) {
-                const tbody = $('#saleItems');
-                if (tbody.children('tr').length > 1) {
-                    // Destroy Select2 before removing the row
-                    row.find('.product-select').select2('destroy');
-                    row.remove();
-                    calculateTotal();
-                } else {
-                    alert('Minimal satu item harus ada');
-                }
-            }
-
-            function initializeProductSelect(row) {
-                if (!row || row.length === 0) {
-                    console.error('Invalid row passed to initializeProductSelect');
+            try {
+                const productSelect = row.find('.product-select');
+                if (!productSelect || productSelect.length === 0) {
+                    console.error('Product select element not found in row');
                     return;
                 }
 
-                try {
-                    const productSelect = row.find('.product-select');
-                    if (!productSelect || productSelect.length === 0) {
-                        console.error('Product select element not found in row');
-                        return;
+                productSelect.select2({
+                    theme: 'tailwind',
+                    placeholder: 'Pilih Produk',
+                    width: '100%',
+                    dropdownParent: $('#saleItems').closest('.overflow-x-auto'),
+                    templateResult: formatProductOption,
+                    templateSelection: formatProductSelection,
+                    escapeMarkup: function(markup) {
+                        return markup;
                     }
-
-                    productSelect.select2({
-                        theme: 'tailwind',
-                        placeholder: 'Pilih Produk',
-                        width: '100%',
-                        dropdownParent: $('#saleItems').closest('.overflow-x-auto'),
-                        templateResult: formatProductOption,
-                        templateSelection: formatProductSelection,
-                        escapeMarkup: function(markup) {
-                            return markup;
-                        }
-                    }).on('select2:open', function() {
-                        $('.select2-dropdown').addClass('dark:bg-gray-800 dark:border-gray-700');
-                        $('.select2-search__field').addClass('dark:bg-gray-800 dark:text-gray-300');
-                    });
-                } catch (e) {
-                    console.error('Error initializing Select2:', e);
-                    try {
-                        // Fallback to native select if Select2 fails
-                        const productSelect = row.find('.product-select');
-                        if (productSelect && productSelect.length > 0) {
-                            productSelect.removeClass('select2-hidden-accessible').css('display', 'block');
-                            const container = productSelect.next('.select2-container');
-                            if (container && container.length > 0) {
-                                container.remove();
-                            }
-                            productSelect.addClass(
-                                'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                            );
-                        }
-                    } catch (fallbackError) {
-                        console.error('Error applying fallback for Select2:', fallbackError);
-                    }
-                }
-            }
-
-            function updateProductInfo(selectElement) {
-                const productId = selectElement.val();
-                const row = selectElement.closest('tr');
-                const unitSelect = row.find('select[name="unit_id[]"]');
-                const priceInput = row.find('input[name="selling_price[]"]');
-                const stockDisplay = row.find('.stock-display');
-
-                // Clear unit options
-                unitSelect.html('<option value="">-- Pilih Satuan --</option>');
-
-                if (productId) {
-                    // Show loading indicator
-                    stockDisplay.html(
-                        '<span class="inline-flex items-center"><svg class="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="ml-2">Loading...</span></span>'
-                    );
-                    stockDisplay.removeClass(
-                            'bg-green-100 bg-yellow-100 bg-red-100 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-red-900/30'
-                        )
-                        .addClass('bg-gray-100 dark:bg-gray-700');
-
-                    console.log('Fetching units for product ID:', productId);
-
-                    // Fetch product units via Fetch API
-                    fetch(`/products/${productId}/units`)
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error('Network response was not ok');
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            console.log('Received product data:', data);
-
-                            // Calculate already selected quantity for this product
-                            const alreadySelectedQuantity = calculateAlreadySelectedQuantity(productId, row);
-
-                            // Update stock display with adjusted stock
-                            const adjustedStock = Math.max(0, (data.stock || 0) - alreadySelectedQuantity);
-                            stockDisplay.text(adjustedStock);
-                            console.log('Stock updated to:', adjustedStock);
-
-                            // Add color coding based on stock level
-                            stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
-                            if (adjustedStock > 10) {
-                                stockDisplay.addClass(
-                                    'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400');
-                            } else if (adjustedStock > 0) {
-                                stockDisplay.addClass(
-                                    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400');
-                            } else {
-                                stockDisplay.addClass(
-                                    'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
-                            }
-
-                            // Populate unit options
-                            if (data.units && data.units.length > 0) {
-                                console.log('Adding', data.units.length, 'unit options');
-
-                                data.units.forEach(unit => {
-                                    const option = $('<option></option>');
-                                    option.val(unit.id);
-                                    option.text(`${unit.unit_name} (${unit.unit_abbreviation})`);
-                                    option.data('price', unit.selling_price);
-                                    option.data('conversionFactor', unit.conversion_factor);
-                                    option.data('isDefault', unit.is_default ? "1" : "0");
-                                    unitSelect.append(option);
-
-                                    console.log('Added unit option:', unit.unit_name, 'ID:', unit.id);
-                                });
-
-                                // Select default unit if available
-                                const defaultUnit = unitSelect.find('option[data-is-default="1"]');
-                                if (defaultUnit.length) {
-                                    defaultUnit.prop('selected', true);
-                                    console.log('Selected default unit:', defaultUnit.val());
-                                    updatePrice(unitSelect);
-                                } else if (data.units.length > 0) {
-                                    // Select the first unit if no default is set
-                                    unitSelect.find('option:eq(1)').prop('selected', true);
-                                    console.log('Selected first unit:', unitSelect.val());
-                                    updatePrice(unitSelect);
-                                }
-                            } else {
-                                console.warn('No units found for product:', productId);
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error fetching product units:', error);
-                            stockDisplay.text('Error');
-                            stockDisplay.removeClass(
-                                    'bg-green-100 bg-yellow-100 bg-gray-100 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-gray-700'
-                                )
-                                .addClass('bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
-                        });
-                } else {
-                    stockDisplay.text('-');
-                    stockDisplay.removeClass(
-                            'bg-green-100 bg-yellow-100 bg-red-100 text-green-800 text-yellow-800 text-red-800 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-red-900/30 dark:text-green-400 dark:text-yellow-400 dark:text-red-400'
-                        )
-                        .addClass('bg-gray-100 dark:bg-gray-700');
-                    priceInput.val(0);
-                    calculateSubtotal(row);
-                }
-            }
-
-            // Function to calculate already selected quantity for a product
-            function calculateAlreadySelectedQuantity(productId, currentRow) {
-                let totalSelectedQuantity = 0;
-
-                $('#saleItems tr').each(function() {
-                    const row = $(this);
-                    // Skip the current row to avoid counting it twice
-                    if (row.is(currentRow)) {
-                        return true; // continue to next iteration
-                    }
-
-                    const rowProductId = row.find('select[name="product_id[]"]').val();
-                    if (rowProductId === productId) {
-                        const quantity = parseInt(row.find('input[name="quantity[]"]').val()) || 0;
-                        const unitSelect = row.find('select[name="unit_id[]"]');
-                        const selectedOption = unitSelect.find('option:selected');
-
-                        // If a unit is selected, consider its conversion factor
-                        if (selectedOption.length && selectedOption.data('conversionFactor')) {
-                            const conversionFactor = parseFloat(selectedOption.data('conversionFactor')) || 1;
-                            totalSelectedQuantity += quantity * conversionFactor;
-                        } else {
-                            totalSelectedQuantity += quantity;
-                        }
-                    }
+                }).on('select2:open', function() {
+                    $('.select2-dropdown').addClass('dark:bg-gray-800 dark:border-gray-700');
+                    $('.select2-search__field').addClass('dark:bg-gray-800 dark:text-gray-300');
                 });
-
-                return totalSelectedQuantity;
+            } catch (e) {
+                console.error('Error initializing Select2:', e);
+                try {
+                    // Fallback to native select if Select2 fails
+                    const productSelect = row.find('.product-select');
+                    if (productSelect && productSelect.length > 0) {
+                        productSelect.removeClass('select2-hidden-accessible').css('display', 'block');
+                        const container = productSelect.next('.select2-container');
+                        if (container && container.length > 0) {
+                            container.remove();
+                        }
+                        productSelect.addClass(
+                            'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                        );
+                    }
+                } catch (fallbackError) {
+                    console.error('Error applying fallback for Select2:', fallbackError);
+                }
             }
+        }
 
-            function calculateSubtotal(row) {
-                const quantity = parseInt(row.find('input[name="quantity[]"]').val()) || 0;
-                const price = parseInt(row.find('input[name="selling_price[]"]').val()) || 0;
-                const subtotal = quantity * price;
-                row.find('.subtotal').text(formatRupiah(subtotal));
-                calculateTotal();
+        function updateProductInfo(selectElement) {
+            const productId = selectElement.val();
+            const row = selectElement.closest('tr');
+            const unitSelect = row.find('select[name="unit_id[]"]');
+            const priceInput = row.find('input[name="selling_price[]"]');
+            const stockDisplay = row.find('.stock-display');
 
-                // Update stock displays for all rows with the same product
-                updateStockDisplaysForProduct(row);
-            }
+            // Clear unit options
+            unitSelect.html('<option value="">-- Pilih Satuan --</option>');
 
-            // Function to update stock displays for all rows with the same product
-            function updateStockDisplaysForProduct(changedRow) {
-                const changedProductId = changedRow.find('select[name="product_id[]"]').val();
-                if (!changedProductId) return;
+            if (productId) {
+                // Show loading indicator
+                stockDisplay.html(
+                    '<span class="inline-flex items-center"><svg class="animate-spin h-4 w-4 text-indigo-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg><span class="ml-2">Loading...</span></span>'
+                );
+                stockDisplay.removeClass(
+                        'bg-green-100 bg-yellow-100 bg-red-100 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-red-900/30'
+                    )
+                    .addClass('bg-gray-100 dark:bg-gray-700');
 
-                $('#saleItems tr').each(function() {
-                    const row = $(this);
-                    const productSelect = row.find('select[name="product_id[]"]');
-                    const productId = productSelect.val();
+                console.log('Fetching units for product ID:', productId);
 
-                    // Only update rows with the same product
-                    if (productId === changedProductId && !row.is(changedRow)) {
-                        // Recalculate the adjusted stock
+                // Fetch product units via Fetch API
+                fetch(`/products/${productId}/units`)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Network response was not ok');
+                        }
+                        return response.json();
+                    })
+                    .then(data => {
+                        console.log('Received product data:', data);
+
+                        // Calculate already selected quantity for this product
                         const alreadySelectedQuantity = calculateAlreadySelectedQuantity(productId, row);
-                        const originalStock = productSelect.find('option:selected').data('stock') || 0;
-                        const adjustedStock = Math.max(0, originalStock - alreadySelectedQuantity);
 
-                        // Update the stock display with color coding
-                        const stockDisplay = row.find('.stock-display');
+                        // Update stock display with adjusted stock
+                        const adjustedStock = Math.max(0, (data.stock || 0) - alreadySelectedQuantity);
                         stockDisplay.text(adjustedStock);
+                        console.log('Stock updated to:', adjustedStock);
 
                         // Add color coding based on stock level
-                        stockDisplay.removeClass(
-                            'bg-green-100 bg-yellow-100 bg-red-100 text-green-800 text-yellow-800 text-red-800 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-red-900/30 dark:text-green-400 dark:text-yellow-400 dark:text-red-400'
-                        );
-
+                        stockDisplay.removeClass('bg-gray-100 dark:bg-gray-700');
                         if (adjustedStock > 10) {
                             stockDisplay.addClass(
                                 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400');
@@ -1782,321 +1717,450 @@
                             stockDisplay.addClass(
                                 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
                         }
-                    }
-                });
-            }
 
-            function updatePrice(selectElement) {
-                const selectedOption = selectElement.find('option:selected');
-                const row = selectElement.closest('tr');
-                const priceInput = row.find('input[name="selling_price[]"]');
+                        // Populate unit options
+                        if (data.units && data.units.length > 0) {
+                            console.log('Adding', data.units.length, 'unit options');
 
-                if (selectedOption.length && selectedOption.data('price') !== undefined) {
-                    priceInput.val(selectedOption.data('price'));
+                            data.units.forEach(unit => {
+                                const option = $('<option></option>');
+                                option.val(unit.id);
+                                option.text(`${unit.unit_name} (${unit.unit_abbreviation})`);
+                                option.data('price', unit.selling_price);
+                                option.data('conversionFactor', unit.conversion_factor);
+                                option.data('isDefault', unit.is_default ? "1" : "0");
+                                unitSelect.append(option);
 
-                    // Highlight the price change with animation
-                    priceInput.addClass('bg-yellow-50 dark:bg-yellow-900/20');
-                    setTimeout(() => {
-                        priceInput.removeClass('bg-yellow-50 dark:bg-yellow-900/20');
-                    }, 500);
-                } else {
-                    priceInput.val(0);
-                }
+                                console.log('Added unit option:', unit.unit_name, 'ID:', unit.id);
+                            });
 
+                            // Select default unit if available
+                            const defaultUnit = unitSelect.find('option[data-is-default="1"]');
+                            if (defaultUnit.length) {
+                                defaultUnit.prop('selected', true);
+                                console.log('Selected default unit:', defaultUnit.val());
+                                updatePrice(unitSelect);
+                            } else if (data.units.length > 0) {
+                                // Select the first unit if no default is set
+                                unitSelect.find('option:eq(1)').prop('selected', true);
+                                console.log('Selected first unit:', unitSelect.val());
+                                updatePrice(unitSelect);
+                            }
+                        } else {
+                            console.warn('No units found for product:', productId);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error fetching product units:', error);
+                        stockDisplay.text('Error');
+                        stockDisplay.removeClass(
+                                'bg-green-100 bg-yellow-100 bg-gray-100 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-gray-700'
+                            )
+                            .addClass('bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
+                    });
+            } else {
+                stockDisplay.text('-');
+                stockDisplay.removeClass(
+                        'bg-green-100 bg-yellow-100 bg-red-100 text-green-800 text-yellow-800 text-red-800 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-red-900/30 dark:text-green-400 dark:text-yellow-400 dark:text-red-400'
+                    )
+                    .addClass('bg-gray-100 dark:bg-gray-700');
+                priceInput.val(0);
                 calculateSubtotal(row);
             }
+        }
 
-            function calculateTotal() {
-                let total = 0;
-                $('#saleItems .subtotal').each(function() {
-                    const value = parseFloat($(this).text().replace('Rp ', '').replace(/\./g, '') || 0);
-                    total += value;
-                });
-                $('#totalAmount').text(formatRupiah(total));
-                calculateFinalTotal(); // Recalculate final total after total changes
-            }
+        // Function to calculate already selected quantity for a product
+        function calculateAlreadySelectedQuantity(productId, currentRow) {
+            let totalSelectedQuantity = 0;
 
-            function calculateFinalTotal() {
-                const totalText = $('#totalAmount').text();
-                const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                const discount = parseFloat($('#discount').val()) || 0;
-
-                // Calculate final total after discount
-                const finalTotal = Math.max(0, total - discount);
-                $('#finalAmount').text(formatRupiah(finalTotal));
-
-                // Animate the final amount to highlight change
-                $('#finalAmount').addClass('animate-pulse text-indigo-700 dark:text-indigo-300');
-                setTimeout(() => {
-                    $('#finalAmount').removeClass('animate-pulse text-indigo-700 dark:text-indigo-300');
-                }, 700);
-
-                // Update payment calculations based on payment method
-                const paymentMethod = $('#payment_method').val();
-                if (paymentMethod === 'credit') {
-                    calculateRemainingAmount();
-                } else {
-                    calculateChange();
+            $('#saleItems tr').each(function() {
+                const row = $(this);
+                // Skip the current row to avoid counting it twice
+                if (row.is(currentRow)) {
+                    return true; // continue to next iteration
                 }
+
+                const rowProductId = row.find('select[name="product_id[]"]').val();
+                if (rowProductId === productId) {
+                    const quantity = parseInt(row.find('input[name="quantity[]"]').val()) || 0;
+                    const unitSelect = row.find('select[name="unit_id[]"]');
+                    const selectedOption = unitSelect.find('option:selected');
+
+                    // If a unit is selected, consider its conversion factor
+                    if (selectedOption.length && selectedOption.data('conversionFactor')) {
+                        const conversionFactor = parseFloat(selectedOption.data('conversionFactor')) || 1;
+                        totalSelectedQuantity += quantity * conversionFactor;
+                    } else {
+                        totalSelectedQuantity += quantity;
+                    }
+                }
+            });
+
+            return totalSelectedQuantity;
+        }
+
+        function calculateSubtotal(row) {
+            const quantity = parseInt(row.find('input[name="quantity[]"]').val()) || 0;
+            const price = parseInt(row.find('input[name="selling_price[]"]').val()) || 0;
+            const subtotal = quantity * price;
+            row.find('.subtotal').text(formatRupiah(subtotal));
+            calculateTotal();
+
+            // Update stock displays for all rows with the same product
+            updateStockDisplaysForProduct(row);
+        }
+
+        // Function to update stock displays for all rows with the same product
+        function updateStockDisplaysForProduct(changedRow) {
+            const changedProductId = changedRow.find('select[name="product_id[]"]').val();
+            if (!changedProductId) return;
+
+            $('#saleItems tr').each(function() {
+                const row = $(this);
+                const productSelect = row.find('select[name="product_id[]"]');
+                const productId = productSelect.val();
+
+                // Only update rows with the same product
+                if (productId === changedProductId && !row.is(changedRow)) {
+                    // Recalculate the adjusted stock
+                    const alreadySelectedQuantity = calculateAlreadySelectedQuantity(productId, row);
+                    const originalStock = productSelect.find('option:selected').data('stock') || 0;
+                    const adjustedStock = Math.max(0, originalStock - alreadySelectedQuantity);
+
+                    // Update the stock display with color coding
+                    const stockDisplay = row.find('.stock-display');
+                    stockDisplay.text(adjustedStock);
+
+                    // Add color coding based on stock level
+                    stockDisplay.removeClass(
+                        'bg-green-100 bg-yellow-100 bg-red-100 text-green-800 text-yellow-800 text-red-800 dark:bg-green-900/30 dark:bg-yellow-900/30 dark:bg-red-900/30 dark:text-green-400 dark:text-yellow-400 dark:text-red-400'
+                    );
+
+                    if (adjustedStock > 10) {
+                        stockDisplay.addClass(
+                            'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400');
+                    } else if (adjustedStock > 0) {
+                        stockDisplay.addClass(
+                            'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400');
+                    } else {
+                        stockDisplay.addClass(
+                            'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400');
+                    }
+                }
+            });
+        }
+
+        function updatePrice(selectElement) {
+            const selectedOption = selectElement.find('option:selected');
+            const row = selectElement.closest('tr');
+            const priceInput = row.find('input[name="selling_price[]"]');
+
+            if (selectedOption.length && selectedOption.data('price') !== undefined) {
+                priceInput.val(selectedOption.data('price'));
+
+                // Highlight the price change with animation
+                priceInput.addClass('bg-yellow-50 dark:bg-yellow-900/20');
+                setTimeout(() => {
+                    priceInput.removeClass('bg-yellow-50 dark:bg-yellow-900/20');
+                }, 500);
+            } else {
+                priceInput.val(0);
             }
 
-            function setExactAmount() {
-                const finalText = $('#finalAmount').text();
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                $('#paid_amount').val(finalTotal);
+            calculateSubtotal(row);
+        }
+
+        function calculateTotal() {
+            let total = 0;
+            $('#saleItems .subtotal').each(function() {
+                const value = parseFloat($(this).text().replace('Rp ', '').replace(/\./g, '') || 0);
+                total += value;
+            });
+            $('#totalAmount').text(formatRupiah(total));
+            calculateFinalTotal(); // Recalculate final total after total changes
+        }
+
+        function calculateFinalTotal() {
+            const totalText = $('#totalAmount').text();
+            const total = parseFloat(totalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const discount = parseFloat($('#discount').val()) || 0;
+
+            // Calculate final total after discount
+            const finalTotal = Math.max(0, total - discount);
+            $('#finalAmount').text(formatRupiah(finalTotal));
+
+            // Animate the final amount to highlight change
+            $('#finalAmount').addClass('animate-pulse text-indigo-700 dark:text-indigo-300');
+            setTimeout(() => {
+                $('#finalAmount').removeClass('animate-pulse text-indigo-700 dark:text-indigo-300');
+            }, 700);
+
+            // Update payment calculations based on payment method
+            const paymentMethod = $('#payment_method').val();
+            if (paymentMethod === 'credit') {
+                calculateRemainingAmount();
+            } else {
                 calculateChange();
             }
+        }
 
-            function calculateChange() {
-                const finalText = $('#finalAmount').text(); // Use finalAmount
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                const paid = parseFloat($('#paid_amount').val()) || 0;
-                const change = paid - finalTotal;
-                $('#changeAmount').text(formatRupiah(Math.max(0, change)));
+        function setExactAmount() {
+            const finalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            $('#paid_amount').val(finalTotal);
+            calculateChange();
+        }
 
-                // Validation for minimum paid amount
-                const submitButton = $('button[type="submit"]');
-                const paymentMethod = $('#payment_method').val();
+        function calculateChange() {
+            const finalText = $('#finalAmount').text(); // Use finalAmount
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const paid = parseFloat($('#paid_amount').val()) || 0;
+            const change = paid - finalTotal;
+            $('#changeAmount').text(formatRupiah(Math.max(0, change)));
 
-                if (paymentMethod !== 'credit' && paid < finalTotal) {
-                    // Disable submit button only for non-credit transactions
-                    submitButton.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
-                } else {
-                    submitButton.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
-                }
+            // Validation for minimum paid amount
+            const submitButton = $('button[type="submit"]');
+            const paymentMethod = $('#payment_method').val();
+
+            if (paymentMethod !== 'credit' && paid < finalTotal) {
+                // Disable submit button only for non-credit transactions
+                submitButton.prop('disabled', true).addClass('opacity-50 cursor-not-allowed');
+            } else {
+                submitButton.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
             }
+        }
 
-            function calculateRemainingAmount() {
-                const finalTotalText = $('#finalAmount').text();
-                const finalTotal = parseFloat(finalTotalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                const dp = parseFloat($('#down_payment').val()) || 0;
-                const remaining = finalTotal - dp;
+        function calculateRemainingAmount() {
+            const finalTotalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalTotalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const dp = parseFloat($('#down_payment').val()) || 0;
+            const remaining = finalTotal - dp;
 
-                $('#remainingAmount').text(formatRupiah(Math.max(0, remaining)));
+            $('#remainingAmount').text(formatRupiah(Math.max(0, remaining)));
 
-                // Update hidden paid_amount field for backend processing (DP is considered paid amount for credit)
-                $('#paid_amount').val(dp);
+            // Update hidden paid_amount field for backend processing (DP is considered paid amount for credit)
+            $('#paid_amount').val(dp);
 
-                // Validation: DP cannot exceed total
-                if (dp > finalTotal) {
-                    alert('Uang muka tidak boleh melebihi total belanja');
-                    $('#down_payment').val(finalTotal);
-                    calculateRemainingAmount();
-                }
-            }
-
-            function setDownPayment(percentage) {
-                const finalText = $('#finalAmount').text();
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                const downPaymentAmount = Math.round(finalTotal * percentage / 100);
-                $('#down_payment').val(downPaymentAmount);
+            // Validation: DP cannot exceed total
+            if (dp > finalTotal) {
+                alert('Uang muka tidak boleh melebihi total belanja');
+                $('#down_payment').val(finalTotal);
                 calculateRemainingAmount();
             }
+        }
 
-            function formatRupiah(number) {
-                // Remove decimals & format with thousand separator
-                return 'Rp ' + Math.round(number).toLocaleString('id-ID', {
-                    maximumFractionDigits: 0,
-                    currencyDisplay: 'symbol'
-                });
-            }
+        function setDownPayment(percentage) {
+            const finalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const downPaymentAmount = Math.round(finalTotal * percentage / 100);
+            $('#down_payment').val(downPaymentAmount);
+            calculateRemainingAmount();
+        }
 
-            function addInputValidations() {
-                // Prevent negative values in all number inputs
-                $('input[type="number"]').each(function() {
-                    $(this).on('input', function() {
-                        if (parseFloat($(this).val()) < 0) {
-                            $(this).val(0);
-                        }
-                    });
-                });
-            }
+        function formatRupiah(number) {
+            // Remove decimals & format with thousand separator
+            return 'Rp ' + Math.round(number).toLocaleString('id-ID', {
+                maximumFractionDigits: 0,
+                currencyDisplay: 'symbol'
+            });
+        }
 
-            function validateProductStock() {
-                // Skip stock validation for drafts
-                if (isDraftSubmission) {
-                    return true;
-                }
-
-                let isValid = true;
-                $('#saleItems tr').each(function() {
-                    const row = $(this);
-                    const productSelect = row.find('select[name="product_id[]"]');
-                    const quantityInput = row.find('input[name="quantity[]"]');
-                    const unitSelect = row.find('select[name="unit_id[]"]');
-                    const selectedOption = productSelect.find('option:selected');
-                    const selectedUnit = unitSelect.find('option:selected');
-
-                    if (selectedOption.length && selectedOption.val()) {
-                        const availableStock = parseInt(selectedOption.data('stock')) || 0;
-                        let requestedQuantity = parseInt(quantityInput.val()) || 0;
-
-                        // Apply conversion factor if unit is selected
-                        if (selectedUnit.length && selectedUnit.data('conversionFactor')) {
-                            const conversionFactor = parseFloat(selectedUnit.data('conversionFactor')) || 1;
-                            requestedQuantity = requestedQuantity * conversionFactor;
-                        }
-
-                        if (requestedQuantity > availableStock) {
-                            alert(
-                                `Stok tidak mencukupi untuk produk ${selectedOption.text()}. Tersedia: ${availableStock}`
-                            );
-                            isValid = false;
-                            return false; // Break .each loop
-                        }
+        function addInputValidations() {
+            // Prevent negative values in all number inputs
+            $('input[type="number"]').each(function() {
+                $(this).on('input', function() {
+                    if (parseFloat($(this).val()) < 0) {
+                        $(this).val(0);
                     }
                 });
+            });
+        }
 
-                return isValid;
-            }
-
-            function validateForm() {
-                // If draft submission, use simpler validation
-                if (isDraftSubmission) {
-                    return validateDraftForm();
-                }
-
-                // Existing validation code for completed transactions
-                const tbody = $('#saleItems');
-                if (tbody.children('tr').length === 0) {
-                    alert('Tambahkan setidaknya satu item');
-                    return false;
-                }
-
-                if (!validateProductStock()) {
-                    return false;
-                }
-
-                const paymentMethod = $('#payment_method').val();
-                const finalText = $('#finalAmount').text();
-                const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
-                const paid = parseFloat($('#paid_amount').val()) || 0;
-
-                // Validation for paid amount for non-credit methods
-                if (paymentMethod !== 'credit' && paid < finalTotal) {
-                    alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
-                    return false;
-                }
-
-                // Validation for customer selection for credit payments
-                if (paymentMethod === 'credit') {
-                    if (!$('#customer_select').val()) {
-                        alert('Transaksi kredit harus memilih pelanggan');
-                        return false;
-                    }
-                }
-
+        function validateProductStock() {
+            // Skip stock validation for drafts
+            if (isDraftSubmission) {
                 return true;
             }
 
-            function updatePaymentSections() {
-                const paymentMethod = $('#payment_method').val();
-                const dpSection = $('#dp_container');
-                const cashSection = $('#cash-payment-section');
-                const submitButton = $('button[type="submit"]');
-                const paidAmountInput = $('#paid_amount');
-                const dpInput = $('#down_payment');
+            let isValid = true;
+            $('#saleItems tr').each(function() {
+                const row = $(this);
+                const productSelect = row.find('select[name="product_id[]"]');
+                const quantityInput = row.find('input[name="quantity[]"]');
+                const unitSelect = row.find('select[name="unit_id[]"]');
+                const selectedOption = productSelect.find('option:selected');
+                const selectedUnit = unitSelect.find('option:selected');
 
-                if (paymentMethod === 'credit') {
-                    dpSection.removeClass('hidden');
-                    cashSection.addClass('hidden');
+                if (selectedOption.length && selectedOption.val()) {
+                    const availableStock = parseInt(selectedOption.data('stock')) || 0;
+                    let requestedQuantity = parseInt(quantityInput.val()) || 0;
 
-                    // Reset values
-                    dpInput.val('0');
-                    paidAmountInput.val('0');
-
-                    // Enable submit button for credit
-                    submitButton.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
-
-                    // Check for customer selection
-                    if (!$('#customer_select').val()) {
-                        // This validation is also in validateForm, but an early alert might be helpful
+                    // Apply conversion factor if unit is selected
+                    if (selectedUnit.length && selectedUnit.data('conversionFactor')) {
+                        const conversionFactor = parseFloat(selectedUnit.data('conversionFactor')) || 1;
+                        requestedQuantity = requestedQuantity * conversionFactor;
                     }
 
-                    // Calculate remaining amount
-                    calculateRemainingAmount();
-                } else {
-                    dpSection.addClass('hidden');
-                    cashSection.removeClass('hidden');
+                    if (requestedQuantity > availableStock) {
+                        alert(
+                            `Stok tidak mencukupi untuk produk ${selectedOption.text()}. Tersedia: ${availableStock}`
+                        );
+                        isValid = false;
+                        return false; // Break .each loop
+                    }
+                }
+            });
 
-                    // Reset DP value
-                    dpInput.val('0');
+            return isValid;
+        }
 
-                    // Calculate change
-                    calculateChange();
+        function validateForm() {
+            // If draft submission, use simpler validation
+            if (isDraftSubmission) {
+                return validateDraftForm();
+            }
+
+            // Existing validation code for completed transactions
+            const tbody = $('#saleItems');
+            if (tbody.children('tr').length === 0) {
+                alert('Tambahkan setidaknya satu item');
+                return false;
+            }
+
+            if (!validateProductStock()) {
+                return false;
+            }
+
+            const paymentMethod = $('#payment_method').val();
+            const finalText = $('#finalAmount').text();
+            const finalTotal = parseFloat(finalText.replace('Rp ', '').replace(/\./g, '') || 0);
+            const paid = parseFloat($('#paid_amount').val()) || 0;
+
+            // Validation for paid amount for non-credit methods
+            if (paymentMethod !== 'credit' && paid < finalTotal) {
+                alert('Jumlah yang dibayar harus lebih besar atau sama dengan total belanja');
+                return false;
+            }
+
+            // Validation for customer selection for credit payments
+            if (paymentMethod === 'credit') {
+                if (!$('#customer_select').val()) {
+                    alert('Transaksi kredit harus memilih pelanggan');
+                    return false;
                 }
             }
 
-            function initializeCustomerSelect() {
-                try {
-                    $('#customer_select').select2({
-                        theme: 'tailwind',
-                        tags: true, // Allow creating new tags
-                        placeholder: 'Pilih atau ketik nama pelanggan baru',
-                        allowClear: true,
-                        createTag: function(params) {
-                            // Don't create a tag if input is empty
-                            if ($.trim(params.term) === '') {
-                                return null;
-                            }
-                            return {
-                                id: 'new:' + params.term,
-                                text: params.term,
-                                newTag: true
-                            }
-                        },
-                        templateResult: function(data) {
+            return true;
+        }
 
-                            if (data.loading) return data.text;
-                            const $container = $("<div class='select2-result-customer'></div>");
-                            if (data.newTag) {
-                                $container.append(
-                                    $("<div class='text-blue-600'><i class='fas fa-plus-circle mr-1'></i> Tambah pelanggan baru: " +
-                                        data.text + "</div>")
-                                );
-                            } else {
-                                $container.append($("<div>" + data.text + "</div>"));
-                            }
-                            return $container;
-                        },
-                        templateSelection: function(data) {
+        function updatePaymentSections() {
+            const paymentMethod = $('#payment_method').val();
+            const dpSection = $('#dp_container');
+            const cashSection = $('#cash-payment-section');
+            const submitButton = $('button[type="submit"]');
+            const paidAmountInput = $('#paid_amount');
+            const dpInput = $('#down_payment');
 
-                            if (data.newTag) {
-                                return "Pelanggan Baru: " + data.text;
-                            }
-                            return data.text;
+            if (paymentMethod === 'credit') {
+                dpSection.removeClass('hidden');
+                cashSection.addClass('hidden');
+
+                // Reset values
+                dpInput.val('0');
+                paidAmountInput.val('0');
+
+                // Enable submit button for credit
+                submitButton.prop('disabled', false).removeClass('opacity-50 cursor-not-allowed');
+
+                // Check for customer selection
+                if (!$('#customer_select').val()) {
+                    // This validation is also in validateForm, but an early alert might be helpful
+                }
+
+                // Calculate remaining amount
+                calculateRemainingAmount();
+            } else {
+                dpSection.addClass('hidden');
+                cashSection.removeClass('hidden');
+
+                // Reset DP value
+                dpInput.val('0');
+
+                // Calculate change
+                calculateChange();
+            }
+        }
+
+        function initializeCustomerSelect() {
+            try {
+                $('#customer_select').select2({
+                    theme: 'tailwind',
+                    tags: true, // Allow creating new tags
+                    placeholder: 'Pilih atau ketik nama pelanggan baru',
+                    allowClear: true,
+                    createTag: function(params) {
+                        // Don't create a tag if input is empty
+                        if ($.trim(params.term) === '') {
+                            return null;
                         }
-                    }).on('change', function(e) {
+                        return {
+                            id: 'new:' + params.term,
+                            text: params.term,
+                            newTag: true
+                        }
+                    },
+                    templateResult: function(data) {
 
-                        const selectedValue = $(this).val();
-                        if (selectedValue && selectedValue.startsWith('new:')) {
-                            const newCustomerName = selectedValue.substring(4);
-                            $('#new_customer_name').val(newCustomerName);
-                            $(this).next('.select2-container').find('.select2-selection').addClass(
-                                'border-blue-500');
+                        if (data.loading) return data.text;
+                        const $container = $("<div class='select2-result-customer'></div>");
+                        if (data.newTag) {
+                            $container.append(
+                                $("<div class='text-blue-600'><i class='fas fa-plus-circle mr-1'></i> Tambah pelanggan baru: " +
+                                    data.text + "</div>")
+                            );
                         } else {
-                            $('#new_customer_name').val('');
-                            $(this).next('.select2-container').find('.select2-selection').removeClass(
-                                'border-blue-500');
+                            $container.append($("<div>" + data.text + "</div>"));
                         }
-                    });
-                } catch (e) {
-                    console.error('Error initializing customer Select2:', e);
-                    // Fallback to native select
-                    $('#customer_select').removeClass('select2-hidden-accessible').css('display', 'block')
-                        .next('.select2-container').remove();
-                    $('#customer_select').addClass(
-                        'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
-                    );
-                }
+                        return $container;
+                    },
+                    templateSelection: function(data) {
+
+                        if (data.newTag) {
+                            return "Pelanggan Baru: " + data.text;
+                        }
+                        return data.text;
+                    }
+                }).on('change', function(e) {
+
+                    const selectedValue = $(this).val();
+                    if (selectedValue && selectedValue.startsWith('new:')) {
+                        const newCustomerName = selectedValue.substring(4);
+                        $('#new_customer_name').val(newCustomerName);
+                        $(this).next('.select2-container').find('.select2-selection').addClass(
+                            'border-blue-500');
+                    } else {
+                        $('#new_customer_name').val('');
+                        $(this).next('.select2-container').find('.select2-selection').removeClass(
+                            'border-blue-500');
+                    }
+                });
+            } catch (e) {
+                console.error('Error initializing customer Select2:', e);
+                // Fallback to native select
+                $('#customer_select').removeClass('select2-hidden-accessible').css('display', 'block')
+                    .next('.select2-container').remove();
+                $('#customer_select').addClass(
+                    'w-full rounded-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300'
+                );
             }
+        }
 
-            function formatProductOption(product) {
-                if (!product.id) return product.text;
-                const $option = $(product.element); // Get the original option element
-                const stock = $option.data('stock') || 0;
+        function formatProductOption(product) {
+            if (!product.id) return product.text;
+            const $option = $(product.element); // Get the original option element
+            const stock = $option.data('stock') || 0;
 
-                return `
+            return `
                 <div class="flex items-center p-2 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors">
                     <div class="flex-1">
                         <div class="font-medium text-gray-900 dark:text-gray-100">
@@ -2115,48 +2179,48 @@
                     </div>
                 </div>
                 `;
-            }
+        }
 
-            function formatProductSelection(product) {
-                if (!product.id) return product.text;
-                return `
+        function formatProductSelection(product) {
+            if (!product.id) return product.text;
+            return `
                 <div class="flex items-center">
                     <div class="font-medium text-gray-900 dark:text-gray-100">${product.text}</div>
                 </div>
                 `;
+        }
+
+        function addProductToSale(product) {
+            // Add a new row if needed
+            if ($('#saleItems tr').length === 0) {
+                addItem();
             }
 
-            function addProductToSale(product) {
-                // Add a new row if needed
-                if ($('#saleItems tr').length === 0) {
-                    addItem();
-                }
+            // Find the last empty row or add a new one
+            let emptyRow = $('#saleItems tr').filter(function() {
+                return $(this).find('select[name="product_id[]"]').val() === '';
+            }).first();
 
-                // Find the last empty row or add a new one
-                let emptyRow = $('#saleItems tr').filter(function() {
-                    return $(this).find('select[name="product_id[]"]').val() === '';
-                }).first();
-
-                if (!emptyRow.length) {
-                    addItem();
-                    emptyRow = $('#saleItems tr:last');
-                }
-
-                // Select the product in the dropdown
-                const productSelect = emptyRow.find('select[name="product_id[]"]');
-                productSelect.val(product.id).trigger('change');
+            if (!emptyRow.length) {
+                addItem();
+                emptyRow = $('#saleItems tr:last');
             }
 
-            function showNotification(message, type = 'info') {
-                // Remove any existing notifications
-                $('.notification-toast').remove();
+            // Select the product in the dropdown
+            const productSelect = emptyRow.find('select[name="product_id[]"]');
+            productSelect.val(product.id).trigger('change');
+        }
 
-                // Create notification element
-                const colorClass = type === 'success' ? 'bg-green-500' :
-                    type === 'error' ? 'bg-red-500' :
-                    type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+        function showNotification(message, type = 'info') {
+            // Remove any existing notifications
+            $('.notification-toast').remove();
 
-                const notificationHtml = `
+            // Create notification element
+            const colorClass = type === 'success' ? 'bg-green-500' :
+                type === 'error' ? 'bg-red-500' :
+                type === 'warning' ? 'bg-yellow-500' : 'bg-blue-500';
+
+            const notificationHtml = `
                 <div class="notification-toast fixed top-4 right-4 z-50 flex items-center p-4 mb-4 w-full max-w-xs rounded-lg shadow text-white ${colorClass}" role="alert">
                     <div class="inline-flex flex-shrink-0 justify-center items-center w-8 h-8 rounded-lg bg-white/20">
                         ${type === 'success' ?
@@ -2174,38 +2238,38 @@
                 </div>
                 `;
 
-                $('body').append(notificationHtml);
+            $('body').append(notificationHtml);
 
-                // Auto-dismiss after 3 seconds
-                setTimeout(() => {
-                    $('.notification-toast').fadeOut(300, function() {
-                        $(this).remove();
-                    });
-                }, 3000);
-
-                // Dismiss on click
-                $('.notification-toast button').on('click', function() {
-                    $(this).closest('.notification-toast').fadeOut(300, function() {
-                        $(this).remove();
-                    });
+            // Auto-dismiss after 3 seconds
+            setTimeout(() => {
+                $('.notification-toast').fadeOut(300, function() {
+                    $(this).remove();
                 });
-            }
+            }, 3000);
 
-            // Fungsi untuk menampilkan histori pelanggan
-            function showCustomerHistory() {
-                const customerId = $('#customer_select').val();
+            // Dismiss on click
+            $('.notification-toast button').on('click', function() {
+                $(this).closest('.notification-toast').fadeOut(300, function() {
+                    $(this).remove();
+                });
+            });
+        }
 
-                // Tampilkan modal terlebih dahulu
-                $('#shortcuts-modal').removeClass('hidden');
+        // Fungsi untuk menampilkan histori pelanggan
+        function showCustomerHistory() {
+            const customerId = $('#customer_select').val();
 
-                // Tampilkan section yang sesuai
-                $('#customer-history-loading').addClass('hidden');
-                $('#customer-history-empty').addClass('hidden');
-                $('#customer-history-content').addClass('hidden');
+            // Tampilkan modal terlebih dahulu
+            $('#shortcuts-modal').removeClass('hidden');
 
-                // Jika pelanggan belum dipilih
-                if (!customerId || customerId.startsWith('new:')) {
-                    $('#customer-history-info').html(`
+            // Tampilkan section yang sesuai
+            $('#customer-history-loading').addClass('hidden');
+            $('#customer-history-empty').addClass('hidden');
+            $('#customer-history-content').addClass('hidden');
+
+            // Jika pelanggan belum dipilih
+            if (!customerId || customerId.startsWith('new:')) {
+                $('#customer-history-info').html(`
                         <div class="flex items-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-indigo-500 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -2213,75 +2277,75 @@
                             <span>Silakan pilih pelanggan terlebih dahulu untuk melihat histori pembelian</span>
                         </div>
                     `);
-                    return;
-                }
-
-                // Jika pelanggan dipilih, ambil datanya
-                $('#customer-history-info').text('');
-                $('#customer-history-loading').removeClass('hidden');
-
-                // Ambil data histori pelanggan
-                fetchCustomerHistory(customerId);
+                return;
             }
 
-            // Fungsi untuk mengambil histori pelanggan
-            function fetchCustomerHistory(customerId) {
-                // Ajax request untuk mendapatkan histori
-                fetch(`/customers/${customerId}/history`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        $('#customer-history-loading').addClass('hidden');
+            // Jika pelanggan dipilih, ambil datanya
+            $('#customer-history-info').text('');
+            $('#customer-history-loading').removeClass('hidden');
 
-                        // Jika tidak ada histori
-                        if (!data.history || data.history.length === 0) {
-                            $('#customer-history-empty').removeClass('hidden');
-                            return;
-                        }
+            // Ambil data histori pelanggan
+            fetchCustomerHistory(customerId);
+        }
 
-                        // Tampilkan histori
-                        displayCustomerHistory(data);
-                    })
-                    .catch(error => {
-                        console.error('Error fetching customer history:', error);
-                        $('#customer-history-loading').addClass('hidden');
-                        $('#customer-history-info').text(
-                            'Terjadi kesalahan saat mengambil histori. Silakan coba lagi.');
-                    });
-            }
+        // Fungsi untuk mengambil histori pelanggan
+        function fetchCustomerHistory(customerId) {
+            // Ajax request untuk mendapatkan histori
+            fetch(`/customers/${customerId}/history`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    $('#customer-history-loading').addClass('hidden');
 
-            // Fungsi untuk menampilkan data histori
-            function displayCustomerHistory(data) {
-                // Tampilkan nama pelanggan
-                const customerName = $('#customer_select option:selected').text().split('-')[0].trim();
-                $('#customer-history-info').html(`Histori untuk <strong>${customerName}</strong>`);
-
-                // Tampilkan tabel histori
-                const historyTable = $('#customer-history-table');
-                historyTable.empty();
-
-                data.history.forEach(sale => {
-                    const date = new Date(sale.date);
-                    const formattedDate =
-                        `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
-
-                    let statusBadge = '';
-                    if (sale.payment_status === 'paid') {
-                        statusBadge =
-                            `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Lunas</span>`;
-                    } else if (sale.payment_status === 'partial') {
-                        statusBadge =
-                            `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Sebagian</span>`;
-                    } else {
-                        statusBadge =
-                            `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Belum Bayar</span>`;
+                    // Jika tidak ada histori
+                    if (!data.history || data.history.length === 0) {
+                        $('#customer-history-empty').removeClass('hidden');
+                        return;
                     }
 
-                    const row = `
+                    // Tampilkan histori
+                    displayCustomerHistory(data);
+                })
+                .catch(error => {
+                    console.error('Error fetching customer history:', error);
+                    $('#customer-history-loading').addClass('hidden');
+                    $('#customer-history-info').text(
+                        'Terjadi kesalahan saat mengambil histori. Silakan coba lagi.');
+                });
+        }
+
+        // Fungsi untuk menampilkan data histori
+        function displayCustomerHistory(data) {
+            // Tampilkan nama pelanggan
+            const customerName = $('#customer_select option:selected').text().split('-')[0].trim();
+            $('#customer-history-info').html(`Histori untuk <strong>${customerName}</strong>`);
+
+            // Tampilkan tabel histori
+            const historyTable = $('#customer-history-table');
+            historyTable.empty();
+
+            data.history.forEach(sale => {
+                const date = new Date(sale.date);
+                const formattedDate =
+                    `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+
+                let statusBadge = '';
+                if (sale.payment_status === 'paid') {
+                    statusBadge =
+                        `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400">Lunas</span>`;
+                } else if (sale.payment_status === 'partial') {
+                    statusBadge =
+                        `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400">Sebagian</span>`;
+                } else {
+                    statusBadge =
+                        `<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400">Belum Bayar</span>`;
+                }
+
+                const row = `
                     <tr class="hover:bg-gray-50 dark:hover:bg-gray-600/50">
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${formattedDate}</td>
                         <td class="px-4 py-2 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">${sale.invoice_number}</td>
@@ -2298,16 +2362,16 @@
                     </tr>
                     `;
 
-                    historyTable.append(row);
-                });
+                historyTable.append(row);
+            });
 
-                // Tampilkan produk favorit
-                const favoriteProducts = $('#customer-favorite-products');
-                favoriteProducts.empty();
+            // Tampilkan produk favorit
+            const favoriteProducts = $('#customer-favorite-products');
+            favoriteProducts.empty();
 
-                if (data.favorite_products && data.favorite_products.length > 0) {
-                    data.favorite_products.forEach(product => {
-                        const productCard = `
+            if (data.favorite_products && data.favorite_products.length > 0) {
+                data.favorite_products.forEach(product => {
+                    const productCard = `
                         <div class="p-3 bg-white dark:bg-gray-800 rounded-lg border border-gray-200 dark:border-gray-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors duration-150 cursor-pointer favorite-product shadow-sm" data-product-id="${product.id}">
                             <div class="flex items-start justify-between">
                                 <div class="flex-1">
@@ -2341,10 +2405,10 @@
                         </div>
                         `;
 
-                        favoriteProducts.append(productCard);
-                    });
-                } else {
-                    favoriteProducts.append(`
+                    favoriteProducts.append(productCard);
+                });
+            } else {
+                favoriteProducts.append(`
                         <div class="col-span-full p-4 bg-gray-50 dark:bg-gray-700 rounded-lg text-center">
                             <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 mx-auto text-gray-400 dark:text-gray-500 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -2354,88 +2418,15 @@
                             <p class="text-xs text-gray-400 dark:text-gray-500 mt-1">Produk favorit akan muncul setelah beberapa transaksi</p>
                         </div>
                     `);
-                }
-
-                // Tampilkan konten
-                $('#customer-history-content').removeClass('hidden');
-
-                // Event listener untuk tombol salin item
-                $('.history-copy-items').on('click', function() {
-                    const saleId = $(this).data('sale-id');
-                    copySaleItems(saleId);
-                });
-
-                // Event listener untuk tambah produk favorit
-                $('.favorite-product').on('click', function() {
-                    const productId = $(this).data('product-id');
-                    addProductById(productId);
-                    $('#shortcuts-modal').addClass('hidden');
-                });
             }
 
-            // Fungsi untuk menyalin item dari penjualan sebelumnya
-            function copySaleItems(saleId) {
-                // Tampilkan loading
-                showNotification('Menyalin item...', 'info');
+            // Tampilkan konten
+            $('#customer-history-content').removeClass('hidden');
 
-                // Ajax request untuk mendapatkan detail penjualan
-                fetch(`/sales/${saleId}/details`)
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error('Network response was not ok');
-                        }
-                        return response.json();
-                    })
-                    .then(data => {
-                        // Hapus semua item yang ada
-                        $('#saleItems tr').each(function() {
-                            $(this).remove();
-                        });
-
-                        // Tambahkan item dari penjualan sebelumnya
-                        data.details.forEach(detail => {
-                            addItem();
-                            const row = $('#saleItems tr:last');
-
-                            // Pilih produk
-                            row.find('select[name="product_id[]"]').val(detail.product_id).trigger(
-                                'change');
-
-                            // Tambahkan handler untuk memilih unit dan jumlah setelah produk dimuat
-                            const checkUnitLoaded = setInterval(() => {
-                                const unitSelect = row.find('select[name="unit_id[]"]');
-                                if (unitSelect.find('option').length > 1) {
-                                    clearInterval(checkUnitLoaded);
-
-                                    // Pilih unit jika ada
-                                    unitSelect.val(detail.product_unit_id).trigger('change');
-
-                                    // Set jumlah
-                                    row.find('input[name="quantity[]"]').val(detail.quantity)
-                                        .trigger(
-                                            'input');
-                                }
-                            }, 100);
-                        });
-
-                        // Tutup modal
-                        $('#shortcuts-modal').addClass('hidden');
-
-                        // Tampilkan notifikasi
-                        showNotification('Item berhasil disalin dari transaksi sebelumnya', 'success');
-                    })
-                    .catch(error => {
-                        console.error('Error copying sale items:', error);
-                        showNotification('Terjadi kesalahan saat menyalin item', 'error');
-                    });
-            }
-
-            // Tambahkan event listener saat pelanggan dipilih
-            $('#customer_select').on('change', function() {
-                // Jika modal histori sedang terbuka, update isinya
-                if (!$('#shortcuts-modal').hasClass('hidden')) {
-                    showCustomerHistory();
-                }
+            // Event listener untuk tombol salin item
+            $('.history-copy-items').on('click', function() {
+                const saleId = $(this).data('sale-id');
+                copySaleItems(saleId);
             });
 
             // Event listener untuk tambah produk favorit
@@ -2444,162 +2435,235 @@
                 addProductById(productId);
                 $('#shortcuts-modal').addClass('hidden');
             });
+        }
 
-            // Fungsi untuk menambahkan produk berdasarkan ID
-            function addProductById(productId) {
-                // Cari apakah produk sudah ada di keranjang
-                let existingRow = null;
-                $('#saleItems tr').each(function() {
-                    const row = $(this);
-                    if (row.find('select[name="product_id[]"]').val() == productId) {
-                        existingRow = row;
-                        return false; // break each loop
+        // Fungsi untuk menyalin item dari penjualan sebelumnya
+        function copySaleItems(saleId) {
+            // Tampilkan loading
+            showNotification('Menyalin item...', 'info');
+
+            // Ajax request untuk mendapatkan detail penjualan
+            fetch(`/sales/${saleId}/details`)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
                     }
-                });
-
-                if (existingRow) {
-                    // Jika produk sudah ada, tambahkan kuantitasnya
-                    const quantityInput = existingRow.find('input[name="quantity[]"]');
-                    let currentQty = parseInt(quantityInput.val()) || 0;
-                    quantityInput.val(currentQty + 1).trigger('input');
-
-                    // Highlight row untuk menunjukkan perubahan
-                    existingRow.addClass('bg-yellow-50 dark:bg-yellow-900/20')
-                        .find('.subtotal').addClass('animate-pulse text-indigo-700 dark:text-indigo-400');
-
-                    // Scroll ke baris yang diubah
-                    $('html, body').animate({
-                        scrollTop: existingRow.offset().top - 100
-                    }, 500);
-
-                    // Hapus kelas setelah animasi
-                    setTimeout(() => {
-                        existingRow.removeClass('bg-yellow-50 dark:bg-yellow-900/20')
-                            .find('.subtotal').removeClass(
-                                'animate-pulse text-indigo-700 dark:text-indigo-400');
-                    }, 1000);
-                } else {
-                    // Jika produk belum ada, tambahkan baris baru
-                    addItem();
-                    const newRow = $('#saleItems tr:last');
-
-                    // Pilih produk
-                    newRow.find('select[name="product_id[]"]').val(productId).trigger('change');
-
-                    // Scroll ke baris baru dengan animasi
-                    $('html, body').animate({
-                        scrollTop: newRow.offset().top - 100
-                    }, 500);
-
-                    // Highlight row baru dengan animasi
-                    newRow.addClass('bg-green-50 dark:bg-green-900/20');
-                    setTimeout(() => {
-                        newRow.removeClass('bg-green-50 dark:bg-green-900/20');
-                    }, 1500);
-                }
-
-                // Tampilkan notifikasi
-                showNotification('Produk berhasil ditambahkan', 'success');
-            }
-
-            // Product Selector Integration
-            function openProductSelector() {
-                // Call the global function directly
-                if (typeof window.openProductSelector === 'function') {
-                    // Avoid infinite recursion by checking if we're calling the global function
-                    const globalFunction = window.openProductSelector;
-                    if (globalFunction !== openProductSelector) {
-                        globalFunction();
-                        return;
-                    }
-                }
-                
-                // Fallback: try to find and call the modal directly
-                const modalElement = document.querySelector('[x-data*="enhancedProductSelector"]');
-                if (modalElement && modalElement._x_dataStack) {
-                    const component = modalElement._x_dataStack[0];
-                    if (component && typeof component.openModal === 'function') {
-                        component.openModal();
-                        return;
-                    }
-                }
-                
-                console.error('Product selector not initialized');
-            }
-
-            // Handle product selection from modal
-            window.addEventListener('product-selected', function(event) {
-                const selectedProducts = event.detail.products;
-                
-                selectedProducts.forEach(product => {
-                    addProductToSale(product);
-                });
-            });
-
-            function addProductToSale(product) {
-                // Check if product already exists in the table
-                const existingRow = $(`#saleItems tr[data-product-id="${product.id}"]`);
-                
-                if (existingRow.length > 0) {
-                    // If product exists, increase quantity
-                    const quantityInput = existingRow.find('input[name="quantity[]"]');
-                    let currentQty = parseInt(quantityInput.val()) || 0;
-                    quantityInput.val(currentQty + (product.quantity || 1)).trigger('input');
-                    
-                    // Highlight existing row
-                    existingRow.addClass('bg-yellow-50 dark:bg-yellow-900/20');
-                    setTimeout(() => {
-                        existingRow.removeClass('bg-yellow-50 dark:bg-yellow-900/20');
-                    }, 1000);
-                } else {
-                    // Add new product row
-                    addItem();
-                    const newRow = $('#saleItems tr:last');
-                    newRow.attr('data-product-id', product.id);
-                    
-                    // Set product data
-                    const productSelect = newRow.find('select[name="product_id[]"]');
-                    
-                    // Add option if not exists
-                    if (productSelect.find(`option[value="${product.id}"]`).length === 0) {
-                        productSelect.append(`<option value="${product.id}">${product.name} - ${product.code}</option>`);
-                    }
-                    
-                    productSelect.val(product.id).trigger('change');
-                    
-                    // Set quantity if specified
-                    if (product.quantity && product.quantity > 1) {
-                        newRow.find('input[name="quantity[]"]').val(product.quantity).trigger('input');
-                    }
-                    
-                    // Highlight new row
-                    newRow.addClass('bg-green-50 dark:bg-green-900/20');
-                    setTimeout(() => {
-                        newRow.removeClass('bg-green-50 dark:bg-green-900/20');
-                    }, 1500);
-                    
-                    // Scroll to new row
-                    $('html, body').animate({
-                        scrollTop: newRow.offset().top - 100
-                    }, 500);
-                }
-            }
-
-            // Initialize product selector when document is ready
-            $(document).ready(function() {
-                // Initialize Alpine.js product selector store
-                if (typeof Alpine !== 'undefined' && window.initProductSelector) {
-                    window.initProductSelector({
-                        apiEndpoint: '/api/products',
-                        searchEndpoint: '/api/products/search',
-                        categoriesEndpoint: '/api/products/categories',
-                        multiSelect: true,
-                        showQuantityInput: true,
-                        defaultView: 'grid'
+                    return response.json();
+                })
+                .then(data => {
+                    // Hapus semua item yang ada
+                    $('#saleItems tr').each(function() {
+                        $(this).remove();
                     });
+
+                    // Tambahkan item dari penjualan sebelumnya
+                    data.details.forEach(detail => {
+                        addItem();
+                        const row = $('#saleItems tr:last');
+
+                        // Pilih produk
+                        row.find('select[name="product_id[]"]').val(detail.product_id).trigger(
+                            'change');
+
+                        // Tambahkan handler untuk memilih unit dan jumlah setelah produk dimuat
+                        const checkUnitLoaded = setInterval(() => {
+                            const unitSelect = row.find('select[name="unit_id[]"]');
+                            if (unitSelect.find('option').length > 1) {
+                                clearInterval(checkUnitLoaded);
+
+                                // Pilih unit jika ada
+                                unitSelect.val(detail.product_unit_id).trigger('change');
+
+                                // Set jumlah
+                                row.find('input[name="quantity[]"]').val(detail.quantity)
+                                    .trigger(
+                                        'input');
+                            }
+                        }, 100);
+                    });
+
+                    // Tutup modal
+                    $('#shortcuts-modal').addClass('hidden');
+
+                    // Tampilkan notifikasi
+                    showNotification('Item berhasil disalin dari transaksi sebelumnya', 'success');
+                })
+                .catch(error => {
+                    console.error('Error copying sale items:', error);
+                    showNotification('Terjadi kesalahan saat menyalin item', 'error');
+                });
+        }
+
+        // Tambahkan event listener saat pelanggan dipilih
+        $('#customer_select').on('change', function() {
+            // Jika modal histori sedang terbuka, update isinya
+            if (!$('#shortcuts-modal').hasClass('hidden')) {
+                showCustomerHistory();
+            }
+        });
+
+        // Event listener untuk tambah produk favorit
+        $('.favorite-product').on('click', function() {
+            const productId = $(this).data('product-id');
+            addProductById(productId);
+            $('#shortcuts-modal').addClass('hidden');
+        });
+
+        // Fungsi untuk menambahkan produk berdasarkan ID
+        function addProductById(productId) {
+            // Cari apakah produk sudah ada di keranjang
+            let existingRow = null;
+            $('#saleItems tr').each(function() {
+                const row = $(this);
+                if (row.find('select[name="product_id[]"]').val() == productId) {
+                    existingRow = row;
+                    return false; // break each loop
                 }
             });
-        </script>
+
+            if (existingRow) {
+                // Jika produk sudah ada, tambahkan kuantitasnya
+                const quantityInput = existingRow.find('input[name="quantity[]"]');
+                let currentQty = parseInt(quantityInput.val()) || 0;
+                quantityInput.val(currentQty + 1).trigger('input');
+
+                // Highlight row untuk menunjukkan perubahan
+                existingRow.addClass('bg-yellow-50 dark:bg-yellow-900/20')
+                    .find('.subtotal').addClass('animate-pulse text-indigo-700 dark:text-indigo-400');
+
+                // Scroll ke baris yang diubah
+                $('html, body').animate({
+                    scrollTop: existingRow.offset().top - 100
+                }, 500);
+
+                // Hapus kelas setelah animasi
+                setTimeout(() => {
+                    existingRow.removeClass('bg-yellow-50 dark:bg-yellow-900/20')
+                        .find('.subtotal').removeClass(
+                            'animate-pulse text-indigo-700 dark:text-indigo-400');
+                }, 1000);
+            } else {
+                // Jika produk belum ada, tambahkan baris baru
+                addItem();
+                const newRow = $('#saleItems tr:last');
+
+                // Pilih produk
+                newRow.find('select[name="product_id[]"]').val(productId).trigger('change');
+
+                // Scroll ke baris baru dengan animasi
+                $('html, body').animate({
+                    scrollTop: newRow.offset().top - 100
+                }, 500);
+
+                // Highlight row baru dengan animasi
+                newRow.addClass('bg-green-50 dark:bg-green-900/20');
+                setTimeout(() => {
+                    newRow.removeClass('bg-green-50 dark:bg-green-900/20');
+                }, 1500);
+            }
+
+            // Tampilkan notifikasi
+            showNotification('Produk berhasil ditambahkan', 'success');
+        }
+
+        // Product Selector Integration
+        function openProductSelector() {
+            // Call the global function directly
+            if (typeof window.openProductSelector === 'function') {
+                // Avoid infinite recursion by checking if we're calling the global function
+                const globalFunction = window.openProductSelector;
+                if (globalFunction !== openProductSelector) {
+                    globalFunction();
+                    return;
+                }
+            }
+
+            // Fallback: try to find and call the modal directly
+            const modalElement = document.querySelector('[x-data*="enhancedProductSelector"]');
+            if (modalElement && modalElement._x_dataStack) {
+                const component = modalElement._x_dataStack[0];
+                if (component && typeof component.openModal === 'function') {
+                    component.openModal();
+                    return;
+                }
+            }
+
+            console.error('Product selector not initialized');
+        }
+
+        // Handle product selection from modal
+        window.addEventListener('product-selected', function(event) {
+            const selectedProducts = event.detail.products;
+
+            selectedProducts.forEach(product => {
+                addProductToSale(product);
+            });
+        });
+
+        function addProductToSale(product) {
+            // Check if product already exists in the table
+            const existingRow = $(`#saleItems tr[data-product-id="${product.id}"]`);
+
+            if (existingRow.length > 0) {
+                // If product exists, increase quantity
+                const quantityInput = existingRow.find('input[name="quantity[]"]');
+                let currentQty = parseInt(quantityInput.val()) || 0;
+                quantityInput.val(currentQty + (product.quantity || 1)).trigger('input');
+
+                // Highlight existing row
+                existingRow.addClass('bg-yellow-50 dark:bg-yellow-900/20');
+                setTimeout(() => {
+                    existingRow.removeClass('bg-yellow-50 dark:bg-yellow-900/20');
+                }, 1000);
+            } else {
+                // Add new product row
+                addItem();
+                const newRow = $('#saleItems tr:last');
+                newRow.attr('data-product-id', product.id);
+
+                // Set product data
+                const productSelect = newRow.find('select[name="product_id[]"]');
+
+                // Add option if not exists
+                if (productSelect.find(`option[value="${product.id}"]`).length === 0) {
+                    productSelect.append(`<option value="${product.id}">${product.name} - ${product.code}</option>`);
+                }
+
+                productSelect.val(product.id).trigger('change');
+
+                // Set quantity if specified
+                if (product.quantity && product.quantity > 1) {
+                    newRow.find('input[name="quantity[]"]').val(product.quantity).trigger('input');
+                }
+
+                // Highlight new row
+                newRow.addClass('bg-green-50 dark:bg-green-900/20');
+                setTimeout(() => {
+                    newRow.removeClass('bg-green-50 dark:bg-green-900/20');
+                }, 1500);
+
+                // Scroll to new row
+                $('html, body').animate({
+                    scrollTop: newRow.offset().top - 100
+                }, 500);
+            }
+        }
+
+        // Initialize product selector when document is ready
+        $(document).ready(function() {
+            // Initialize Alpine.js product selector store
+            if (typeof Alpine !== 'undefined' && window.initProductSelector) {
+                window.initProductSelector({
+                    apiEndpoint: '/api/products',
+                    searchEndpoint: '/api/products/search',
+                    categoriesEndpoint: '/api/products/categories',
+                    multiSelect: true,
+                    showQuantityInput: true,
+                    defaultView: 'grid'
+                });
+            }
+        });
+    </script>
     @endpush
 
 </x-app-layout>

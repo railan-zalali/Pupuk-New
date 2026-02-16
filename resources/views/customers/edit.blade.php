@@ -1,283 +1,257 @@
 <x-app-layout>
     <div class="space-y-6">
-        <!-- Page Heading -->
-        <div class="flex items-center justify-between">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in-up">
             <div>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <i class="ti ti-edit text-xl"></i>
+                    </div>
                     {{ __('Edit Pelanggan') }}
                 </h2>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Edit informasi dan data pelanggan</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-13">
+                    Perbarui informasi data pelanggan
+                </p>
             </div>
+            <a href="{{ route('customers.index') }}" class="btn-secondary flex items-center gap-2">
+                <i class="ti ti-arrow-left"></i> Kembali
+            </a>
         </div>
-        @if (session('success'))
-            <div class="rounded-lg bg-green-50 dark:bg-green-900/50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-green-400 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <p class="text-sm font-medium text-green-800 dark:text-green-200">{{ session('success') }}</p>
-                    </div>
+
+        @if ($errors->any())
+        <div class="p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 animate-fade-in-up">
+            <div class="flex items-start gap-3">
+                <i class="ti ti-alert-circle text-red-500 text-lg flex-shrink-0 mt-0.5"></i>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-red-800 dark:text-red-200">Terjadi kesalahan input:</h3>
+                    <ul class="mt-1 text-sm text-red-700 dark:text-red-300 list-disc pl-4 space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             </div>
+        </div>
         @endif
-        @push('styles')
-            <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
-        @endpush
 
-        <!-- Edit Form -->
-        <div
-            class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div class="p-6 space-y-6">
-                <form action="{{ route('customers.update', $customer) }}" method="POST">
-                    @csrf
-                    @method('PUT')
-
-                    <div class="grid grid-cols-1 gap-6 mb-6">
-                        <!-- Personal Info Section -->
-                        <div
-                            class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                                </svg>
-                                Informasi Pribadi
-                            </h3>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <x-input-label for="nik" :value="__('NIK')" />
-                                    <x-text-input id="nik" name="nik" type="number" class="mt-1 block w-full"
-                                        :value="old('nik', $customer->nik)" required />
-                                    <x-input-error :messages="$errors->get('nik')" class="mt-2" />
-                                </div>
-
-                                <div>
-                                    <x-input-label for="nama" :value="__('Nama')" />
-                                    <x-text-input id="nama" name="nama" type="text" class="mt-1 block w-full"
-                                        :value="old('nama', $customer->nama)" required />
-                                    <x-input-error :messages="$errors->get('nama')" class="mt-2" />
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Address Section -->
-                        <div
-                            class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                            <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg"
-                                    class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Informasi Alamat
-                            </h3>
-
-                            <div class="space-y-4">
-                                <div class="md:col-span-2">
-                                    <x-input-label for="alamat" :value="__('Alamat Lengkap')" />
-                                    <textarea id="alamat" name="alamat" rows="3"
-                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-700 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300">{{ old('alamat', $customer->alamat) }}</textarea>
-                                    <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
-                                </div>
-
-                                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    <!-- Provinsi -->
-                                    <div
-                                        class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <x-input-label for="provinsi" :value="__('Provinsi')" />
-                                        <select id="provinsi" name="provinsi_id"
-                                            class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-700 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300"
-                                            required>
-                                            <option value="">Pilih Provinsi</option>
-                                        </select>
-                                        <input type="hidden" name="provinsi_nama" id="provinsi_nama"
-                                            value="{{ old('provinsi_nama', $customer->provinsi_nama) }}">
-                                        <x-input-error :messages="$errors->get('provinsi_id')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Kabupaten -->
-                                    <div
-                                        class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <x-input-label for="kabupaten" :value="__('Kabupaten')" />
-                                        <select id="kabupaten" name="kabupaten_id"
-                                            class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-700 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300"
-                                            required disabled>
-                                            <option value="">Pilih Kabupaten</option>
-                                        </select>
-                                        <input type="hidden" name="kabupaten_nama" id="kabupaten_nama"
-                                            value="{{ old('kabupaten_nama', $customer->kabupaten_nama) }}">
-                                        <x-input-error :messages="$errors->get('kabupaten_id')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Kecamatan -->
-                                    <div
-                                        class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <x-input-label for="kecamatan" :value="__('Kecamatan')" />
-                                        <select id="kecamatan" name="kecamatan_id"
-                                            class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-700 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300"
-                                            required disabled>
-                                            <option value="">Pilih Kecamatan</option>
-                                        </select>
-                                        <input type="hidden" name="kecamatan_nama" id="kecamatan_nama"
-                                            value="{{ old('kecamatan_nama', $customer->kecamatan_nama) }}">
-                                        <x-input-error :messages="$errors->get('kecamatan_id')" class="mt-2" />
-                                    </div>
-
-                                    <!-- Desa -->
-                                    <div
-                                        class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                        <x-input-label for="desa" :value="__('Desa')" />
-                                        <select id="desa" name="desa_id"
-                                            class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-700 focus:ring-opacity-50 dark:bg-gray-800 dark:text-gray-300"
-                                            required disabled>
-                                            <option value="">Pilih Desa</option>
-                                        </select>
-                                        <input type="hidden" name="desa_nama" id="desa_nama"
-                                            value="{{ old('desa_nama', $customer->desa_nama) }}">
-                                        <x-input-error :messages="$errors->get('desa_id')" class="mt-2" />
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" onclick="window.history.back()"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Batal
-                        </button>
-
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                            </svg>
-                            Simpan Perubahan
-                        </button>
-                    </div>
-                </form>
+        @if (session('success'))
+        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 animate-fade-in-up">
+            <div class="flex items-center gap-3">
+                <i class="ti ti-check-circle text-emerald-500 text-lg"></i>
+                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-200">{{ session('success') }}</p>
             </div>
         </div>
+        @endif
+
+        <div class="card animate-fade-in-up delay-100">
+            <form action="{{ route('customers.update', $customer) }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <!-- Personal Info -->
+                <div class="p-6 border-b border-gray-100 dark:border-gray-700/50">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+                        <i class="ti ti-id text-emerald-500"></i> Informasi Pribadi
+                    </h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div>
+                            <x-input-label for="nik" value="NIK" class="mb-1.5" />
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ti ti-id-badge text-gray-400"></i>
+                                </div>
+                                <x-text-input id="nik" name="nik" type="number" class="pl-10 w-full" :value="old('nik', $customer->nik)" required />
+                            </div>
+                        </div>
+                        <div>
+                            <x-input-label for="nama" value="Nama Lengkap" class="mb-1.5" />
+                            <div class="relative">
+                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                    <i class="ti ti-user text-gray-400"></i>
+                                </div>
+                                <x-text-input id="nama" name="nama" type="text" class="pl-10 w-full" :value="old('nama', $customer->nama)" required />
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Address Info -->
+                <div class="p-6 bg-gray-50/50 dark:bg-gray-800/50">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+                        <i class="ti ti-map-pin text-emerald-500"></i> Alamat Lengkap
+                    </h3>
+
+                    <div class="space-y-4">
+                        <div>
+                            <x-input-label for="alamat" value="Jalan / Dusun / RT RW" class="mb-1.5" />
+                            <textarea id="alamat" name="alamat" rows="2" class="input-field w-full">{{ old('alamat', $customer->alamat) }}</textarea>
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <x-input-label for="provinsi" value="Provinsi" class="mb-1.5" />
+                                <select id="provinsi" name="provinsi_id" class="select2 w-full" required>
+                                    <option value="">Pilih Provinsi</option>
+                                </select>
+                                <input type="hidden" name="provinsi_nama" id="provinsi_nama" value="{{ old('provinsi_nama', $customer->provinsi_nama) }}">
+                            </div>
+
+                            <div>
+                                <x-input-label for="kabupaten" value="Kabupaten/Kota" class="mb-1.5" />
+                                <select id="kabupaten" name="kabupaten_id" class="select2 w-full" required>
+                                    <option value="">Pilih Kabupaten</option>
+                                </select>
+                                <input type="hidden" name="kabupaten_nama" id="kabupaten_nama" value="{{ old('kabupaten_nama', $customer->kabupaten_nama) }}">
+                            </div>
+
+                            <div>
+                                <x-input-label for="kecamatan" value="Kecamatan" class="mb-1.5" />
+                                <select id="kecamatan" name="kecamatan_id" class="select2 w-full" required>
+                                    <option value="">Pilih Kecamatan</option>
+                                </select>
+                                <input type="hidden" name="kecamatan_nama" id="kecamatan_nama" value="{{ old('kecamatan_nama', $customer->kecamatan_nama) }}">
+                            </div>
+
+                            <div>
+                                <x-input-label for="desa" value="Desa/Kelurahan" class="mb-1.5" />
+                                <select id="desa" name="desa_id" class="select2 w-full" required>
+                                    <option value="">Pilih Desa</option>
+                                </select>
+                                <input type="hidden" name="desa_nama" id="desa_nama" value="{{ old('desa_nama', $customer->desa_nama) }}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="p-6 border-t border-gray-100 dark:border-gray-700/50 flex justify-end gap-3">
+                    <button type="button" onclick="window.history.back()" class="btn-ghost">Batal</button>
+                    <button type="submit" class="btn-primary">
+                        <i class="ti ti-device-floppy"></i> Simpan Perubahan
+                    </button>
+                </div>
+            </form>
+        </div>
     </div>
+
+    @push('styles')
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        .select2-container--default .select2-selection--single {
+            background-color: transparent;
+            border-color: #d1d5db;
+            border-radius: 0.75rem;
+            height: 42px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark .select2-container--default .select2-selection--single {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-left: 1rem;
+            color: #374151;
+        }
+
+        .dark .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #e5e7eb;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+            right: 0.5rem;
+        }
+
+        .select2-dropdown {
+            border-radius: 0.75rem;
+            border-color: #d1d5db;
+            overflow: hidden;
+        }
+    </style>
+    @endpush
+
     @push('scripts')
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-        <script>
-            $(document).ready(function() {
-                $('.select2').select2({
-                    theme: 'classic',
-                    width: '100%'
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.select2').select2({
+                width: '100%'
+            });
+            const API_URL = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+
+            // Initial Load for Edit Mode
+            const initialProv = "{{ old('provinsi_id', $customer->provinsi_id) }}";
+            const initialKab = "{{ old('kabupaten_id', $customer->kabupaten_id) }}";
+            const initialKec = "{{ old('kecamatan_id', $customer->kecamatan_id) }}";
+            const initialDesa = "{{ old('desa_id', $customer->desa_id) }}";
+
+            // Load Provinces
+            $.get(`${API_URL}/provinces.json`, function(provinces) {
+                provinces.forEach(p => {
+                    const selected = p.id == initialProv ? 'selected' : '';
+                    $('#provinsi').append(new Option(p.name, p.id, false, selected));
                 });
+                if (initialProv) loadData('regencies', initialProv, '#kabupaten', initialKab);
+            });
 
-                // Load Provinsi
-                $.get('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json', function(provinces) {
-                    provinces.forEach(function(province) {
-                        let selected = "{{ old('provinsi_id', $customer->provinsi_id) }}" == province
-                            .id ? 'selected' : '';
-                        $('#provinsi').append(new Option(province.name, province.id, false, selected));
-                    });
-                });
-
-                // Event Provinsi Change
-                $('#provinsi').on('change', function() {
-                    $('#kabupaten').empty().append(new Option('Pilih Kabupaten', '')).prop('disabled', true);
-                    $('#kecamatan').empty().append(new Option('Pilih Kecamatan', '')).prop('disabled', true);
-                    $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);
-
-                    if (this.value) {
-                        $('#provinsi_nama').val($('#provinsi option:selected').text());
-                        loadKabupaten(this.value);
-                    }
-                });
-
-                // Event Kabupaten Change
-                $('#kabupaten').on('change', function() {
-                    $('#kecamatan').empty().append(new Option('Pilih Kecamatan', '')).prop('disabled', true);
-                    $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);
-
-                    if (this.value) {
-                        $('#kabupaten_nama').val($('#kabupaten option:selected').text());
-                        loadKecamatan(this.value);
-                    }
-                });
-
-                // Event Kecamatan Change
-                $('#kecamatan').on('change', function() {
-                    $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);
-
-                    if (this.value) {
-                        $('#kecamatan_nama').val($('#kecamatan option:selected').text());
-                        loadDesa(this.value);
-                    }
-                });
-
-                // Event Desa Change
-                $('#desa').on('change', function() {
-                    if (this.value) {
-                        $('#desa_nama').val($('#desa option:selected').text());
-                    }
-                });
-
-                function loadKabupaten(provinceId) {
-                    $.get(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinceId}.json`, function(
-                        regencies) {
-                        $('#kabupaten').prop('disabled', false);
-                        regencies.forEach(function(regency) {
-                            let selected = "{{ old('kabupaten_id', $customer->kabupaten_id) }}" ==
-                                regency.id ? 'selected' : '';
-                            $('#kabupaten').append(new Option(regency.name, regency.id, false,
-                                selected));
-                        });
-                    });
-                }
-
-                function loadKecamatan(regencyId) {
-                    $.get(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${regencyId}.json`, function(
-                        districts) {
-                        $('#kecamatan').prop('disabled', false);
-                        districts.forEach(function(district) {
-                            let selected = "{{ old('kecamatan_id', $customer->kecamatan_id) }}" ==
-                                district.id ? 'selected' : '';
-                            $('#kecamatan').append(new Option(district.name, district.id, false,
-                                selected));
-                        });
-                    });
-                }
-
-                function loadDesa(districtId) {
-                    $.get(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${districtId}.json`, function(
-                        villages) {
-                        $('#desa').prop('disabled', false);
-                        villages.forEach(function(village) {
-                            let selected = "{{ old('desa_id', $customer->desa_id) }}" == village.id ?
-                                'selected' : '';
-                            $('#desa').append(new Option(village.name, village.id, false, selected));
-                        });
-                    });
+            // Cascading Logic
+            $('#provinsi').on('change', function() {
+                resetCascading('#kabupaten', '#kecamatan', '#desa');
+                if (this.value) {
+                    $('#provinsi_nama').val($("#provinsi option:selected").text());
+                    loadData('regencies', this.value, '#kabupaten');
                 }
             });
-        </script>
+
+            $('#kabupaten').on('change', function() {
+                resetCascading('#kecamatan', '#desa');
+                if (this.value) {
+                    $('#kabupaten_nama').val($("#kabupaten option:selected").text());
+                    loadData('districts', this.value, '#kecamatan');
+                }
+            });
+
+            $('#kecamatan').on('change', function() {
+                resetCascading('#desa');
+                if (this.value) {
+                    $('#kecamatan_nama').val($("#kecamatan option:selected").text());
+                    loadData('villages', this.value, '#desa');
+                }
+            });
+
+            $('#desa').on('change', function() {
+                if (this.value) $('#desa_nama').val($("#desa option:selected").text());
+            });
+
+            function loadData(endpoint, parentId, target, selectedId = null) {
+                $.get(`${API_URL}/${endpoint}/${parentId}.json`, function(data) {
+                    // Keep the selected value if we are chaining loads
+                    data.forEach(item => {
+                        const isSelected = item.id == selectedId ? 'selected' : '';
+                        $(target).append(new Option(item.name, item.id, false, isSelected));
+                    });
+
+                    // If we just loaded this level and have a selectedId, trigger change to load next level
+                    if (selectedId) {
+                        $(target).trigger('change');
+                        // Wait a bit to ensure next level loading ?? 
+                        // Actually trigger change might be async if manual trigger, 
+                        // but here we are in callback.
+                        // Recursive loading: if target is kabupaten and we have initialKec, load kecamatan
+                        if (target === '#kabupaten' && initialKec) loadData('districts', initialKab, '#kecamatan', initialKec);
+                        if (target === '#kecamatan' && initialDesa) loadData('villages', initialKec, '#desa', initialDesa);
+                    }
+                });
+            }
+
+            function resetCascading(...selectors) {
+                selectors.forEach(sel => $(sel).empty().append(new Option($(sel).find('option:first').text(), '')));
+            }
+        });
+    </script>
     @endpush
 </x-app-layout>

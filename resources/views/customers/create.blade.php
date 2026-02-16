@@ -1,441 +1,319 @@
 <x-app-layout>
     <div class="space-y-6">
-        <!-- Page Heading -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-6">
-            <div class="flex items-center justify-between">
-                <div>
-                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-                        </svg>
-                        {{ __('Tambah Pelanggan Baru') }}
-                    </h2>
-                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Isi informasi lengkap untuk menambah pelanggan baru atau import data dari file Excel</p>
-                </div>
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in-up">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <i class="ti ti-user-plus text-xl"></i>
+                    </div>
+                    {{ __('Tambah Pelanggan') }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-13">
+                    Input data pelanggan baru atau import dari Excel
+                </p>
             </div>
+
+            <a href="{{ route('customers.index') }}" class="btn-secondary flex items-center gap-2">
+                <i class="ti ti-arrow-left"></i> Kembali
+            </a>
         </div>
 
-        <!-- Import Data Section -->
-        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 rounded-lg shadow-sm border border-blue-200 dark:border-blue-800 p-6">
-            <div class="flex items-start space-x-4">
-                <div class="flex-shrink-0">
-                    <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900/50 rounded-lg flex items-center justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
-                        </svg>
-                    </div>
-                </div>
-                <div class="flex-1">
-                    <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-2">Import Data Pelanggan</h3>
-                    <p class="text-sm text-gray-600 dark:text-gray-400 mb-4">Upload file Excel untuk menambahkan multiple pelanggan sekaligus</p>
-                    
-                    <form action="{{ route('customers.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
-                        @csrf
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            <div class="space-y-4">
-                                <div>
-                                    <x-input-label for="excel_file" :value="__('Pilih File Excel')" class="text-sm font-medium text-gray-700 dark:text-gray-300" />
-                                    <div class="mt-2">
-                                        <label for="excel_file" class="relative cursor-pointer group">
-                                            <div class="flex items-center justify-center w-full h-32 px-6 py-4 border-2 border-dashed border-blue-300 dark:border-blue-600 rounded-lg hover:border-blue-400 dark:hover:border-blue-500 transition-colors bg-white dark:bg-gray-800">
-                                                <div class="text-center">
-                                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mx-auto text-blue-400 dark:text-blue-300 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3-3m0 0l3 3m-3-3v8" />
-                                                    </svg>
-                                                    <p class="text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-blue-600 dark:group-hover:text-blue-400">Klik untuk pilih file</p>
-                                                    <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">atau drag & drop file Excel di sini</p>
-                                                    <p id="file-name" class="text-xs text-blue-600 dark:text-blue-400 mt-2 font-medium">Belum ada file dipilih</p>
-                                                </div>
-                                            </div>
-                                            <input id="excel_file" name="excel_file" type="file" accept=".xlsx,.xls" class="sr-only" required />
-                                        </label>
-                                    </div>
-                                    <x-input-error :messages="$errors->get('excel_file')" class="mt-2" />
-                                </div>
-                                
-                                <div class="flex space-x-3">
-                                    <x-primary-button type="submit" class="flex-1 justify-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0l-4 4m4-4v12" />
-                                        </svg>
-                                        {{ __('Import Pelanggan') }}
-                                    </x-primary-button>
-                                </div>
-                            </div>
-                            
-                            <div class="space-y-4">
-                                <div class="bg-white dark:bg-gray-800 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                                    <h4 class="text-sm font-semibold text-gray-900 dark:text-gray-100 mb-3 flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Template & Format
-                                    </h4>
-                                    <div class="space-y-3">
-                                        <a href="{{ route('customers.template.download') }}" class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-medium">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                                            </svg>
-                                            Download Template Excel
-                                        </a>
-                                        <div class="text-xs text-gray-600 dark:text-gray-400">
-                                            <p class="font-medium mb-2">Format kolom yang dibutuhkan:</p>
-                                            <ul class="space-y-1">
-                                                <li class="flex items-start">
-                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                                                    <span><span class="font-medium">NIK</span> - 16 digit nomor induk</span>
-                                                </li>
-                                                <li class="flex items-start">
-                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                                                    <span><span class="font-medium">Nama</span> - Nama lengkap</span>
-                                                </li>
-                                                <li class="flex items-start">
-                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                                                    <span><span class="font-medium">Alamat</span> - Alamat lengkap</span>
-                                                </li>
-                                                <li class="flex items-start">
-                                                    <span class="w-2 h-2 bg-blue-400 rounded-full mt-1.5 mr-2 flex-shrink-0"></span>
-                                                    <span><span class="font-medium">Desa, Kecamatan, Kabupaten, Provinsi</span></span>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Script untuk menampilkan nama file yang dipilih -->
-        <script>
-            document.getElementById('excel_file').addEventListener('change', function(e) {
-                const fileName = e.target.files[0] ? e.target.files[0].name : 'Belum ada file dipilih';
-                document.getElementById('file-name').textContent = fileName;
-                document.getElementById('file-name').classList.toggle('text-blue-600', e.target.files[0]);
-                document.getElementById('file-name').classList.toggle('dark:text-blue-400', e.target.files[0]);
-                document.getElementById('file-name').classList.toggle('text-gray-500', !e.target.files[0]);
-                document.getElementById('file-name').classList.toggle('dark:text-gray-400', !e.target.files[0]);
-            });
-        </script>
-
-        <!-- Success/Error Messages for Import -->
-        @if (session('success'))
-            <div class="rounded-lg bg-green-50 dark:bg-green-900/50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-green-400 dark:text-green-300" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-green-800 dark:text-green-200">Berhasil!</h3>
-                        <div class="mt-2 text-sm text-green-700 dark:text-green-300">
-                            <p>{!! session('success') !!}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        @if (session('error'))
-            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.293-4.293a1 1 0 011.414-1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terjadi Kesalahan!</h3>
-                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                            <p>{!! session('error') !!}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        @endif
-
-        <!-- Error Messages -->
         @if ($errors->any())
-            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zm-1.293-4.293a1 1 0 011.414-1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 001.414 1.414L10 11.414l1.293 1.293z"
-                                clip-rule="evenodd" />
-                        </svg>
+        <div class="p-4 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800 animate-fade-in-up">
+            <div class="flex items-start gap-3">
+                <i class="ti ti-alert-circle text-red-500 text-lg flex-shrink-0 mt-0.5"></i>
+                <div class="flex-1">
+                    <h3 class="text-sm font-semibold text-red-800 dark:text-red-200">Terjadi kesalahan input:</h3>
+                    <ul class="mt-1 text-sm text-red-700 dark:text-red-300 list-disc pl-4 space-y-0.5">
+                        @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
+            </div>
+        </div>
+        @endif
+
+        @if (session('success'))
+        <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800 animate-fade-in-up">
+            <div class="flex items-center gap-3">
+                <i class="ti ti-check-circle text-emerald-500 text-lg"></i>
+                <p class="text-sm font-medium text-emerald-800 dark:text-emerald-200">{{ session('success') }}</p>
+            </div>
+        </div>
+        @endif
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Left Column: Manual Input -->
+            <div class="lg:col-span-2 space-y-6 animate-fade-in-up delay-100">
+                <form action="{{ route('customers.store') }}" method="POST" class="card">
+                    @csrf
+                    <!-- Personal Info -->
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700/50">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+                            <i class="ti ti-id text-emerald-500"></i> Informasi Pribadi
+                        </h3>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                                <x-input-label for="nik" value="NIK" class="mb-1.5" />
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="ti ti-id-badge text-gray-400"></i>
+                                    </div>
+                                    <x-text-input id="nik" name="nik" type="number" class="pl-10 w-full" :value="old('nik')" required placeholder="16 digit NIK" />
+                                </div>
+                            </div>
+                            <div>
+                                <x-input-label for="nama" value="Nama Lengkap" class="mb-1.5" />
+                                <div class="relative">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <i class="ti ti-user text-gray-400"></i>
+                                    </div>
+                                    <x-text-input id="nama" name="nama" type="text" class="pl-10 w-full" :value="old('nama')" required placeholder="Nama sesuai KTP" />
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terdapat beberapa kesalahan:</h3>
-                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                            <ul class="list-disc pl-5 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
+
+                    <!-- Address Info -->
+                    <div class="p-6 bg-gray-50/50 dark:bg-gray-800/50">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2 mb-4">
+                            <i class="ti ti-map-pin text-emerald-500"></i> Alamat Lengkap
+                        </h3>
+
+                        <div class="space-y-4">
+                            <div>
+                                <x-input-label for="alamat" value="Jalan / Dusun / RT RW" class="mb-1.5" />
+                                <textarea id="alamat" name="alamat" rows="2" class="input-field w-full" placeholder="Detail alamat rumah...">{{ old('alamat') }}</textarea>
+                            </div>
+
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <x-input-label for="provinsi" value="Provinsi" class="mb-1.5" />
+                                    <select id="provinsi" name="provinsi_id" class="select2 w-full" required>
+                                        <option value="">Pilih Provinsi</option>
+                                    </select>
+                                    <input type="hidden" name="provinsi_nama" id="provinsi_nama">
+                                </div>
+
+                                <div>
+                                    <x-input-label for="kabupaten" value="Kabupaten/Kota" class="mb-1.5" />
+                                    <select id="kabupaten" name="kabupaten_id" class="select2 w-full" required disabled>
+                                        <option value="">Pilih Kabupaten</option>
+                                    </select>
+                                    <input type="hidden" name="kabupaten_nama" id="kabupaten_nama">
+                                </div>
+
+                                <div>
+                                    <x-input-label for="kecamatan" value="Kecamatan" class="mb-1.5" />
+                                    <select id="kecamatan" name="kecamatan_id" class="select2 w-full" required disabled>
+                                        <option value="">Pilih Kecamatan</option>
+                                    </select>
+                                    <input type="hidden" name="kecamatan_nama" id="kecamatan_nama">
+                                </div>
+
+                                <div>
+                                    <x-input-label for="desa" value="Desa/Kelurahan" class="mb-1.5" />
+                                    <select id="desa" name="desa_id" class="select2 w-full" required disabled>
+                                        <option value="">Pilih Desa</option>
+                                    </select>
+                                    <input type="hidden" name="desa_nama" id="desa_nama">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-6 border-t border-gray-100 dark:border-gray-700/50 flex justify-end gap-3">
+                        <button type="button" onclick="window.history.back()" class="btn-ghost">Batal</button>
+                        <button type="submit" class="btn-primary">
+                            <i class="ti ti-device-floppy"></i> Simpan Data
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Column: Import -->
+            <div class="lg:col-span-1 space-y-6 animate-fade-in-up delay-200">
+                <div class="card overflow-hidden bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-900/20 dark:to-teal-900/20 border-emerald-100 dark:border-emerald-800/30">
+                    <div class="p-6">
+                        <div class="flex items-center gap-3 mb-4">
+                            <div class="w-10 h-10 rounded-lg bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                                <i class="ti ti-file-spreadsheet text-xl"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-gray-800 dark:text-gray-100">Import Excel</h3>
+                        </div>
+                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-6">
+                            Upload file Excel untuk import data pelanggan dalam jumlah banyak sekaligus.
+                        </p>
+
+                        <form action="{{ route('customers.import') }}" method="POST" enctype="multipart/form-data" class="space-y-4">
+                            @csrf
+                            <input type="file" name="excel_file" id="excel_file" class="hidden" accept=".xlsx,.xls" required>
+
+                            <label for="excel_file" class="block w-full border-2 border-dashed border-emerald-300 dark:border-emerald-700 rounded-xl p-6 text-center cursor-pointer hover:border-emerald-500 dark:hover:border-emerald-500 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10 transition-all group">
+                                <i class="ti ti-cloud-upload text-3xl text-emerald-400 group-hover:text-emerald-600 transition-colors mb-2"></i>
+                                <span class="block text-sm font-medium text-gray-700 dark:text-gray-300 group-hover:text-emerald-700 dark:group-hover:text-emerald-300 transition-colors">
+                                    Klik untuk upload
+                                </span>
+                                <span id="file-name" class="block text-xs text-gray-500 mt-1">Format: .xlsx, .xls</span>
+                            </label>
+
+                            <button type="submit" class="btn-primary w-full justify-center">
+                                <i class="ti ti-upload"></i> Proses Import
+                            </button>
+                        </form>
+
+                        <div class="mt-6 pt-6 border-t border-emerald-200/50 dark:border-emerald-800/30">
+                            <h4 class="text-xs font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-3">Format Excel</h4>
+                            <a href="{{ route('customers.template.download') }}" class="flex items-center gap-2 p-3 rounded-lg bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 hover:border-emerald-500 dark:hover:border-emerald-500 transition-colors group">
+                                <div class="w-8 h-8 rounded bg-green-100 dark:bg-green-900/30 flex items-center justify-center text-green-600 dark:text-green-400">
+                                    <i class="ti ti-table"></i>
+                                </div>
+                                <div class="text-left">
+                                    <div class="text-sm font-medium text-gray-800 dark:text-gray-200 group-hover:text-emerald-600 transition-colors">Download Template</div>
+                                    <div class="text-xs text-gray-500">File kosong dengan header</div>
+                                </div>
+                                <i class="ti ti-download ml-auto text-gray-400 group-hover:text-emerald-500"></i>
+                            </a>
+
+                            <ul class="mt-4 space-y-2 text-xs text-gray-600 dark:text-gray-400">
+                                <li class="flex items-center gap-2"><i class="ti ti-check text-emerald-500"></i> NIK (16 digit)</li>
+                                <li class="flex items-center gap-2"><i class="ti ti-check text-emerald-500"></i> Nama Lengkap</li>
+                                <li class="flex items-center gap-2"><i class="ti ti-check text-emerald-500"></i> Alamat & Wilayah</li>
                             </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        @endif
-
-        <!-- Form Content -->
-        <div
-            class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-            <div class="p-6 space-y-6">
-                <form action="{{ route('customers.store') }}" method="POST" class="space-y-6">
-                    @csrf
-
-                    <!-- Personal Info Section -->
-                    <div
-                        class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                            </svg>
-                            Informasi Pribadi
-                        </h3>
-
-                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <div>
-                                <x-input-label for="nik" :value="__('NIK')" />
-                                <x-text-input id="nik" name="nik" type="number" class="mt-1 block w-full"
-                                    :value="old('nik')" required />
-                                <x-input-error :messages="$errors->get('nik')" class="mt-2" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="nama" :value="__('Nama')" />
-                                <x-text-input id="nama" name="nama" type="text" class="mt-1 block w-full"
-                                    :value="old('nama')" required />
-                                <x-input-error :messages="$errors->get('nama')" class="mt-2" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Address Section -->
-                    <div
-                        class="bg-gray-50 dark:bg-gray-900/50 rounded-lg p-4 border border-gray-200 dark:border-gray-700">
-                        <h3 class="text-lg font-semibold text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg"
-                                class="h-5 w-5 text-indigo-600 dark:text-indigo-400 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                            </svg>
-                            Informasi Alamat
-                        </h3>
-
-                        <div class="space-y-4">
-                            <div class="md:col-span-2">
-                                <x-input-label for="alamat" :value="__('Alamat Lengkap')" />
-                                <textarea id="alamat" name="alamat" rows="3"
-                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50 dark:bg-gray-700 dark:text-gray-300">{{ old('alamat') }}</textarea>
-                                <x-input-error :messages="$errors->get('alamat')" class="mt-2" />
-                            </div>
-
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <!-- Provinsi -->
-                                <div
-                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                    <x-input-label for="provinsi" :value="__('Provinsi')" />
-                                    <select id="provinsi" name="provinsi_id"
-                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                                        required>
-                                        <option value="">Pilih Provinsi</option>
-                                    </select>
-                                    <input type="hidden" name="provinsi_nama" id="provinsi_nama">
-                                    <x-input-error :messages="$errors->get('provinsi_id')" class="mt-2" />
-                                </div>
-
-                                <!-- Kabupaten -->
-                                <div
-                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                    <x-input-label for="kabupaten" :value="__('Kabupaten')" />
-                                    <select id="kabupaten" name="kabupaten_id"
-                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                                        required disabled>
-                                        <option value="">Pilih Kabupaten</option>
-                                    </select>
-                                    <input type="hidden" name="kabupaten_nama" id="kabupaten_nama">
-                                    <x-input-error :messages="$errors->get('kabupaten_id')" class="mt-2" />
-                                </div>
-
-                                <!-- Kecamatan -->
-                                <div
-                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                    <x-input-label for="kecamatan" :value="__('Kecamatan')" />
-                                    <select id="kecamatan" name="kecamatan_id"
-                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                                        required disabled>
-                                        <option value="">Pilih Kecamatan</option>
-                                    </select>
-                                    <input type="hidden" name="kecamatan_nama" id="kecamatan_nama">
-                                    <x-input-error :messages="$errors->get('kecamatan_id')" class="mt-2" />
-                                </div>
-
-                                <!-- Desa -->
-                                <div
-                                    class="bg-white dark:bg-gray-800 p-4 rounded-md border border-gray-200 dark:border-gray-700">
-                                    <x-input-label for="desa" :value="__('Desa')" />
-                                    <select id="desa" name="desa_id"
-                                        class="mt-1 block w-full select2 rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring focus:ring-indigo-200 dark:focus:ring-indigo-800 focus:ring-opacity-50"
-                                        required disabled>
-                                        <option value="">Pilih Desa</option>
-                                    </select>
-                                    <input type="hidden" name="desa_nama" id="desa_nama">
-                                    <x-input-error :messages="$errors->get('desa_id')" class="mt-2" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- Form Actions -->
-                    <div class="flex justify-end space-x-3">
-                        <button type="button" onclick="window.history.back()"
-                            class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                            </svg>
-                            Batal
-                        </button>
-
-                        <button type="submit"
-                            class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 dark:bg-indigo-500 hover:bg-indigo-700 dark:hover:bg-indigo-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                            </svg>
-                            Simpan Pelanggan
-                        </button>
-                    </div>
-                </form>
-            </div>
         </div>
     </div>
 
     @push('styles')
-        <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <style>
+        /* Custom Select2 Styling to match Tailwind */
+        .select2-container--default .select2-selection--single {
+            background-color: transparent;
+            border-color: #d1d5db;
+            border-radius: 0.75rem;
+            /* xl */
+            height: 42px;
+            display: flex;
+            align-items: center;
+        }
+
+        .dark .select2-container--default .select2-selection--single {
+            background-color: #374151;
+            border-color: #4b5563;
+            color: #e5e7eb;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            padding-left: 1rem;
+            color: #374151;
+        }
+
+        .dark .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #e5e7eb;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 40px;
+            right: 0.5rem;
+        }
+
+        .select2-dropdown {
+            border-radius: 0.75rem;
+            border-color: #d1d5db;
+            overflow: hidden;
+        }
+
+        .select2-search__field {
+            border-radius: 0.5rem;
+        }
+    </style>
     @endpush
 
     @push('scripts')
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
 
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Input file handler
-                const fileInput = document.getElementById('excel_file');
-                const fileNameDisplay = document.getElementById('file-name');
-
-                fileInput.addEventListener('change', function() {
-                    if (this.files && this.files[0]) {
-                        fileNameDisplay.textContent = this.files[0].name;
-                    } else {
-                        fileNameDisplay.textContent = 'Belum ada file dipilih';
-                    }
-                });
-
-                // Initialize Select2
-                $('.select2').select2({
-                    theme: 'classic',
-                    width: '100%'
-                });
-
-                // Load Provinsi
-                $.get('https://www.emsifa.com/api-wilayah-indonesia/api/provinces.json', function(provinces) {
-                    provinces.forEach(function(province) {
-                        $('#provinsi').append(new Option(province.name, province.id));
-                    });
-                });
-
-                // Event Provinsi Change
-                $('#provinsi').on('change', function() {
-                    $('#kabupaten').empty().append(new Option('Pilih Kabupaten', '')).prop('disabled', true);
-                    $('#kecamatan').empty().append(new Option('Pilih Kecamatan', '')).prop('disabled', true);
-                    $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);
-
-                    if (this.value) {
-                        $('#provinsi_nama').val($('#provinsi option:selected').text());
-                        loadKabupaten(this.value);
-                    }
-                });
-
-                // Event Kabupaten Change
-                $('#kabupaten').on('change', function() {
-                    $('#kecamatan').empty().append(new Option('Pilih Kecamatan', '')).prop('disabled', true);
-                    $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);
-
-                    if (this.value) {
-                        $('#kabupaten_nama').val($('#kabupaten option:selected').text());
-                        loadKecamatan(this.value);
-                    }
-                });
-
-                // Event Kecamatan Change
-                $('#kecamatan').on('change', function() {
-                    $('#desa').empty().append(new Option('Pilih Desa', '')).prop('disabled', true);
-
-                    if (this.value) {
-                        $('#kecamatan_nama').val($('#kecamatan option:selected').text());
-                        loadDesa(this.value);
-                    }
-                });
-
-                // Event Desa Change
-                $('#desa').on('change', function() {
-                    if (this.value) {
-                        $('#desa_nama').val($('#desa option:selected').text());
-                    }
-                });
-
-                function loadKabupaten(provinceId) {
-                    $.get(`https://www.emsifa.com/api-wilayah-indonesia/api/regencies/${provinceId}.json`, function(
-                        regencies) {
-                        $('#kabupaten').prop('disabled', false);
-                        regencies.forEach(function(regency) {
-                            $('#kabupaten').append(new Option(regency.name, regency.id));
-                        });
-                    });
-                }
-
-                function loadKecamatan(regencyId) {
-                    $.get(`https://www.emsifa.com/api-wilayah-indonesia/api/districts/${regencyId}.json`, function(
-                        districts) {
-                        $('#kecamatan').prop('disabled', false);
-                        districts.forEach(function(district) {
-                            $('#kecamatan').append(new Option(district.name, district.id));
-                        });
-                    });
-                }
-
-                function loadDesa(districtId) {
-                    $.get(`https://www.emsifa.com/api-wilayah-indonesia/api/villages/${districtId}.json`, function(
-                        villages) {
-                        $('#desa').prop('disabled', false);
-                        villages.forEach(function(village) {
-                            $('#desa').append(new Option(village.name, village.id));
-                        });
-                    });
+    <script>
+        $(document).ready(function() {
+            // File Input logic
+            $('#excel_file').on('change', function() {
+                const fileName = this.files[0] ? this.files[0].name : 'Format: .xlsx, .xls';
+                $('#file-name').text(fileName);
+                if (this.files[0]) {
+                    $(this).parent().addClass('border-emerald-500 bg-emerald-50/50');
                 }
             });
-        </script>
+
+            // Initialize Select2
+            $('.select2').select2({
+                width: '100%'
+            });
+
+            // API Base URL
+            const API_URL = 'https://www.emsifa.com/api-wilayah-indonesia/api';
+
+            // Load Provinces
+            $.get(`${API_URL}/provinces.json`, function(provinces) {
+                provinces.forEach(p => $('#provinsi').append(new Option(p.name, p.id)));
+            });
+
+            // Cascading Dropdowns
+            $('#provinsi').on('change', function() {
+                resetSelect('#kabupaten', 'Pilih Kabupaten');
+                resetSelect('#kecamatan', 'Pilih Kecamatan');
+                resetSelect('#desa', 'Pilih Desa');
+
+                if (this.value) {
+                    $('#provinsi_nama').val($("#provinsi option:selected").text());
+                    loadData('regencies', this.value, '#kabupaten');
+                }
+            });
+
+            $('#kabupaten').on('change', function() {
+                resetSelect('#kecamatan', 'Pilih Kecamatan');
+                resetSelect('#desa', 'Pilih Desa');
+
+                if (this.value) {
+                    $('#kabupaten_nama').val($("#kabupaten option:selected").text());
+                    loadData('districts', this.value, '#kecamatan');
+                }
+            });
+
+            $('#kecamatan').on('change', function() {
+                resetSelect('#desa', 'Pilih Desa');
+
+                if (this.value) {
+                    $('#kecamatan_nama').val($("#kecamatan option:selected").text());
+                    loadData('villages', this.value, '#desa');
+                }
+            });
+
+            $('#desa').on('change', function() {
+                if (this.value) {
+                    $('#desa_nama').val($("#desa option:selected").text());
+                }
+            });
+
+            // Helper functions
+            function loadData(endpoint, parentId, targetSelector) {
+                $(targetSelector).prop('disabled', true).html('<option>Memuat...</option>');
+                $.get(`${API_URL}/${endpoint}/${parentId}.json`, function(data) {
+                    $(targetSelector).empty().append(new Option($(targetSelector).data('placeholder') || 'Pilih...', ''));
+                    data.forEach(item => $(targetSelector).append(new Option(item.name, item.id)));
+                    $(targetSelector).prop('disabled', false);
+                });
+            }
+
+            function resetSelect(selector, placeholder) {
+                $(selector).empty().append(new Option(placeholder, '')).prop('disabled', true);
+            }
+        });
+    </script>
     @endpush
 </x-app-layout>

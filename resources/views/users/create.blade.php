@@ -7,66 +7,103 @@
 
     <div class="py-12">
         <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
-            <div class="bg-white dark:bg-gray-800 overflow-hidden shadow-sm sm:rounded-lg">
-                <div class="p-6 text-gray-900 dark:text-gray-100">
-                    <form action="{{ route('users.store') }}" method="POST">
-                        @csrf
+            <div class="card p-6 sm:p-8">
+                <header class="mb-6">
+                    <h2 class="text-lg font-medium text-gray-900 dark:text-gray-100">
+                        {{ __('Informasi Pengguna Baru') }}
+                    </h2>
+                    <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">
+                        {{ __('Tambahkan pengguna baru ke sistem dengan peran yang sesuai.') }}
+                    </p>
+                </header>
 
-                        <div class="grid grid-cols-1 gap-6">
-                            <div>
-                                <x-input-label for="name" :value="__('Nama')" />
-                                <x-text-input id="name" name="name" type="text" class="mt-1 block w-full"
-                                    :value="old('name')" required />
-                                <x-input-error class="mt-2" :messages="$errors->get('name')" />
-                            </div>
+                <form action="{{ route('users.store') }}" method="POST">
+                    @csrf
 
-                            <div>
-                                <x-input-label for="email" :value="__('Email')" />
-                                <x-text-input id="email" name="email" type="email" class="mt-1 block w-full"
-                                    :value="old('email')" required />
-                                <x-input-error class="mt-2" :messages="$errors->get('email')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="password" :value="__('Kata Sandi')" />
-                                <x-text-input id="password" name="password" type="password" class="mt-1 block w-full"
-                                    required />
-                                <x-input-error class="mt-2" :messages="$errors->get('password')" />
-                            </div>
-
-                            <div>
-                                <x-input-label for="password_confirmation" :value="__('Konfirmasi Kata Sandi')" />
-                                <x-text-input id="password_confirmation" name="password_confirmation" type="password"
-                                    class="mt-1 block w-full" required />
-                            </div>
-
-                            <div>
-                                <x-input-label for="roles" :value="__('Peran')" />
-                                <div class="mt-2 space-y-2">
-                                    @foreach ($roles as $role)
-                                        <label class="inline-flex items-center">
-                                            <input type="checkbox"
-                                                class="rounded border-gray-300 dark:border-gray-600 text-indigo-600 shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 dark:bg-gray-700 dark:focus:ring-indigo-500"
-                                                name="roles[]" value="{{ $role->id }}"
-                                                {{ in_array($role->id, old('roles', [])) ? 'checked' : '' }}>
-                                            <span class="ml-2 text-gray-700 dark:text-gray-300">{{ $role->name }}</span>
-                                        </label>
-                                    @endforeach
-                                </div>
-                                <x-input-error class="mt-2" :messages="$errors->get('roles')" />
-                            </div>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Name -->
+                        <div class="relative">
+                            <input type="text" id="name" name="name"
+                                class="peer input-primary w-full pb-2 pt-6 px-4 rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
+                                placeholder=" "
+                                value="{{ old('name') }}"
+                                required />
+                            <label for="name"
+                                class="absolute left-4 top-4 text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 pointer-events-none">
+                                {{ __('Nama Lengkap') }}
+                            </label>
+                            <x-input-error class="mt-2" :messages="$errors->get('name')" />
                         </div>
 
-                        <div class="mt-6 flex justify-end">
-                            <x-secondary-button type="button" onclick="window.history.back()" class="mr-3">
-                                {{ __('Batal') }}
-                            </x-secondary-button>
-                            <x-primary-button>
-                                {{ __('Tambah Pengguna') }}
-                            </x-primary-button>
+                        <!-- Email -->
+                        <div class="relative">
+                            <input type="email" id="email" name="email"
+                                class="peer input-primary w-full pb-2 pt-6 px-4 rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
+                                placeholder=" "
+                                value="{{ old('email') }}"
+                                required />
+                            <label for="email"
+                                class="absolute left-4 top-4 text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 pointer-events-none">
+                                {{ __('Email') }}
+                            </label>
+                            <x-input-error class="mt-2" :messages="$errors->get('email')" />
                         </div>
-                    </form>
-                </div>
+
+                        <!-- Password -->
+                        <div class="relative">
+                            <input type="password" id="password" name="password"
+                                class="peer input-primary w-full pb-2 pt-6 px-4 rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
+                                placeholder=" "
+                                required />
+                            <label for="password"
+                                class="absolute left-4 top-4 text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 pointer-events-none">
+                                {{ __('Kata Sandi') }}
+                            </label>
+                            <x-input-error class="mt-2" :messages="$errors->get('password')" />
+                        </div>
+
+                        <!-- Confirm Password -->
+                        <div class="relative">
+                            <input type="password" id="password_confirmation" name="password_confirmation"
+                                class="peer input-primary w-full pb-2 pt-6 px-4 rounded-xl border-gray-300 dark:border-gray-700 dark:bg-gray-900 dark:text-white focus:border-emerald-500 focus:ring-emerald-500"
+                                placeholder=" "
+                                required />
+                            <label for="password_confirmation"
+                                class="absolute left-4 top-4 text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-3 scale-75 origin-[0] peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-3 pointer-events-none">
+                                {{ __('Konfirmasi Kata Sandi') }}
+                            </label>
+                        </div>
+
+                        <!-- Roles -->
+                        <div class="md:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{{ __('Peran (Role)') }}</label>
+                            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                @foreach ($roles as $role)
+                                <label class="relative flex items-start p-4 border rounded-xl cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors {{ in_array($role->id, old('roles', [])) ? 'border-emerald-500 bg-emerald-50 dark:bg-emerald-900/20' : 'border-gray-200 dark:border-gray-700' }}">
+                                    <div class="min-w-0 flex-1 text-sm">
+                                        <div class="font-medium text-gray-700 dark:text-gray-200 select-none">{{ $role->name }}</div>
+                                    </div>
+                                    <div class="ml-3 flex items-center h-5">
+                                        <input type="checkbox" name="roles[]" value="{{ $role->id }}"
+                                            class="focus:ring-emerald-500 h-4 w-4 text-emerald-600 border-gray-300 rounded"
+                                            {{ in_array($role->id, old('roles', [])) ? 'checked' : '' }}>
+                                    </div>
+                                </label>
+                                @endforeach
+                            </div>
+                            <x-input-error class="mt-2" :messages="$errors->get('roles')" />
+                        </div>
+                    </div>
+
+                    <div class="mt-6 flex justify-end gap-3">
+                        <button type="button" onclick="window.history.back()" class="btn-ghost">
+                            {{ __('Batal') }}
+                        </button>
+                        <button type="submit" class="btn-primary">
+                            {{ __('Tambah Pengguna') }}
+                        </button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>

@@ -1,320 +1,302 @@
 <x-app-layout>
     <div class="space-y-6">
         <!-- Page Header -->
-        <div class="flex items-center justify-between">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in-up">
             <div>
-                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 mr-2 text-indigo-600" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-500/20 flex items-center justify-center text-blue-600 dark:text-blue-400">
+                        <i class="ti ti-chart-bar text-xl"></i>
+                    </div>
                     {{ __('Laporan Penjualan') }}
                 </h2>
-                <p class="mt-1 text-sm text-gray-600 dark:text-gray-400">Lihat dan analisa data penjualan</p>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-13">
+                    Analisa detail transaksi penjualan periode {{ $startDate->format('d M Y') }} - {{ $endDate->format('d M Y') }}
+                </p>
             </div>
-            <div class="flex space-x-2">
-                <a href="{{ route('reports.sales', array_merge(request()->query(), ['type' => 'excel'])) }}"
-                    class="inline-flex items-center px-4 py-2 bg-green-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-green-700 focus:bg-green-700 active:bg-green-900 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    Excel
+
+            <div class="flex flex-wrap gap-2">
+                <a href="{{ route('reports.sales', array_merge(request()->query(), ['type' => 'excel'])) }}" class="btn-success flex items-center gap-2">
+                    <i class="ti ti-file-spreadsheet"></i> Excel
                 </a>
-                <a href="{{ route('reports.sales', array_merge(request()->query(), ['type' => 'pdf'])) }}"
-                    class="inline-flex items-center px-4 py-2 bg-red-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-red-700 focus:bg-red-700 active:bg-red-900 focus:outline-none focus:ring-2 focus:ring-red-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M7 21h10a2 2 0 002-2V9.414a1 1 0 00-.293-.707l-5.414-5.414A1 1 0 0012.586 3H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
-                    </svg>
-                    PDF
+                <a href="{{ route('reports.sales', array_merge(request()->query(), ['type' => 'pdf'])) }}" class="btn-danger flex items-center gap-2">
+                    <i class="ti ti-file-type-pdf"></i> PDF
                 </a>
-                <a href="{{ route('reports.sales', array_merge(request()->query(), ['type' => 'print'])) }}"
-                    class="inline-flex items-center px-4 py-2 bg-gray-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-gray-700 focus:bg-gray-700 active:bg-gray-900 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 transition ease-in-out duration-150">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    Cetak
+                <a href="{{ route('reports.sales', array_merge(request()->query(), ['type' => 'print'])) }}" class="btn-secondary flex items-center gap-2" target="_blank">
+                    <i class="ti ti-printer"></i> Cetak
                 </a>
             </div>
         </div>
 
-        {{-- Filters --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
-                </svg>
-                Filter Laporan
-            </h3>
-            <form action="{{ route('reports.sales') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div>
-                    <x-input-label for="start_date" value="Tanggal Mulai" />
-                    <x-text-input type="date" name="start_date" id="start_date"
-                        value="{{ request('start_date', $startDate->format('Y-m-d')) }}" class="mt-1 block w-full" />
-                </div>
-
-                <div>
-                    <x-input-label for="end_date" value="Tanggal Akhir" />
-                    <x-text-input type="date" name="end_date" id="end_date"
-                        value="{{ request('end_date', $endDate->format('Y-m-d')) }}" class="mt-1 block w-full" />
-                </div>
-
-                <div>
-                    <x-input-label for="payment_method" value="Metode Pembayaran" />
-                    <select name="payment_method" id="payment_method"
-                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
-                        <option value="">Semua Metode</option>
-                        <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai
-                        </option>
-                        <option value="transfer" {{ request('payment_method') === 'transfer' ? 'selected' : '' }}>
-                            Transfer</option>
-                        <option value="credit" {{ request('payment_method') === 'credit' ? 'selected' : '' }}>Kredit
-                        </option>
-                    </select>
-                </div>
-
-                <div class="flex items-end">
-                    <x-primary-button type="submit" class="w-full justify-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                        </svg>
-                        Terapkan Filter
-                    </x-primary-button>
-                </div>
-            </form>
-        </div>
-
-        {{-- Summary Cards --}}
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Penjualan</h3>
-                <p class="mt-2 text-md font-bold text-gray-900 dark:text-gray-100">{{ $summary['total_sales'] }}</p>
+        <!-- Filter Section -->
+        <div class="card animate-fade-in-up delay-100">
+            <div class="p-4 border-b border-gray-100 dark:border-gray-700/50 flex items-center justify-between cursor-pointer" onclick="document.getElementById('filterContent').classList.toggle('hidden')">
+                <h3 class="text-sm font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="ti ti-filter text-lg text-emerald-500"></i> Filter Laporan
+                </h3>
+                <i class="ti ti-chevron-down text-gray-500"></i>
             </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Nominal</h3>
-                <p class="mt-2 text-md font-bold text-gray-900 dark:text-gray-100">Rp
-                    {{ number_format($summary['total_amount'], 0, ',', '.') }}</p>
-            </div>
-
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Rata-rata Penjualan</h3>
-                <p class="mt-2 text-md font-bold text-gray-900 dark:text-gray-100">Rp
-                    {{ number_format($summary['average_sale'], 0, ',', '.') }}</p>
-            </div>
-
-            <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-sm font-medium text-gray-500 dark:text-gray-400">Metode Pembayaran</h3>
-                <div class="mt-2 space-y-1">
-                    @foreach ($summary['payment_methods'] as $method => $count)
-                        <div class="flex justify-between items-center">
-                            <span class="text-sm text-gray-500 dark:text-gray-400">
-                                @if ($method == 'cash')
-                                    Tunai
-                                @elseif($method == 'transfer')
-                                    Transfer
-                                @elseif($method == 'credit')
-                                    Kredit
-                                @else
-                                    {{ ucfirst($method) }}
-                                @endif
-                            </span>
-                            <span
-                                class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $count }}</span>
+            <div id="filterContent" class="p-6">
+                <form action="{{ route('reports.sales') }}" method="GET" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                    <div>
+                        <x-input-label for="start_date" value="Tanggal Mulai" class="mb-1.5" />
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="ti ti-calendar text-gray-400"></i>
+                            </div>
+                            <x-text-input type="date" name="start_date" id="start_date"
+                                value="{{ request('start_date', $startDate->format('Y-m-d')) }}" class="pl-10 w-full" />
                         </div>
+                    </div>
+
+                    <div>
+                        <x-input-label for="end_date" value="Tanggal Akhir" class="mb-1.5" />
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="ti ti-calendar text-gray-400"></i>
+                            </div>
+                            <x-text-input type="date" name="end_date" id="end_date"
+                                value="{{ request('end_date', $endDate->format('Y-m-d')) }}" class="pl-10 w-full" />
+                        </div>
+                    </div>
+
+                    <div>
+                        <x-input-label for="payment_method" value="Metode Pembayaran" class="mb-1.5" />
+                        <div class="relative">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <i class="ti ti-credit-card text-gray-400"></i>
+                            </div>
+                            <select name="payment_method" id="payment_method" class="input-field w-full pl-10">
+                                <option value="">Semua Metode</option>
+                                <option value="cash" {{ request('payment_method') === 'cash' ? 'selected' : '' }}>Tunai</option>
+                                <option value="transfer" {{ request('payment_method') === 'transfer' ? 'selected' : '' }}>Transfer</option>
+                                <option value="credit" {{ request('payment_method') === 'credit' ? 'selected' : '' }}>Kredit</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="flex items-end">
+                        <button type="submit" class="btn-primary w-full justify-center">
+                            <i class="ti ti-search mr-2"></i> Terapkan Filter
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Summary Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 animate-fade-in-up delay-200">
+            <!-- Total Sales -->
+            <div class="card p-6 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-emerald-50 to-transparent dark:from-emerald-900/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Transaksi</p>
+                    <h4 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">{{ $summary['total_sales'] }}</h4>
+                    <div class="mt-2 flex items-center text-xs text-emerald-600 dark:text-emerald-400">
+                        <i class="ti ti-trending-up mr-1"></i> Transaksi berhasil
+                    </div>
+                </div>
+                <div class="absolute top-6 right-6 p-2 bg-emerald-100 dark:bg-emerald-500/20 rounded-lg text-emerald-600 dark:text-emerald-400">
+                    <i class="ti ti-shopping-cart text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Total Amount -->
+            <div class="card p-6 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-blue-50 to-transparent dark:from-blue-900/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Omset</p>
+                    <h4 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">Rp {{ number_format($summary['total_amount'], 0, ',', '.') }}</h4>
+                    <div class="mt-2 flex items-center text-xs text-blue-600 dark:text-blue-400">
+                        <i class="ti ti-coins mr-1"></i> Pendapatan kotor
+                    </div>
+                </div>
+                <div class="absolute top-6 right-6 p-2 bg-blue-100 dark:bg-blue-500/20 rounded-lg text-blue-600 dark:text-blue-400">
+                    <i class="ti ti-cash text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Average Sales -->
+            <div class="card p-6 relative overflow-hidden group">
+                <div class="absolute right-0 top-0 h-full w-1/3 bg-gradient-to-l from-purple-50 to-transparent dark:from-purple-900/10 opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                <div class="relative z-10">
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Rata-rata / Transaksi</p>
+                    <h4 class="text-2xl font-bold text-gray-900 dark:text-gray-100 mt-2">Rp {{ number_format($summary['average_sale'], 0, ',', '.') }}</h4>
+                    <div class="mt-2 flex items-center text-xs text-purple-600 dark:text-purple-400">
+                        <i class="ti ti-chart-bar mr-1"></i> Nilai keranjang
+                    </div>
+                </div>
+                <div class="absolute top-6 right-6 p-2 bg-purple-100 dark:bg-purple-500/20 rounded-lg text-purple-600 dark:text-purple-400">
+                    <i class="ti ti-calculator text-xl"></i>
+                </div>
+            </div>
+
+            <!-- Payment Methods -->
+            <div class="card p-6 relative overflow-hidden group">
+                <p class="text-sm font-medium text-gray-500 dark:text-gray-400 mb-2">Metode Pembayaran</p>
+                <div class="space-y-2 mt-1">
+                    @foreach ($summary['payment_methods'] as $method => $count)
+                    <div class="flex justify-between items-center text-sm">
+                        <span class="text-gray-600 dark:text-gray-300 flex items-center gap-2">
+                            @if ($method == 'cash')
+                            <i class="ti ti-cash text-emerald-500"></i> Tunai
+                            @elseif($method == 'transfer')
+                            <i class="ti ti-building-bank text-blue-500"></i> Transfer
+                            @elseif($method == 'credit')
+                            <i class="ti ti-credit-card text-amber-500"></i> Kredit
+                            @else
+                            <i class="ti ti-circle-filled text-gray-400"></i> {{ ucfirst($method) }}
+                            @endif
+                        </span>
+                        <span class="font-bold text-gray-900 dark:text-gray-100">{{ $count }}</span>
+                    </div>
                     @endforeach
                 </div>
             </div>
         </div>
 
-        {{-- Sales Chart --}}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <h3
-                class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
-                </svg>
-                Grafik Penjualan
-            </h3>
-            <div class="h-80">
-                <canvas id="salesChart"></canvas>
-            </div>
-        </div>
-
-
-        {{-- Payment Method Distribution --}}
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3
-                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-                    </svg>
-                    Distribusi Metode Pembayaran
-                </h3>
-                <div class="h-64">
-                    <canvas id="paymentMethodChart"></canvas>
-                </div>
-            </div>
-
-            <div
-                class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3
-                    class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-                    </svg>
-                    Statistik Penjualan
-                </h3>
-                <div class="space-y-4">
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Penjualan Tertinggi</span>
-                        <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
-                            Rp {{ number_format($sales->max('total_amount') ?? 0, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Penjualan Terendah</span>
-                        <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
-                            Rp {{ number_format($sales->min('total_amount') ?? 0, 0, ',', '.') }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Jumlah Produk Terjual</span>
-                        <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
-                            {{ $sales->sum(function ($sale) {return $sale->saleDetails->sum('quantity');}) ?? 0 }}
-                        </span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-sm font-medium text-gray-500 dark:text-gray-400">Rata-rata Produk per
-                            Transaksi</span>
-                        <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
-                            {{ $sales->count() > 0? number_format($sales->sum(function ($sale) {return $sale->saleDetails->sum('quantity');}) / $sales->count(),1): 0 }}
-                        </span>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {{-- Sales Table --}}
-        <div
-            class="bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden">
-            <div class="p-6 border-b border-gray-200 dark:border-gray-700">
-                <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Daftar Transaksi
+        <!-- Charts Section -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fade-in-up delay-300">
+            <!-- Sales Chart -->
+            <div class="lg:col-span-2 card">
+                <div class="p-6 border-b border-gray-100 dark:border-gray-700/50 flex items-center justify-between">
+                    <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                        <i class="ti ti-chart-line text-blue-500"></i> Tren Penjualan
                     </h3>
-                    <div class="relative">
-                        <input type="text" id="invoiceSearch" placeholder="Cari nomor faktur..." 
-                            class="w-full sm:w-64 px-4 py-2 pl-10 pr-4 text-sm border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 dark:bg-gray-700 dark:text-gray-100 dark:placeholder-gray-400">
-                        <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                            <svg class="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
+                </div>
+                <div class="p-6">
+                    <div class="h-80 w-full">
+                        <canvas id="salesChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Stats & Payment Chart -->
+            <div class="lg:col-span-1 space-y-6">
+                <!-- Payment Chart -->
+                <div class="card">
+                    <div class="p-6 border-b border-gray-100 dark:border-gray-700/50">
+                        <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                            <i class="ti ti-chart-pie text-emerald-500"></i> Distribusi Pembayaran
+                        </h3>
+                    </div>
+                    <div class="p-6 flex justify-center">
+                        <div class="h-48 w-full">
+                            <canvas id="paymentMethodChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Key Stats -->
+                <div class="card p-6">
+                    <h3 class="text-sm font-bold text-gray-700 dark:text-gray-300 uppercase tracking-wider mb-4">Statistik Kunci</h3>
+                    <div class="space-y-4">
+                        <div class="flex justify-between items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Penjualan Tertinggi</span>
+                            <span class="text-sm font-bold text-emerald-600 dark:text-emerald-400">
+                                Rp {{ number_format($sales->max('total_amount') ?? 0, 0, ',', '.') }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Penjualan Terendah</span>
+                            <span class="text-sm font-bold text-red-600 dark:text-red-400">
+                                Rp {{ number_format($sales->min('total_amount') ?? 0, 0, ',', '.') }}
+                            </span>
+                        </div>
+                        <div class="flex justify-between items-center p-3 rounded-lg bg-gray-50 dark:bg-gray-700/50">
+                            <span class="text-sm text-gray-500 dark:text-gray-400">Total Item Terjual</span>
+                            <span class="text-sm font-bold text-gray-900 dark:text-gray-100">
+                                {{ $sales->sum(function ($sale) {return $sale->saleDetails->sum('quantity');}) ?? 0 }}
+                            </span>
                         </div>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <!-- Sales Table -->
+        <div class="card overflow-hidden animate-fade-in-up delay-300">
+            <div class="p-6 border-b border-gray-100 dark:border-gray-700/50 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+                <h3 class="text-lg font-bold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="ti ti-list text-emerald-500"></i> Riwayat Transaksi
+                </h3>
+
+                <div class="relative">
+                    <input type="text" id="invoiceSearch" placeholder="Cari nomor faktur..."
+                        class="pl-10 pr-4 py-2 rounded-xl border-gray-300 dark:border-gray-600 shadow-sm focus:border-emerald-500 focus:ring-emerald-500 dark:bg-gray-700 dark:text-gray-200">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                        <i class="ti ti-search text-gray-400"></i>
+                    </div>
+                </div>
+            </div>
+
             <div class="overflow-x-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                    <thead class="bg-gray-50 dark:bg-gray-700">
+                    <thead class="bg-gray-50 dark:bg-gray-700/50">
                         <tr>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Tanggal</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Faktur</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Pelanggan</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Total</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Pembayaran</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Status</th>
-                            <th
-                                class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                                Aksi</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Tanggal & Waktu</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">No. Faktur</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pelanggan</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Total</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Pembayaran</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase tracking-wider">Status</th>
+                            <th class="px-6 py-3 text-right text-xs font-semibold text-gray-500 uppercase tracking-wider">Aksi</th>
                         </tr>
                     </thead>
                     <tbody id="salesTableBody" class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                         @forelse($sales as $sale)
-                            <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50" data-invoice="{{ $sale->invoice_number }}">
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    {{ $sale->created_at->format('d/m/Y H:i') }}
-                                </td>
-                                <td
-                                    class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-gray-100">
-                                    {{ $sale->invoice_number }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    {{ $sale->customer ? $sale->customer->nama : '-' }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
-                                    Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                                    @if ($sale->payment_method == 'cash')
-                                        Tunai
-                                    @elseif($sale->payment_method == 'transfer')
-                                        Transfer
-                                    @elseif($sale->payment_method == 'credit')
-                                        Kredit
-                                    @else
-                                        {{ ucfirst($sale->payment_method) }}
-                                    @endif
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap">
-                                    <span
-                                        class="inline-flex rounded-full px-2 text-xs font-semibold leading-5 {{ $sale->trashed() ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-300' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300' }}">
-                                        {{ $sale->trashed() ? 'Dibatalkan' : 'Selesai' }}
-                                    </span>
-                                </td>
-                                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                                    <a href="{{ route('sales.show', $sale) }}"
-                                        class="text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                        Lihat
-                                    </a>
-                                </td>
-                            </tr>
+                        <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors" data-invoice="{{ $sale->invoice_number }}">
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                {{ $sale->created_at->format('d/m/Y H:i') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100 font-mono">
+                                {{ $sale->invoice_number }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
+                                <div class="flex items-center gap-2">
+                                    <div class="w-6 h-6 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-xs text-emerald-600 dark:text-emerald-400 font-bold">
+                                        {{ $sale->customer ? substr($sale->customer->nama, 0, 1) : 'U' }}
+                                    </div>
+                                    {{ $sale->customer ? $sale->customer->nama : 'Umum' }}
+                                </div>
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-gray-900 dark:text-gray-100">
+                                Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                                @if ($sale->payment_method == 'cash')
+                                <span class="inline-flex items-center gap-1"><i class="ti ti-cash"></i> Tunai</span>
+                                @elseif($sale->payment_method == 'transfer')
+                                <span class="inline-flex items-center gap-1"><i class="ti ti-building-bank"></i> Transfer</span>
+                                @elseif($sale->payment_method == 'credit')
+                                <span class="inline-flex items-center gap-1 text-amber-600"><i class="ti ti-credit-card"></i> Kredit</span>
+                                @else
+                                {{ ucfirst($sale->payment_method) }}
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap">
+                                @if($sale->trashed())
+                                <span class="badge badge-red">Dibatalkan</span>
+                                @else
+                                <span class="badge badge-emerald">Selesai</span>
+                                @endif
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-right">
+                                <a href="{{ route('sales.show', $sale) }}" class="btn-action btn-secondary inline-flex" title="Detail">
+                                    <i class="ti ti-eye"></i>
+                                </a>
+                            </td>
+                        </tr>
                         @empty
-                            <tr>
-                                <td colspan="7"
-                                    class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    Tidak ada data penjualan dalam periode ini.
-                                </td>
-                            </tr>
+                        <tr>
+                            <td colspan="7" class="px-6 py-12 text-center text-gray-500 dark:text-gray-400">
+                                <div class="flex flex-col items-center justify-center">
+                                    <div class="w-12 h-12 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mb-3">
+                                        <i class="ti ti-file-off text-xl"></i>
+                                    </div>
+                                    <p>Tidak ada data penjualan dalam periode ini.</p>
+                                </div>
+                            </td>
+                        </tr>
                         @endforelse
                     </tbody>
                 </table>
@@ -323,163 +305,225 @@
     </div>
 
     @push('scripts')
-        <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Invoice search functionality
-                const invoiceSearch = document.getElementById('invoiceSearch');
-                const salesTableBody = document.getElementById('salesTableBody');
-                const allRows = salesTableBody.querySelectorAll('tr');
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Invoice search functionality
+            const invoiceSearch = document.getElementById('invoiceSearch');
+            const salesTableBody = document.getElementById('salesTableBody');
+            const allRows = salesTableBody.querySelectorAll('tr');
 
+            if (invoiceSearch) {
                 invoiceSearch.addEventListener('input', function() {
                     const searchTerm = this.value.toLowerCase().trim();
-                    
+                    let hasVisible = false;
+
+                    // Remove existing empty message if any
+                    const existingEmpty = salesTableBody.querySelector('.search-empty-state');
+                    if (existingEmpty) existingEmpty.remove();
+
                     allRows.forEach(row => {
+                        if (row.classList.contains('empty-state')) return; // Skip original empty state
+
                         const invoiceNumber = row.getAttribute('data-invoice');
                         if (invoiceNumber && invoiceNumber.toLowerCase().includes(searchTerm)) {
                             row.style.display = '';
+                            hasVisible = true;
                         } else {
                             row.style.display = 'none';
                         }
                     });
 
-                    // Show/hide empty state
-                    const visibleRows = Array.from(allRows).filter(row => row.style.display !== 'none');
-                    const emptyRow = salesTableBody.querySelector('.empty-state');
-                    
-                    if (visibleRows.length === 0 && searchTerm !== '') {
-                        if (!emptyRow) {
-                            const emptyStateRow = document.createElement('tr');
-                            emptyStateRow.className = 'empty-state';
-                            emptyStateRow.innerHTML = `
-                                <td colspan="7" class="px-6 py-4 text-center text-sm text-gray-500 dark:text-gray-400">
-                                    Tidak ada transaksi yang ditemukan dengan faktur "${searchTerm}".
+                    if (!hasVisible && searchTerm !== '') {
+                        const emptyStateRow = document.createElement('tr');
+                        emptyStateRow.className = 'search-empty-state';
+                        emptyStateRow.innerHTML = `
+                                <td colspan="7" class="px-6 py-8 text-center text-sm text-gray-500 dark:text-gray-400">
+                                    <div class="flex flex-col items-center justify-center">
+                                        <i class="ti ti-search-off text-2xl mb-2"></i>
+                                        <p>Tidak ada transaksi yang ditemukan dengan faktur "${searchTerm}".</p>
+                                    </div>
                                 </td>
                             `;
-                            salesTableBody.appendChild(emptyStateRow);
-                        }
-                    } else if (emptyRow) {
-                        emptyRow.remove();
+                        salesTableBody.appendChild(emptyStateRow);
                     }
                 });
+            }
 
-                // Prepare data for sales chart
-                try {
-                    const salesCtx = document.getElementById('salesChart');
-                    if (salesCtx) {
-                        const salesData = @json($salesChartData ?? []);
-                        
-                        // Check if we have data
-                        if (Object.keys(salesData).length === 0) {
-                            // Show message if no data
-                            salesCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400"><p>Tidak ada data penjualan untuk ditampilkan</p></div>';
-                        } else {
-                            new Chart(salesCtx, {
-                                type: 'line',
-                                data: {
-                                    labels: Object.keys(salesData),
-                                    datasets: [{
-                                        label: 'Total Penjualan',
-                                        data: Object.values(salesData),
-                                        backgroundColor: 'rgba(59, 130, 246, 0.5)',
-                                        borderColor: 'rgb(59, 130, 246)',
-                                        borderWidth: 2,
-                                        tension: 0.1,
-                                        fill: true
-                                    }]
+            // Prepare data for sales chart
+            try {
+                const salesCtx = document.getElementById('salesChart');
+                if (salesCtx) {
+                    const salesData = @json($salesChartData ?? []);
+
+                    if (Object.keys(salesData).length === 0) {
+                        salesCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-sm"><p>Tidak ada data grafik</p></div>';
+                    } else {
+                        new Chart(salesCtx, {
+                            type: 'line',
+                            data: {
+                                labels: Object.keys(salesData),
+                                datasets: [{
+                                    label: 'Total Penjualan',
+                                    data: Object.values(salesData),
+                                    backgroundColor: 'rgba(16, 185, 129, 0.1)', // emerald-500 with opacity
+                                    borderColor: '#10b981', // emerald-500
+                                    borderWidth: 2,
+                                    pointBackgroundColor: '#ffffff',
+                                    pointBorderColor: '#10b981',
+                                    pointRadius: 4,
+                                    pointHoverRadius: 6,
+                                    tension: 0.3,
+                                    fill: true
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                interaction: {
+                                    mode: 'index',
+                                    intersect: false,
                                 },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    scales: {
-                                        y: {
-                                            beginAtZero: true,
-                                            ticks: {
-                                                callback: function(value) {
-                                                    return 'Rp ' + new Intl.NumberFormat('id-ID').format(value);
-                                                }
+                                scales: {
+                                    y: {
+                                        beginAtZero: true,
+                                        grid: {
+                                            color: 'rgba(0, 0, 0, 0.05)',
+                                            drawBorder: false
+                                        },
+                                        ticks: {
+                                            callback: function(value) {
+                                                return 'Rp ' + new Intl.NumberFormat('id-ID', {
+                                                    notation: "compact"
+                                                }).format(value);
+                                            },
+                                            font: {
+                                                family: "'Plus Jakarta Sans', sans-serif"
                                             }
                                         }
                                     },
-                                    plugins: {
-                                        tooltip: {
-                                            callbacks: {
-                                                label: function(context) {
-                                                    return context.dataset.label + ': Rp ' + new Intl.NumberFormat('id-ID').format(context.raw);
-                                                }
+                                    x: {
+                                        grid: {
+                                            display: false
+                                        },
+                                        ticks: {
+                                            font: {
+                                                family: "'Plus Jakarta Sans', sans-serif"
+                                            }
+                                        }
+                                    }
+                                },
+                                plugins: {
+                                    legend: {
+                                        display: false
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                        titleColor: '#1f2937',
+                                        bodyColor: '#4b5563',
+                                        borderColor: '#e5e7eb',
+                                        borderWidth: 1,
+                                        padding: 10,
+                                        boxPadding: 4,
+                                        titleFont: {
+                                            family: "'Plus Jakarta Sans', sans-serif",
+                                            size: 14,
+                                            weight: 'bold'
+                                        },
+                                        bodyFont: {
+                                            family: "'Plus Jakarta Sans', sans-serif",
+                                        },
+                                        callbacks: {
+                                            label: function(context) {
+                                                return 'Total: Rp ' + new Intl.NumberFormat('id-ID').format(context.raw);
                                             }
                                         }
                                     }
                                 }
-                            });
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error creating sales chart:', error);
-                    const salesCtx = document.getElementById('salesChart');
-                    if (salesCtx) {
-                        salesCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-red-500"><p>Error loading sales chart</p></div>';
+                            }
+                        });
                     }
                 }
+            } catch (error) {
+                console.error('Error creating sales chart:', error);
+            }
 
-                // Prepare data for payment method chart
-                try {
-                    const paymentCtx = document.getElementById('paymentMethodChart');
-                    if (paymentCtx) {
-                        const paymentMethods = @json($summary['payment_methods'] ?? []);
-                        const paymentLabels = [];
-                        const paymentData = [];
-                        const paymentColors = [
-                            'rgba(59, 130, 246, 0.7)', // Blue
-                            'rgba(16, 185, 129, 0.7)', // Green
-                            'rgba(245, 158, 11, 0.7)', // Yellow
-                            'rgba(239, 68, 68, 0.7)' // Red
-                        ];
+            // Prepare data for payment method chart
+            try {
+                const paymentCtx = document.getElementById('paymentMethodChart');
+                if (paymentCtx) {
+                    const paymentMethods = @json($summary['payment_methods'] ?? []);
+                    const paymentLabels = [];
+                    const paymentData = [];
 
-                        if (Object.keys(paymentMethods).length === 0) {
-                            paymentCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-gray-500 dark:text-gray-400"><p>Tidak ada data metode pembayaran</p></div>';
-                        } else {
-                            Object.keys(paymentMethods).forEach((method, index) => {
-                                let label;
-                                if (method === 'cash') label = 'Tunai';
-                                else if (method === 'transfer') label = 'Transfer';
-                                else if (method === 'credit') label = 'Kredit';
-                                else label = method;
+                    // Custom colors for methods
+                    const methodColors = {
+                        'cash': '#10b981', // emerald-500
+                        'transfer': '#3b82f6', // blue-500
+                        'credit': '#f59e0b', // amber-500
+                        'other': '#6b7280' // gray-500
+                    };
 
-                                paymentLabels.push(label);
-                                paymentData.push(paymentMethods[method]);
-                            });
+                    const paymentColors = [];
 
-                            new Chart(paymentCtx, {
-                                type: 'doughnut',
-                                data: {
-                                    labels: paymentLabels,
-                                    datasets: [{
-                                        data: paymentData,
-                                        backgroundColor: paymentColors,
-                                        borderWidth: 1
-                                    }]
-                                },
-                                options: {
-                                    responsive: true,
-                                    maintainAspectRatio: false,
-                                    plugins: {
-                                        legend: {
-                                            position: 'bottom'
+                    if (Object.keys(paymentMethods).length === 0) {
+                        paymentCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-full text-gray-400 text-sm"><p>Tidak ada data metode</p></div>';
+                    } else {
+                        Object.keys(paymentMethods).forEach((method) => {
+                            let label;
+                            if (method === 'cash') label = 'Tunai';
+                            else if (method === 'transfer') label = 'Transfer';
+                            else if (method === 'credit') label = 'Kredit';
+                            else label = method;
+
+                            paymentLabels.push(label);
+                            paymentData.push(paymentMethods[method]);
+                            paymentColors.push(methodColors[method] || methodColors['other']);
+                        });
+
+                        new Chart(paymentCtx, {
+                            type: 'doughnut',
+                            data: {
+                                labels: paymentLabels,
+                                datasets: [{
+                                    data: paymentData,
+                                    backgroundColor: paymentColors,
+                                    borderWidth: 0,
+                                    hoverOffset: 4
+                                }]
+                            },
+                            options: {
+                                responsive: true,
+                                maintainAspectRatio: false,
+                                plugins: {
+                                    legend: {
+                                        position: 'bottom',
+                                        labels: {
+                                            usePointStyle: true,
+                                            padding: 15,
+                                            font: {
+                                                family: "'Plus Jakarta Sans', sans-serif",
+                                                size: 11
+                                            }
                                         }
+                                    },
+                                    tooltip: {
+                                        backgroundColor: 'rgba(255, 255, 255, 0.95)',
+                                        titleColor: '#1f2937',
+                                        bodyColor: '#4b5563',
+                                        borderColor: '#e5e7eb',
+                                        borderWidth: 1
                                     }
-                                }
-                            });
-                        }
-                    }
-                } catch (error) {
-                    console.error('Error creating payment method chart:', error);
-                    const paymentCtx = document.getElementById('paymentMethodChart');
-                    if (paymentCtx) {
-                        paymentCtx.parentElement.innerHTML = '<div class="flex items-center justify-center h-64 text-red-500"><p>Error loading payment chart</p></div>';
+                                },
+                                cutout: '65%'
+                            }
+                        });
                     }
                 }
-            });
-        </script>
+            } catch (error) {
+                console.error('Error creating payment method chart:', error);
+            }
+        });
+    </script>
     @endpush
 </x-app-layout>

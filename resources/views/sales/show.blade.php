@@ -1,291 +1,175 @@
 <x-app-layout>
-    <div class="space-y-6">
-        <!-- Page Header with Status Badge -->
-        <div class="flex items-center justify-between bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div>
-                <div class="flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 mr-3 text-indigo-600 dark:text-indigo-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <div>
-                        <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center">
-                            {{ __('Detail Transaksi') }} 
-                            <span class="ml-2 text-indigo-600 dark:text-indigo-400">#{{ $sale->invoice_number }}</span>
-                        </h2>
-                        <p class="mt-1 text-sm text-gray-600 dark:text-gray-400 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1 text-gray-400" fill="none"
-                                viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                            </svg>
-                            {{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}
-                        </p>
-                    </div>
+    <x-slot name="header">Detail Transaksi</x-slot>
+
+    <div class="space-y-5">
+
+        {{-- Page Header --}}
+        <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4 animate-fade-in-up">
+            <div class="flex items-start gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center flex-shrink-0">
+                    <i class="ti ti-file-invoice text-emerald-600 dark:text-emerald-400 text-xl"></i>
                 </div>
-                
-                <!-- Status Badge -->
-                <div class="mt-3 flex items-center">
-                    @if ($sale->trashed())
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-                            </svg>
-                            Transaksi Dibatalkan
-                        </span>
-                    @elseif ($sale->status === 'draft')
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
-                            </svg>
-                            Draft
-                        </span>
-                    @elseif ($sale->status === 'processing')
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/50 dark:text-blue-200">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                            </svg>
-                            Sedang Diproses
-                        </span>
-                    @else
-                        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
-                            <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                            </svg>
-                            Transaksi Selesai
-                        </span>
-                    @endif
-                    
-                    @if ($sale->payment_method === 'credit')
-                        @if ($sale->remaining_amount > 0)
-                            <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-200">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Kredit (Belum Lunas)
-                            </span>
+                <div>
+                    <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">
+                        {{ $sale->invoice_number }}
+                    </h2>
+                    <p class="text-sm text-gray-400 dark:text-gray-500 mt-0.5 flex items-center gap-1.5">
+                        <i class="ti ti-calendar text-xs"></i>
+                        {{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}
+                    </p>
+                    <div class="flex items-center gap-2 mt-2">
+                        @if ($sale->trashed())
+                        <span class="badge badge-danger"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Dibatalkan</span>
+                        @elseif ($sale->status === 'draft')
+                        <span class="badge badge-neutral"><span class="w-1.5 h-1.5 rounded-full bg-gray-400"></span> Draft</span>
+                        @elseif ($sale->status === 'processing')
+                        <span class="badge badge-info"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Diproses</span>
                         @else
-                            <span class="ml-3 inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200">
-                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                Kredit (Lunas)
-                            </span>
+                        <span class="badge badge-success"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Selesai</span>
                         @endif
-                    @endif
+                        @if ($sale->payment_method === 'credit')
+                        @if ($sale->remaining_amount > 0)
+                        <span class="badge badge-warning"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Kredit (Belum Lunas)</span>
+                        @else
+                        <span class="badge badge-success"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Kredit (Lunas)</span>
+                        @endif
+                        @endif
+                    </div>
                 </div>
             </div>
 
-            <div class="flex space-x-3">
-                @php
-                    // Check if sale has seed products
-                    $hasSeedProducts = $sale->saleDetails->filter(function ($detail) {
-                        return $detail->product->category && 
-                               (strtolower($detail->product->category->name) === 'benih');
-                    })->isNotEmpty();
-                    
-                    // Check if sale has non-seed products
-                    $hasNonSeedProducts = $sale->saleDetails->filter(function ($detail) {
-                        return !$detail->product->category || 
-                               (strtolower($detail->product->category->name) !== 'benih');
-                    })->isNotEmpty();
-                @endphp
-
-                <button type="button" onclick="window.print()"
-                    class="inline-flex items-center rounded-md bg-white px-3 py-2 text-sm font-medium text-gray-700 border border-gray-300 shadow-sm hover:bg-gray-50 transition-colors duration-200">
-                    <svg class="w-4 h-4 mr-2 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z">
-                        </path>
-                    </svg>
-                    Print
+            {{-- Action Buttons --}}
+            <div class="flex items-center gap-2 flex-wrap">
+                <button type="button" onclick="window.print()" class="btn-ghost btn-sm">
+                    <i class="ti ti-printer text-base"></i> Print
                 </button>
 
-                <!-- Dropdown Menu for Invoice Types -->
-                <div class="relative" x-data="{ open: false }">
-                    <button @click="open = !open" type="button"
-                        class="inline-flex items-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white shadow-sm hover:bg-indigo-500 transition-colors duration-200">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                        Cetak Dokumen
-                        <svg class="ml-2 -mr-0.5 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
-                            fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z"
-                                clip-rule="evenodd" />
-                        </svg>
-                    </button>
+                @php
+                $hasSeedProducts = $sale->saleDetails->filter(fn($d) => $d->product->category && strtolower($d->product->category->name) === 'benih')->isNotEmpty();
+                $hasNonSeedProducts = $sale->saleDetails->filter(fn($d) => !$d->product->category || strtolower($d->product->category->name) !== 'benih')->isNotEmpty();
+                @endphp
 
-                    <!-- Dropdown panel -->
+                <div class="relative" x-data="{ open: false }">
+                    <button @click="open = !open" class="btn-primary btn-sm">
+                        <i class="ti ti-file-text text-base"></i> Cetak Dokumen
+                        <i class="ti ti-chevron-down text-xs ml-0.5"></i>
+                    </button>
                     <div x-show="open" @click.away="open = false"
                         x-transition:enter="transition ease-out duration-100"
-                        x-transition:enter-start="transform opacity-0 scale-95"
-                        x-transition:enter-end="transform opacity-100 scale-100"
+                        x-transition:enter-start="opacity-0 scale-95"
+                        x-transition:enter-end="opacity-100 scale-100"
                         x-transition:leave="transition ease-in duration-75"
-                        x-transition:leave-start="transform opacity-100 scale-100"
-                        x-transition:leave-end="transform opacity-0 scale-95"
-                        class="absolute right-0 z-10 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none">
-                        <div class="py-1">
-                            @if ($hasNonSeedProducts)
-                                <a href="{{ route('sales.invoice', $sale) }}" target="_blank"
-                                    class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">
-                                    <div class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-gray-500"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Invoice Biasa
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-1 ml-6">Untuk produk umum</p>
-                                </a>
-                            @endif
-
-                            @if ($hasSeedProducts)
-                                <a href="{{ route('sales.invoice-seeds', $sale) }}" target="_blank"
-                                    class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">
-                                    <div class="flex items-center">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-green-500"
-                                            fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                        </svg>
-                                        Invoice Benih
-                                    </div>
-                                    <p class="text-xs text-gray-500 mt-1 ml-6">Dengan cap PPN dibebaskan</p>
-                                </a>
-                            @endif
-
-                            <a href="{{ route('sales.delivery-note', $sale) }}" target="_blank"
-                                class="text-gray-700 block px-4 py-2 text-sm hover:bg-gray-100">
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2 text-blue-500"
-                                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                                    </svg>
-                                    Surat Jalan
-                                </div>
-                                <p class="text-xs text-gray-500 mt-1 ml-6">Dokumen pengiriman barang</p>
-                            </a>
-                        </div>
+                        x-transition:leave-start="opacity-100 scale-100"
+                        x-transition:leave-end="opacity-0 scale-95"
+                        class="absolute right-0 z-20 mt-2 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-100 dark:border-gray-700 py-1.5 overflow-hidden">
+                        @if ($hasNonSeedProducts)
+                        <a href="{{ route('sales.invoice', $sale) }}" target="_blank"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <i class="ti ti-file-invoice text-gray-400"></i>
+                            <div>
+                                <p class="font-medium">Invoice Biasa</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Untuk produk umum</p>
+                            </div>
+                        </a>
+                        @endif
+                        @if ($hasSeedProducts)
+                        <a href="{{ route('sales.invoice-seeds', $sale) }}" target="_blank"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <i class="ti ti-leaf text-emerald-500"></i>
+                            <div>
+                                <p class="font-medium">Invoice Benih</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Dengan cap PPN dibebaskan</p>
+                            </div>
+                        </a>
+                        @endif
+                        <a href="{{ route('sales.delivery-note', $sale) }}" target="_blank"
+                            class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-700/50">
+                            <i class="ti ti-truck text-sky-500"></i>
+                            <div>
+                                <p class="font-medium">Surat Jalan</p>
+                                <p class="text-xs text-gray-400 mt-0.5">Dokumen pengiriman barang</p>
+                            </div>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Transaction Timeline -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-                Status Transaksi
+        {{-- Status Timeline --}}
+        <div class="card p-6 animate-fade-in-up stagger-2">
+            <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                <i class="ti ti-timeline text-emerald-500"></i> Status Transaksi
             </h3>
-            
-            <div class="relative">
-                <!-- Timeline Line -->
-                <div class="absolute left-5 top-0 h-full w-0.5 bg-gray-200 dark:bg-gray-700"></div>
-                
-                <!-- Timeline Items -->
-                <div class="space-y-6">
-                    <!-- Created -->
-                    <div class="relative flex items-start">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 z-10">
-                            <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
+            <div class="relative pl-6">
+                <div class="absolute left-[9px] top-2 bottom-2 w-0.5 bg-gray-100 dark:bg-gray-700"></div>
+                <div class="space-y-5">
+                    {{-- Created --}}
+                    <div class="relative flex items-start gap-3">
+                        <div class="absolute -left-6 w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center ring-4 ring-white dark:ring-gray-800 z-10">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Transaksi Dibuat</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->created_at)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Transaksi dibuat oleh {{ $sale->user->name }}</p>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-100">Transaksi Dibuat</p>
+                            <p class="text-xs text-gray-400 mt-0.5">{{ \Carbon\Carbon::parse($sale->created_at)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }} — oleh {{ $sale->user->name }}</p>
                         </div>
                     </div>
-                    
+
                     @if ($sale->draft_id)
-                    <!-- From Draft -->
-                    <div class="relative flex items-start">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-blue-100 dark:bg-blue-900/30 z-10">
-                            <svg class="h-5 w-5 text-blue-600 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                            </svg>
+                    <div class="relative flex items-start gap-3">
+                        <div class="absolute -left-6 w-5 h-5 rounded-full bg-sky-100 dark:bg-sky-500/20 flex items-center justify-center ring-4 ring-white dark:ring-gray-800 z-10">
+                            <span class="w-2 h-2 rounded-full bg-sky-500"></span>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Dibuat dari Draft</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                                Transaksi ini dibuat dari draft <a href="{{ route('drafts.show', $sale->draft_id) }}" class="text-indigo-600 dark:text-indigo-400 hover:underline">#{{ $sale->draft->invoice_number }}</a>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-100">Dibuat dari Draft</p>
+                            <p class="text-xs text-gray-400 mt-0.5">
+                                Draft <a href="{{ route('drafts.show', $sale->draft_id) }}" class="text-emerald-600 dark:text-emerald-400 hover:underline">#{{ $sale->draft->invoice_number }}</a>
                             </p>
                         </div>
                     </div>
                     @endif
-                    
+
                     @if ($sale->payment_method === 'credit')
-                    <!-- Credit Payment -->
-                    <div class="relative flex items-start">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full {{ $sale->remaining_amount > 0 ? 'bg-yellow-100 dark:bg-yellow-900/30' : 'bg-green-100 dark:bg-green-900/30' }} z-10">
-                            <svg class="h-5 w-5 {{ $sale->remaining_amount > 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
+                    <div class="relative flex items-start gap-3">
+                        <div class="absolute -left-6 w-5 h-5 rounded-full {{ $sale->remaining_amount > 0 ? 'bg-amber-100 dark:bg-amber-500/20' : 'bg-emerald-100 dark:bg-emerald-500/20' }} flex items-center justify-center ring-4 ring-white dark:ring-gray-800 z-10">
+                            <span class="w-2 h-2 rounded-full {{ $sale->remaining_amount > 0 ? 'bg-amber-500' : 'bg-emerald-500' }}"></span>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Pembayaran Kredit</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-100">Pembayaran Kredit</p>
                             @if ($sale->remaining_amount > 0)
-                                <p class="text-sm text-yellow-600 dark:text-yellow-400 mt-1">
-                                    Sisa pembayaran: Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}
-                                    @if ($sale->due_date)
-                                        <span class="ml-2">•</span>
-                                        <span class="ml-2">Jatuh tempo: {{ \Carbon\Carbon::parse($sale->due_date)->format('d/m/Y') }}</span>
-                                    @endif
-                                </p>
+                            <p class="text-xs text-amber-600 dark:text-amber-400 mt-0.5">
+                                Sisa: Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}
+                                @if ($sale->due_date) • Jatuh tempo: {{ \Carbon\Carbon::parse($sale->due_date)->format('d/m/Y') }} @endif
+                            </p>
                             @else
-                                <p class="text-sm text-green-600 dark:text-green-400 mt-1">Pembayaran kredit telah lunas</p>
+                            <p class="text-xs text-emerald-600 dark:text-emerald-400 mt-0.5">Kredit telah lunas</p>
                             @endif
                         </div>
                     </div>
                     @endif
-                    
+
                     @if ($sale->trashed())
-                    <!-- Cancelled -->
-                    <div class="relative flex items-start">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 z-10">
-                            <svg class="h-5 w-5 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
+                    <div class="relative flex items-start gap-3">
+                        <div class="absolute -left-6 w-5 h-5 rounded-full bg-red-100 dark:bg-red-500/20 flex items-center justify-center ring-4 ring-white dark:ring-gray-800 z-10">
+                            <span class="w-2 h-2 rounded-full bg-red-500"></span>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Transaksi Dibatalkan</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ $sale->deleted_at->format('d F Y, H:i') }}</p>
-                            <p class="text-sm text-red-600 dark:text-red-400 mt-1">Semua produk telah dikembalikan ke inventaris</p>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-100">Transaksi Dibatalkan</p>
+                            <p class="text-xs text-red-500 mt-0.5">{{ $sale->deleted_at->format('d F Y, H:i') }} — Stok telah dikembalikan</p>
                         </div>
                     </div>
                     @else
-                    <!-- Completed -->
-                    <div class="relative flex items-start">
-                        <div class="flex items-center justify-center h-10 w-10 rounded-full bg-green-100 dark:bg-green-900/30 z-10">
-                            <svg class="h-5 w-5 text-green-600 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
-                            </svg>
+                    <div class="relative flex items-start gap-3">
+                        <div class="absolute -left-6 w-5 h-5 rounded-full bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center ring-4 ring-white dark:ring-gray-800 z-10">
+                            <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
                         </div>
-                        <div class="ml-4">
-                            <h4 class="text-sm font-medium text-gray-900 dark:text-gray-100">Transaksi Selesai</h4>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d F Y, H:i') }}</p>
-                            <p class="text-sm text-gray-600 dark:text-gray-400 mt-1">Transaksi telah selesai dengan metode pembayaran 
-                                <span class="font-medium capitalize">
-                                    @if ($sale->payment_method === 'cash')
-                                        Tunai
-                                    @elseif ($sale->payment_method === 'credit')
-                                        Kredit
-                                    @elseif ($sale->payment_method === 'transfer')
-                                        Transfer Bank
-                                    @endif
-                                </span>
+                        <div>
+                            <p class="text-sm font-medium text-gray-800 dark:text-gray-100">Transaksi Selesai</p>
+                            <p class="text-xs text-gray-400 mt-0.5">
+                                Metode:
+                                @if ($sale->payment_method === 'cash') Tunai
+                                @elseif ($sale->payment_method === 'credit') Kredit
+                                @elseif ($sale->payment_method === 'transfer') Transfer Bank
+                                @endif
                             </p>
                         </div>
                     </div>
@@ -294,568 +178,308 @@
             </div>
         </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <!-- Customer Information -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                    </svg>
-                    Informasi Pelanggan
+        {{-- Info Cards Grid --}}
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5 animate-fade-in-up stagger-3">
+            {{-- Customer Information --}}
+            <div class="card p-5">
+                <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                    <i class="ti ti-user text-emerald-500"></i> Informasi Pelanggan
                 </h3>
-                
+
                 @if ($sale->draft_id)
-                <div class="mb-4 p-3 bg-blue-50 dark:bg-blue-900/30 rounded-md border-l-4 border-blue-400">
-                    <div class="flex items-center">
-                        <div class="flex-shrink-0">
-                            <svg class="h-5 w-5 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                    d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                        </div>
-                        <div class="ml-3">
-                            <p class="text-sm font-medium text-blue-800 dark:text-blue-200">
-                                Transaksi ini dibuat dari draft <a href="{{ route('drafts.show', $sale->draft_id) }}" class="underline hover:text-blue-600">#{{ $sale->draft->invoice_number }}</a>
-                            </p>
-                        </div>
-                    </div>
+                <div class="flex items-center gap-3 p-3 rounded-xl bg-sky-50 dark:bg-sky-500/10 border border-sky-200 dark:border-sky-500/20 mb-4">
+                    <i class="ti ti-info-circle text-sky-500"></i>
+                    <p class="text-xs text-sky-700 dark:text-sky-300">
+                        Dibuat dari draft <a href="{{ route('drafts.show', $sale->draft_id) }}" class="font-semibold hover:underline">#{{ $sale->draft->invoice_number }}</a>
+                    </p>
                 </div>
                 @endif
 
                 @if ($sale->customer)
-                    <div class="space-y-3">
-                        <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Nama</div>
-                            <div class="text-sm font-medium text-gray-900 dark:text-gray-100">
-                                {{ $sale->customer->nama }}</div>
-                        </div>
-
-                        <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">NIK</div>
-                            <div class="text-sm text-gray-900 dark:text-gray-100">{{ $sale->customer->nik }}</div>
-                        </div>
-
-                        <div class="border-b border-gray-200 dark:border-gray-700 pb-2">
-                            <div class="text-sm text-gray-500 dark:text-gray-400 mb-1">Alamat</div>
-                            <div class="text-sm text-gray-900 dark:text-gray-100">
-                                {{ $sale->customer->alamat ?? '-' }},
-                                {{ $sale->customer->desa_nama }},
-                                {{ $sale->customer->kecamatan_nama }}
-                            </div>
-                        </div>
-
-                        <div>
-                            <a href="{{ route('customers.show', $sale->customer) }}"
-                                class="inline-flex items-center text-sm text-indigo-600 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                                </svg>
-                                Lihat Detail Pelanggan
-                            </a>
-                        </div>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">Nama</span>
+                        <span class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ $sale->customer->nama }}</span>
                     </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">NIK</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-200 tabular-nums">{{ $sale->customer->nik }}</span>
+                    </div>
+                    <div class="py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">Alamat</span>
+                        <p class="text-sm text-gray-700 dark:text-gray-200 mt-1">
+                            {{ $sale->customer->alamat ?? '-' }}, {{ $sale->customer->desa_nama }}, {{ $sale->customer->kecamatan_nama }}
+                        </p>
+                    </div>
+                    <a href="{{ route('customers.show', $sale->customer) }}" class="inline-flex items-center gap-1.5 text-xs font-medium text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 mt-1">
+                        <i class="ti ti-external-link text-sm"></i> Lihat Detail Pelanggan
+                    </a>
+                </div>
                 @else
-                    <div class="bg-gray-50 dark:bg-gray-900/50 p-4 rounded-md text-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-10 w-10 mx-auto text-gray-400 dark:text-gray-500 mb-2" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                        <p class="text-gray-500 dark:text-gray-400">Pelanggan Umum</p>
-                        <p class="text-gray-400 dark:text-gray-500 text-sm mt-1">Tidak ada data pelanggan yang
-                            terdaftar</p>
+                <div class="flex flex-col items-center py-6 text-center">
+                    <div class="w-12 h-12 rounded-2xl bg-gray-50 dark:bg-gray-700 flex items-center justify-center mb-3">
+                        <i class="ti ti-user-off text-gray-400 text-xl"></i>
                     </div>
+                    <p class="text-sm font-medium text-gray-500 dark:text-gray-400">Pelanggan Umum</p>
+                    <p class="text-xs text-gray-400 mt-0.5">Tidak ada data pelanggan terdaftar</p>
+                </div>
                 @endif
             </div>
 
-            <!-- Transaction Information -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400"
-                        fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                    </svg>
-                    Informasi Transaksi
+            {{-- Transaction Information --}}
+            <div class="card p-5">
+                <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+                    <i class="ti ti-clipboard-list text-emerald-500"></i> Informasi Transaksi
                 </h3>
-
                 <div class="space-y-3">
-                    <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">No. Invoice</div>
-                        <div class="text-sm font-medium text-gray-900 dark:text-gray-100">{{ $sale->invoice_number }}
-                        </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">No. Invoice</span>
+                        <span class="text-sm font-semibold text-gray-800 dark:text-gray-100">{{ $sale->invoice_number }}</span>
                     </div>
-
-                    <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Tanggal</div>
-                        <div class="text-sm text-gray-900 dark:text-gray-100">
-                            {{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }}
-                        </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">Tanggal</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-200">{{ \Carbon\Carbon::parse($sale->date)->setTimezone('Asia/Jakarta')->format('d/m/Y H:i') }}</span>
                     </div>
-
-                    <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Status</div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">Status</span>
                         <div>
                             @if ($sale->trashed())
-                                <span
-                                    class="inline-flex items-center rounded-full bg-red-100 dark:bg-red-900/50 px-2.5 py-0.5 text-xs font-medium text-red-800 dark:text-red-200">
-                                    <svg class="mr-1 h-2 w-2 text-red-400" fill="currentColor" viewBox="0 0 8 8">
-                                        <circle cx="4" cy="4" r="3" />
-                                    </svg>
-                                    Dibatalkan
-                                </span>
+                            <span class="badge badge-danger"><span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> Dibatalkan</span>
                             @else
-                                <span
-                                    class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/50 px-2.5 py-0.5 text-xs font-medium text-green-800 dark:text-green-200">
-                                    <svg class="mr-1 h-2 w-2 text-green-400" fill="currentColor" viewBox="0 0 8 8">
-                                        <circle cx="4" cy="4" r="3" />
-                                    </svg>
-                                    Selesai
-                                </span>
+                            <span class="badge badge-success"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Selesai</span>
                             @endif
                         </div>
                     </div>
-
-                    <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Metode Pembayaran</div>
-                        <div class="text-sm text-gray-900 dark:text-gray-100 capitalize">
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">Pembayaran</span>
+                        <div>
                             @if ($sale->payment_method === 'cash')
-                                <span class="inline-flex items-center text-green-600 dark:text-green-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    Tunai
-                                </span>
+                            <span class="badge badge-success"><span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Tunai</span>
                             @elseif ($sale->payment_method === 'credit')
-                                <span class="inline-flex items-center text-yellow-600 dark:text-yellow-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    Kredit
-                                </span>
+                            <span class="badge badge-warning"><span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span> Kredit</span>
                             @elseif ($sale->payment_method === 'transfer')
-                                <span class="inline-flex items-center text-blue-600 dark:text-blue-400">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none"
-                                        viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                                    </svg>
-                                    Transfer Bank
-                                </span>
+                            <span class="badge badge-info"><span class="w-1.5 h-1.5 rounded-full bg-sky-500"></span> Transfer</span>
                             @endif
                         </div>
                     </div>
-
                     @if ($sale->vehicle_type || $sale->vehicle_number)
-                        <div class="grid grid-cols-2 border-b border-gray-200 dark:border-gray-700 pb-2">
-                            <div class="text-sm text-gray-500 dark:text-gray-400">Kendaraan</div>
-                            <div class="text-sm text-gray-900 dark:text-gray-100">
-                                {{ $sale->vehicle_type ?? '-' }}
-                                @if ($sale->vehicle_number)
-                                    ({{ $sale->vehicle_number }})
-                                @endif
-                            </div>
-                        </div>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-50 dark:border-gray-700/30">
+                        <span class="text-xs text-gray-400">Kendaraan</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-200">
+                            {{ $sale->vehicle_type ?? '-' }} @if($sale->vehicle_number)({{ $sale->vehicle_number }})@endif
+                        </span>
+                    </div>
                     @endif
-
-                    <div class="grid grid-cols-2">
-                        <div class="text-sm text-gray-500 dark:text-gray-400">Kasir</div>
-                        <div class="text-sm text-gray-900 dark:text-gray-100">{{ $sale->user->name }}</div>
+                    <div class="flex justify-between items-center py-2">
+                        <span class="text-xs text-gray-400">Kasir</span>
+                        <span class="text-sm text-gray-700 dark:text-gray-200">{{ $sale->user->name }}</span>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Payment Details -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="space-y-6">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                    </svg>
-                    Detail Pembayaran
+        {{-- Payment Summary --}}
+        <div class="card overflow-hidden animate-fade-in-up stagger-4">
+            <div class="p-5 border-b border-gray-100 dark:border-gray-700/40">
+                <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="ti ti-cash text-emerald-500"></i> Detail Pembayaran
                 </h3>
+            </div>
+            <div class="p-5">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30">
+                        <p class="text-xs text-gray-400 mb-1">Total Belanja</p>
+                        <p class="text-lg font-bold text-gray-800 dark:text-gray-100 tabular-nums">Rp {{ number_format($sale->total_amount, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-gray-50 dark:bg-gray-700/30">
+                        <p class="text-xs text-gray-400 mb-1">Potongan</p>
+                        <p class="text-lg font-bold text-gray-800 dark:text-gray-100 tabular-nums">Rp {{ number_format($sale->discount, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-500/10">
+                        <p class="text-xs text-emerald-600 dark:text-emerald-400 mb-1">Total Bayar</p>
+                        <p class="text-lg font-bold text-emerald-700 dark:text-emerald-300 tabular-nums">Rp {{ number_format($sale->total_amount - $sale->discount, 0, ',', '.') }}</p>
+                    </div>
+                    <div class="p-4 rounded-xl {{ $sale->payment_method === 'credit' && $sale->remaining_amount > 0 ? 'bg-amber-50 dark:bg-amber-500/10' : 'bg-emerald-50 dark:bg-emerald-500/10' }}">
+                        <p class="text-xs {{ $sale->payment_method === 'credit' && $sale->remaining_amount > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400' }} mb-1">Status</p>
+                        <p class="text-lg font-bold {{ $sale->payment_method === 'credit' && $sale->remaining_amount > 0 ? 'text-amber-700 dark:text-amber-300' : 'text-emerald-700 dark:text-emerald-300' }}">
+                            @if ($sale->payment_method === 'credit')
+                            @if ($sale->remaining_amount > 0) Belum Lunas @else Lunas @endif
+                            @else
+                            Lunas
+                            @endif
+                        </p>
+                    </div>
+                </div>
 
-                <!-- Payment Summary Card -->
-                <div class="bg-gradient-to-r from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30 rounded-lg p-6 border border-indigo-100 dark:border-indigo-800/30 shadow-sm">
-                    <div class="grid grid-cols-2 gap-4">
+                @if ($sale->payment_method === 'credit')
+                <div class="mt-4 p-4 rounded-xl bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/20">
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
                         <div>
-                            <div class="flex items-center">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                                </svg>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Belanja:</span>
-                                <span class="ml-auto text-sm font-semibold text-gray-900 dark:text-gray-100">
+                            <p class="text-xs text-gray-400 mb-0.5">Uang Muka</p>
+                            <p class="font-semibold text-gray-800 dark:text-gray-100 tabular-nums">Rp {{ number_format($sale->down_payment, 0, ',', '.') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 mb-0.5">Total Terbayar</p>
+                            <p class="font-semibold text-emerald-600 dark:text-emerald-400 tabular-nums">Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}</p>
+                        </div>
+                        <div>
+                            <p class="text-xs text-gray-400 mb-0.5">Sisa Hutang</p>
+                            <p class="font-semibold {{ $sale->remaining_amount > 0 ? 'text-red-600 dark:text-red-400' : 'text-emerald-600 dark:text-emerald-400' }} tabular-nums">Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}</p>
+                        </div>
+                        @if ($sale->due_date)
+                        <div>
+                            <p class="text-xs text-gray-400 mb-0.5">Jatuh Tempo</p>
+                            <p class="font-semibold text-gray-800 dark:text-gray-100">{{ \Carbon\Carbon::parse($sale->due_date)->format('d F Y') }}</p>
+                        </div>
+                        @endif
+                    </div>
+                </div>
+                @endif
+            </div>
+        </div>
+
+        {{-- Sale Items Table --}}
+        <div class="card overflow-hidden animate-fade-in-up stagger-5">
+            <div class="flex items-center justify-between p-5 border-b border-gray-100 dark:border-gray-700/40">
+                <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 flex items-center gap-2">
+                    <i class="ti ti-shopping-cart text-emerald-500"></i> Item Penjualan
+                </h3>
+                <div class="flex items-center gap-2">
+                    <span class="badge badge-primary">{{ $sale->saleDetails->count() }} item</span>
+                </div>
+            </div>
+            <div class="overflow-x-auto">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Produk</th>
+                            <th>Kategori</th>
+                            <th>Satuan</th>
+                            <th>Jumlah</th>
+                            <th>Harga</th>
+                            <th class="text-right">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach ($sale->saleDetails as $detail)
+                        <tr>
+                            <td>
+                                <div>
+                                    <p class="text-sm font-medium text-gray-800 dark:text-gray-100">{{ $detail->product->name }}</p>
+                                    @if($detail->product->code)
+                                    <p class="text-xs text-gray-400 mt-0.5">{{ $detail->product->code }}</p>
+                                    @endif
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge {{ strtolower($detail->product->category->name ?? '') === 'benih' ? 'badge-success' : 'badge-primary' }}">
+                                    {{ $detail->product->category->name ?? '-' }}
+                                </span>
+                            </td>
+                            <td>
+                                <div>
+                                    <p class="text-sm text-gray-700 dark:text-gray-200">{{ $detail->productUnit->unit->name }}</p>
+                                    <p class="text-xs text-gray-400">({{ $detail->productUnit->unit->abbreviation }})</p>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-lg bg-gray-100 dark:bg-gray-700 text-sm font-semibold text-gray-800 dark:text-gray-100 tabular-nums">
+                                    {{ $detail->quantity }}
+                                </span>
+                            </td>
+                            <td>
+                                <p class="text-sm text-gray-700 dark:text-gray-200 tabular-nums">Rp {{ number_format($detail->price, 0, ',', '.') }}</p>
+                                @if($detail->productUnit->conversion > 1)
+                                <p class="text-xs text-gray-400 mt-0.5">Per {{ $detail->productUnit->unit->abbreviation }}</p>
+                                @endif
+                            </td>
+                            <td class="text-right">
+                                <span class="text-sm font-semibold text-gray-800 dark:text-gray-100 tabular-nums">
+                                    Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
+                                </span>
+                            </td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                    <tfoot>
+                        <tr class="bg-emerald-50/50 dark:bg-emerald-500/5">
+                            <td colspan="5" class="text-right text-sm font-semibold text-gray-800 dark:text-gray-100">Total</td>
+                            <td class="text-right">
+                                <span class="text-sm font-bold text-emerald-700 dark:text-emerald-400 tabular-nums">
                                     Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
                                 </span>
-                            </div>
-                            
-                            <div class="flex items-center mt-2">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                                </svg>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Potongan:</span>
-                                <span class="ml-auto text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                    Rp {{ number_format($sale->discount, 0, ',', '.') }}
-                                </span>
-                            </div>
-                            
-                            <div class="flex items-center mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                                </svg>
-                                <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Setelah Potongan:</span>
-                                <span class="ml-auto text-sm font-semibold text-indigo-600 dark:text-indigo-400">
-                                    Rp {{ number_format($sale->total_amount - $sale->discount, 0, ',', '.') }}
-                                </span>
-                            </div>
-                        </div>
-                        
-                        <div class="{{ $sale->payment_method === 'credit' ? 'border-l border-indigo-200 dark:border-indigo-700 pl-4' : '' }}">
-                            @if ($sale->payment_method === 'credit')
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-yellow-500 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Uang Muka:</span>
-                                    <span class="ml-auto text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        Rp {{ number_format($sale->down_payment, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                                
-                                <div class="flex items-center mt-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Total Terbayar:</span>
-                                    <span class="ml-auto text-sm font-semibold text-green-600 dark:text-green-400">
-                                        Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                                
-                                <div class="flex items-center mt-2 pt-2 border-t border-gray-200 dark:border-gray-700">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 {{ $sale->remaining_amount > 0 ? 'text-red-500 dark:text-red-400' : 'text-green-500 dark:text-green-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Sisa Hutang:</span>
-                                    <span class="ml-auto text-sm font-semibold {{ $sale->remaining_amount > 0 ? 'text-red-600 dark:text-red-400' : 'text-green-600 dark:text-green-400' }}">
-                                        Rp {{ number_format($sale->remaining_amount, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                                
-                                @if ($sale->due_date)
-                                <div class="flex items-center mt-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Jatuh Tempo:</span>
-                                    <span class="ml-auto text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        {{ \Carbon\Carbon::parse($sale->due_date)->format('d F Y') }}
-                                    </span>
-                                </div>
-                                @endif
-                            @else
-                                <div class="flex items-center">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Dibayar:</span>
-                                    <span class="ml-auto text-sm font-semibold text-green-600 dark:text-green-400">
-                                        Rp {{ number_format($sale->paid_amount, 0, ',', '.') }}
-                                    </span>
-                                </div>
-                                
-                                @if ($sale->payment_method === 'cash')
-                                <div class="flex items-center mt-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Metode Pembayaran:</span>
-                                    <span class="ml-auto text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        Tunai
-                                    </span>
-                                </div>
-                                @elseif ($sale->payment_method === 'transfer')
-                                <div class="flex items-center mt-2">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-blue-500 dark:text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
-                                    </svg>
-                                    <span class="text-sm font-medium text-gray-700 dark:text-gray-300">Metode Pembayaran:</span>
-                                    <span class="ml-auto text-sm font-semibold text-gray-900 dark:text-gray-100">
-                                        Transfer Bank
-                                    </span>
-                                </div>
-                                @endif
-                            @endif
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Payment Summary Cards -->
-                <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                            </svg>
-                            Total Belanja
-                        </dt>
-                        <dd class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                            Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
-                        </dd>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                            </svg>
-                            Potongan
-                        </dt>
-                        <dd class="mt-2 text-2xl font-semibold text-gray-900 dark:text-gray-100">
-                            Rp {{ number_format($sale->discount, 0, ',', '.') }}
-                        </dd>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-                            </svg>
-                            Total Setelah Potongan
-                        </dt>
-                        <dd class="mt-2 text-2xl font-semibold text-indigo-600 dark:text-indigo-400">
-                            Rp {{ number_format($sale->total_amount - $sale->discount, 0, ',', '.') }}
-                        </dd>
-                    </div>
-
-                    <div class="bg-white dark:bg-gray-800 p-4 rounded-lg border border-gray-200 dark:border-gray-700 shadow-sm hover:shadow-md transition-shadow duration-200">
-                        <dt class="text-sm font-medium text-gray-500 dark:text-gray-400 flex items-center">
-                            @if ($sale->payment_method === 'credit')
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 {{ $sale->remaining_amount > 0 ? 'text-yellow-500 dark:text-yellow-400' : 'text-green-500 dark:text-green-400' }}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Status Pembayaran
-                            @else
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-green-500 dark:text-green-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                </svg>
-                                Status Pembayaran
-                            @endif
-                        </dt>
-                        <dd class="mt-2 text-xl font-semibold {{ $sale->payment_method === 'credit' && $sale->remaining_amount > 0 ? 'text-yellow-600 dark:text-yellow-400' : 'text-green-600 dark:text-green-400' }}">
-                            @if ($sale->payment_method === 'credit')
-                                @if ($sale->remaining_amount > 0)
-                                    Kredit (Belum Lunas)
-                                @else
-                                    Kredit (Lunas)
-                                @endif
-                            @else
-                                Lunas
-                            @endif
-                        </dd>
-                    </div>
-                </div>
+                            </td>
+                        </tr>
+                    </tfoot>
+                </table>
             </div>
         </div>
 
-        <!-- Sale Items -->
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-            <div class="space-y-6">
-                <div class="flex justify-between items-center">
-                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                        </svg>
-                        Item Penjualan
-                    </h3>
-                    <div class="flex items-center space-x-2">
-                        <span class="bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                            {{ $sale->saleDetails->count() }} item
-                        </span>
-                        <span class="bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200 text-xs font-medium px-2.5 py-0.5 rounded-full">
-                            Total: Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
-                        </span>
-                    </div>
-                </div>
-
-                <div class="overflow-x-auto rounded-lg border border-gray-200 dark:border-gray-700 shadow">
-                    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-                        <thead class="bg-gray-50 dark:bg-gray-700/50">
-                            <tr>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Produk
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Kategori
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Satuan
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Jumlah
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Harga
-                                </th>
-                                <th scope="col"
-                                    class="px-6 py-3 text-right text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                                    Subtotal
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-                            @foreach ($sale->saleDetails as $detail)
-                                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors duration-150">
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                        <div class="font-medium">{{ $detail->product->name }}</div>
-                                        @if($detail->product->code)
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">Kode: {{ $detail->product->code }}</div>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
-                                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium 
-                                            {{ strtolower($detail->product->category->name ?? '') === 'benih' ? 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200' : 'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/50 dark:text-indigo-200' }}">
-                                            {{ $detail->product->category->name ?? '-' }}
-                                        </span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                        <div>{{ $detail->productUnit->unit->name }}</div>
-                                        <div class="text-xs text-gray-500 dark:text-gray-400">({{ $detail->productUnit->unit->abbreviation }})</div>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 font-medium">
-                                        <span class="px-2.5 py-0.5 bg-gray-100 dark:bg-gray-700 rounded-md">{{ $detail->quantity }}</span>
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100">
-                                        <div>Rp {{ number_format($detail->price, 0, ',', '.') }}</div>
-                                        @if($detail->productUnit->conversion > 1)
-                                            <div class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                                Per {{ $detail->productUnit->unit->abbreviation }}
-                                            </div>
-                                        @endif
-                                    </td>
-                                    <td class="px-6 py-4 text-sm text-gray-900 dark:text-gray-100 text-right font-medium">
-                                        <span class="px-2.5 py-0.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 rounded-md">
-                                            Rp {{ number_format($detail->subtotal, 0, ',', '.') }}
-                                        </span>
-                                    </td>
-                                </tr>
-                            @endforeach
-                            
-                            <!-- Summary Row -->
-                            <tr class="bg-gray-50 dark:bg-gray-700/50 border-t-2 border-gray-200 dark:border-gray-600">
-                                <td colspan="5" class="px-6 py-4 text-sm font-medium text-gray-900 dark:text-gray-100 text-right">
-                                    Total
-                                </td>
-                                <td class="px-6 py-4 text-right">
-                                    <span class="text-sm font-bold text-white bg-indigo-600 dark:bg-indigo-500 px-3 py-1 rounded-md">
-                                        Rp {{ number_format($sale->total_amount, 0, ',', '.') }}
-                                    </span>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-
-        <!-- Notes Section -->
+        {{-- Notes --}}
         @if ($sale->notes)
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
-                        viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
-                    </svg>
-                    Catatan
-                </h3>
-                <div class="mt-4 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 p-5 rounded-lg border border-yellow-100 dark:border-yellow-800/30 shadow-sm">
-                    <div class="flex">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-yellow-500 dark:text-yellow-400 flex-shrink-0 mr-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <p class="text-sm text-gray-700 dark:text-gray-300 italic">{{ $sale->notes }}</p>
-                    </div>
-                </div>
+        <div class="card p-5 animate-fade-in-up stagger-6">
+            <h3 class="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-3 flex items-center gap-2">
+                <i class="ti ti-notes text-emerald-500"></i> Catatan
+            </h3>
+            <div class="p-4 rounded-xl bg-amber-50/50 dark:bg-amber-500/5 border border-amber-100 dark:border-amber-500/20">
+                <p class="text-sm text-gray-700 dark:text-gray-300 italic leading-relaxed">{{ $sale->notes }}</p>
             </div>
+        </div>
         @endif
 
-        <!-- Actions -->
-        <div class="mt-6 bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700 print:hidden">
-            <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100 flex items-center mb-4">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7" />
-                </svg>
-                Tindakan
-            </h3>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                <button type="button" onclick="window.history.back()"
-                    class="inline-flex items-center justify-center px-4 py-2.5 border border-gray-300 dark:border-gray-600 rounded-lg shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:shadow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-gray-500 dark:text-gray-400" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    <span>Kembali</span>
+        {{-- Action Buttons Footer --}}
+        <div class="card p-5 print:hidden animate-fade-in-up stagger-6">
+            <div class="flex flex-wrap items-center gap-2">
+                <button type="button" onclick="window.history.back()" class="btn-ghost btn-sm">
+                    <i class="ti ti-arrow-left text-base"></i> Kembali
                 </button>
-
-                <button type="button" onclick="window.print()"
-                    class="inline-flex items-center justify-center px-4 py-2.5 border border-indigo-200 dark:border-indigo-800 rounded-lg shadow-sm text-sm font-medium text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-900/30 hover:bg-indigo-100 dark:hover:bg-indigo-800/50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 hover:shadow">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
-                    </svg>
-                    <span>Cetak</span>
+                <button type="button" onclick="window.print()" class="btn-secondary btn-sm">
+                    <i class="ti ti-printer text-base"></i> Cetak
                 </button>
-
                 @if ($sale->payment_method === 'credit' && $sale->remaining_amount > 0 && !$sale->trashed())
-                    <a href="{{ route('sales.credit', ['sale_id' => $sale->id]) }}"
-                        class="inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-200 hover:shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z" />
-                        </svg>
-                        <span>Terima Pembayaran</span>
-                    </a>
+                <a href="{{ route('sales.credit', ['sale_id' => $sale->id]) }}" class="btn-primary btn-sm">
+                    <i class="ti ti-cash text-base"></i> Terima Pembayaran
+                </a>
                 @endif
-
                 @unless ($sale->trashed())
-                    <button type="button" 
-                        data-sale-id="{{ $sale->id }}" 
-                        data-invoice="{{ $sale->invoice_number }}"
-                        class="cancel-sale-btn inline-flex items-center justify-center px-4 py-2.5 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 transition-all duration-200 hover:shadow-md">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                        </svg>
-                        <span>Batalkan Penjualan</span>
-                    </button>
+                <button type="button" class="cancel-sale-btn btn-sm bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-2 text-xs font-semibold transition-colors"
+                    data-sale-id="{{ $sale->id }}" data-invoice="{{ $sale->invoice_number }}">
+                    <i class="ti ti-trash text-base"></i> Batalkan
+                </button>
                 @endunless
+            </div>
+        </div>
+    </div>
+
+    {{-- Cancel Sale Modal --}}
+    <div id="cancelSaleModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen p-4">
+            <div class="fixed inset-0 bg-black/40 backdrop-blur-sm" aria-hidden="true"></div>
+            <div class="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl max-w-md w-full border border-gray-100 dark:border-gray-700 overflow-hidden">
+                <div class="p-6">
+                    <div class="flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center flex-shrink-0">
+                            <i class="ti ti-alert-triangle text-red-500 text-lg"></i>
+                        </div>
+                        <div>
+                            <h3 class="text-base font-semibold text-gray-900 dark:text-gray-100">Konfirmasi Pembatalan</h3>
+                            <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
+                                Apakah Anda yakin ingin membatalkan penjualan <span id="invoice-number" class="font-semibold text-gray-800 dark:text-gray-200"></span>?
+                            </p>
+                            <p class="text-xs text-gray-400 mt-1">Tindakan ini akan mengembalikan semua produk ke inventaris (FIFO).</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center justify-end gap-2 px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-100 dark:border-gray-700/40">
+                    <button type="button" id="cancelModalBtn" class="btn-ghost btn-sm">Batal</button>
+                    <form id="cancelSaleForm" action="" method="POST">
+                        @csrf
+                        @method('DELETE')
+                        <button type="submit" class="btn-sm bg-red-600 hover:bg-red-700 text-white rounded-xl px-4 py-2 text-xs font-semibold transition-colors">
+                            Batalkan Penjualan
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>
@@ -878,12 +502,8 @@
                 width: 100%;
             }
 
-            .print:hidden {
-                display: block !important;
-            }
-
             .no-print,
-            .print\\:hidden {
+            .print\:hidden {
                 display: none !important;
             }
 
@@ -893,91 +513,27 @@
             }
         }
     </style>
-    <!-- Cancel Sale Confirmation Modal -->
-    <div id="cancelSaleModal" class="fixed inset-0 z-50 hidden overflow-y-auto">
-        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <!-- Background overlay -->
-            <div class="fixed inset-0 transition-opacity" aria-hidden="true">
-                <div class="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
 
-            <!-- Modal panel -->
-            <div class="inline-block align-bottom bg-white dark:bg-gray-800 rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-                <div class="bg-white dark:bg-gray-800 px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                    <div class="sm:flex sm:items-start">
-                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 sm:mx-0 sm:h-10 sm:w-10">
-                            <svg class="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-                            </svg>
-                        </div>
-                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                            <h3 class="text-lg leading-6 font-medium text-gray-900 dark:text-gray-100" id="modal-title">
-                                Konfirmasi Pembatalan
-                            </h3>
-                            <div class="mt-2">
-                                <p class="text-sm text-gray-500 dark:text-gray-400">
-                                    Apakah Anda yakin ingin membatalkan penjualan dengan nomor invoice <span id="invoice-number" class="font-medium text-gray-900 dark:text-gray-100"></span>? 
-                                </p>
-                                <p class="text-sm text-gray-500 dark:text-gray-400 mt-2">
-                                    Tindakan ini akan mengembalikan semua produk ke inventaris menggunakan prinsip FIFO.
-                                </p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="bg-gray-50 dark:bg-gray-700 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                    <form id="cancelSaleForm" action="" method="POST" class="inline">
-                        @csrf
-                        @method('DELETE')
-                        <button type="submit" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:ml-3 sm:w-auto sm:text-sm">
-                            Batalkan Penjualan
-                        </button>
-                    </form>
-                    <button type="button" id="cancelModalBtn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 dark:border-gray-600 shadow-sm px-4 py-2 bg-white dark:bg-gray-800 text-base font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                        Batal
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
+    @push('scripts')
     <script>
-        // Cancel Sale Modal Functionality
         document.addEventListener('DOMContentLoaded', function() {
-            const cancelSaleModal = document.getElementById('cancelSaleModal');
-            const cancelSaleButtons = document.querySelectorAll('.cancel-sale-btn');
-            const cancelModalBtn = document.getElementById('cancelModalBtn');
-            const invoiceNumberSpan = document.getElementById('invoice-number');
-            const cancelSaleForm = document.getElementById('cancelSaleForm');
-            
-            // Show modal when cancel button is clicked
-            cancelSaleButtons.forEach(button => {
-                button.addEventListener('click', function() {
-                    const saleId = this.getAttribute('data-sale-id');
-                    const invoiceNumber = this.getAttribute('data-invoice');
-                    
-                    // Set the invoice number in the modal
-                    invoiceNumberSpan.textContent = invoiceNumber;
-                    
-                    // Set the form action
-                    cancelSaleForm.action = `/sales/${saleId}`;
-                    
-                    // Show the modal
-                    cancelSaleModal.classList.remove('hidden');
+            const modal = document.getElementById('cancelSaleModal');
+            const invoiceSpan = document.getElementById('invoice-number');
+            const form = document.getElementById('cancelSaleForm');
+
+            document.querySelectorAll('.cancel-sale-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    invoiceSpan.textContent = this.dataset.invoice;
+                    form.action = `/sales/${this.dataset.saleId}`;
+                    modal.classList.remove('hidden');
                 });
             });
-            
-            // Hide modal when cancel button is clicked
-            cancelModalBtn.addEventListener('click', function() {
-                cancelSaleModal.classList.add('hidden');
-            });
-            
-            // Close modal when clicking outside
-            cancelSaleModal.addEventListener('click', function(event) {
-                if (event.target === cancelSaleModal) {
-                    cancelSaleModal.classList.add('hidden');
-                }
+
+            document.getElementById('cancelModalBtn').addEventListener('click', () => modal.classList.add('hidden'));
+            modal.addEventListener('click', e => {
+                if (e.target === modal) modal.classList.add('hidden');
             });
         });
     </script>
+    @endpush
 </x-app-layout>

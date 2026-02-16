@@ -1,850 +1,435 @@
 <x-app-layout>
-    <div class="space-y-6 max-w-full overflow-hidden">
-        <!-- Page Heading -->
-        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100">{{ __('Edit Produk') }}</h2>
+    <div class="space-y-6">
+        <!-- Page Header -->
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 animate-fade-in-up">
+            <div>
+                <h2 class="text-xl font-bold text-gray-800 dark:text-gray-100 flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-emerald-100 dark:bg-emerald-500/20 flex items-center justify-center text-emerald-600 dark:text-emerald-400">
+                        <i class="ti ti-edit text-xl"></i>
+                    </div>
+                    {{ __('Edit Produk') }}
+                </h2>
+                <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 ml-13">
+                    <a href="{{ route('products.index') }}" class="hover:text-emerald-500 transition-colors">Produk</a>
+                    <span class="mx-1">•</span>
+                    <span>{{ $product->name }}</span>
+                </p>
+            </div>
 
-            <div class="mt-2 sm:mt-0">
-                <a href="{{ route('products.index') }}"
-                    class="inline-flex items-center rounded-md bg-gray-100 dark:bg-gray-700 px-3 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-500 dark:focus:ring-gray-400 transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none" viewBox="0 0 24 24"
-                        stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                            d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Kembali
+
+            <div class="flex gap-2">
+                <a href="{{ route('products.index') }}" class="btn-secondary">
+                    <i class="ti ti-arrow-left text-base"></i>
+                    <span>Kembali</span>
                 </a>
             </div>
         </div>
 
-        <!-- Error Messages -->
         @if ($errors->any())
-            <div class="rounded-lg bg-red-50 dark:bg-red-900/50 p-4">
-                <div class="flex">
-                    <div class="flex-shrink-0">
-                        <svg class="h-5 w-5 text-red-400 dark:text-red-300" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd"
-                                d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
-                                clip-rule="evenodd" />
-                        </svg>
+        <div class="flex items-start gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 animate-fade-in-up">
+            <i class="ti ti-alert-circle text-red-500 text-lg flex-shrink-0 mt-0.5"></i>
+            <div>
+                <h3 class="text-sm font-semibold text-red-800 dark:text-red-200">Ada kesalahan dalam pengisian form:</h3>
+                <ul class="mt-1 text-sm text-red-600 dark:text-red-300 list-disc pl-4 space-y-0.5">
+                    @foreach ($errors->all() as $error)
+                    <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        </div>
+        @endif
+
+        <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data" class="space-y-6 animate-fade-in-up delay-100">
+            @csrf
+            @method('PUT')
+
+            <!-- Basic Information -->
+            <div class="card p-6">
+                <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <i class="ti ti-info-circle text-emerald-500 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Informasi Dasar</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <x-input-label for="code" value="Kode Produk" />
+                        <div class="mt-1 flex rounded-xl shadow-sm">
+                            <span class="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">
+                                <i class="ti ti-barcode"></i>
+                            </span>
+                            <input type="text" id="code" name="code" value="{{ old('code', $product->code) }}" readonly
+                                class="flex-1 rounded-r-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                        </div>
                     </div>
-                    <div class="ml-3">
-                        <h3 class="text-sm font-medium text-red-800 dark:text-red-200">Terdapat beberapa kesalahan:</h3>
-                        <div class="mt-2 text-sm text-red-700 dark:text-red-300">
-                            <ul class="list-disc pl-5 space-y-1">
-                                @foreach ($errors->all() as $error)
-                                    <li>{{ $error }}</li>
-                                @endforeach
-                            </ul>
+
+                    <div>
+                        <x-input-label for="name" value="Nama Produk" />
+                        <input type="text" id="name" name="name" value="{{ old('name', $product->name) }}" required
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                    </div>
+
+                    <div>
+                        <x-input-label for="category_id" value="Kategori" />
+                        <select id="category_id" name="category_id" required
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                            <option value="">-- Pilih Kategori --</option>
+                            @foreach ($categories as $category)
+                            <option value="{{ $category->id }}" {{ old('category_id', $product->category_id) == $category->id ? 'selected' : '' }}>
+                                {{ $category->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div>
+                        <x-input-label for="supplier_id" value="Supplier" />
+                        <select id="supplier_id" name="supplier_id" required
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                            <option value="">-- Pilih Supplier --</option>
+                            @foreach ($suppliers as $supplier)
+                            <option value="{{ $supplier->id }}" {{ old('supplier_id', $product->supplier_id) == $supplier->id ? 'selected' : '' }}>
+                                {{ $supplier->name }}
+                            </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <x-input-label for="description" value="Deskripsi" />
+                        <textarea id="description" name="description" rows="3"
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">{{ old('description', $product->description) }}</textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Price & Stock -->
+            <div class="card p-6">
+                <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <i class="ti ti-currency-dollar text-emerald-500 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Harga & Stok</h3>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div>
+                        <x-input-label for="purchase_price" value="Harga Beli" />
+                        <div class="mt-1 relative rounded-xl shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
+                            </div>
+                            <input type="number" name="purchase_price" id="purchase_price" min="0" step="1" required value="{{ old('purchase_price', $product->purchase_price) }}"
+                                class="block w-full pl-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <x-input-label for="selling_price" value="Harga Jual" />
+                        <div class="mt-1 relative rounded-xl shadow-sm">
+                            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
+                            </div>
+                            <input type="number" name="selling_price" id="selling_price" min="0" step="1" required value="{{ old('selling_price', $product->selling_price) }}"
+                                class="block w-full pl-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                        </div>
+                    </div>
+
+                    <div>
+                        <x-input-label for="stock" value="Stok Saat Ini" />
+                        <input type="number" name="stock" id="stock" min="0" step="1" required value="{{ old('stock', $product->stock) }}"
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                    </div>
+
+                    <div>
+                        <x-input-label for="min_stock" value="Minimal Stok" />
+                        <input type="number" name="min_stock" id="min_stock" min="0" step="1" required value="{{ old('min_stock', $product->min_stock) }}"
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Config -->
+            <div class="card p-6">
+                <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <i class="ti ti-settings text-emerald-500 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Konfigurasi Stok</h3>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <x-input-label for="stock_method" value="Metode Stok" />
+                        <select name="stock_method" id="stock_method"
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                            <option value="FIFO" {{ old('stock_method', $product->stock_method) == 'FIFO' ? 'selected' : '' }}>FIFO (First In, First Out)</option>
+                            <option value="FEFO" {{ old('stock_method', $product->stock_method) == 'FEFO' ? 'selected' : '' }}>FEFO (First Expired, First Out)</option>
+                        </select>
+                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                            FIFO: Stok lama keluar duluan | FEFO: Stok kedaluwarsa keluar duluan
+                        </p>
+                    </div>
+
+                    <div>
+                        <x-input-label for="expiry_warning_days" value="Peringatan Kedaluwarsa (Hari)" />
+                        <input type="number" name="expiry_warning_days" id="expiry_warning_days" min="0" step="1" value="{{ old('expiry_warning_days', $product->expiry_warning_days) }}"
+                            class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <div class="space-y-4">
+                            <label class="flex items-center">
+                                <input type="checkbox" name="requires_expiry_date" id="requires_expiry_date" value="1" {{ old('requires_expiry_date', $product->requires_expiry_date) ? 'checked' : '' }}
+                                    class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Wajib memiliki tanggal kedaluwarsa</span>
+                            </label>
+
+                            <label class="flex items-center">
+                                <input type="checkbox" name="is_perishable" id="is_perishable" value="1" {{ old('is_perishable', $product->is_perishable) ? 'checked' : '' }}
+                                    class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Produk mudah rusak/kedaluwarsa</span>
+                            </label>
+
+                            <label class="flex items-center">
+                                <input type="checkbox" name="strict_expiry_validation" id="strict_expiry_validation" value="1" {{ old('strict_expiry_validation', $product->strict_expiry_validation) ? 'checked' : '' }}
+                                    class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700">
+                                <span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Validasi ketat tanggal kedaluwarsa</span>
+                            </label>
                         </div>
                     </div>
                 </div>
             </div>
-        @endif
 
-        <div
-            class="overflow-hidden rounded-lg bg-white dark:bg-gray-800 shadow-sm border border-gray-200 dark:border-gray-700">
-            <form action="{{ route('products.update', $product) }}" method="POST" enctype="multipart/form-data"
-                class="p-4 md:p-6 space-y-6">
-                @csrf
-                @method('PUT')
-
-                <!-- Basic Information -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6 border border-gray-200 dark:border-gray-700">
-                    <h3
-                        class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                        </svg>
-                        Informasi Dasar
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <x-input-label for="code"
-                                class="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                                Kode Produk
-                            </x-input-label>
-                            <div class="mt-1 flex rounded-md shadow-sm">
-                                <span
-                                    class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-700 text-gray-500 dark:text-gray-400 text-sm">
-                                    Kode
-                                </span>
-                                <x-text-input type="text" id="code" name="code" value="{{ $product->code }}"
-                                    readonly
-                                    class="flex-1 rounded-none rounded-r-md border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300" />
-                            </div>
-                            <x-input-error :messages="$errors->get('code')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="name" value="Nama Produk" />
-                            <x-text-input id="name" name="name" type="text" class="mt-1 block w-full"
-                                value="{{ $product->name }}" required />
-                            <x-input-error :messages="$errors->get('name')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="category_id" value="Kategori" />
-                            <select id="category_id" name="category_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                                required>
-                                <option value="">-- Pilih Kategori --</option>
-                                @foreach ($categories as $category)
-                                    <option value="{{ $category->id }}"
-                                        {{ $product->category_id == $category->id ? 'selected' : '' }}>
-                                        {{ $category->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('category_id')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="supplier_id" value="Supplier" />
-                            <select id="supplier_id" name="supplier_id"
-                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                                required>
-                                <option value="">-- Pilih Supplier --</option>
-                                @foreach ($suppliers as $supplier)
-                                    <option value="{{ $supplier->id }}"
-                                        {{ $supplierId == $supplier->id ? 'selected' : '' }}>
-                                        {{ $supplier->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                            <x-input-error :messages="$errors->get('supplier_id')" class="mt-2" />
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <x-input-label for="description" value="Deskripsi" />
-                            <textarea id="description" name="description" rows="3"
-                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">{{ $product->description }}</textarea>
-                            <x-input-error :messages="$errors->get('description')" class="mt-2" />
-                        </div>
-                    </div>
+            <!-- Units -->
+            <div class="card p-6">
+                <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <i class="ti ti-ruler-2 text-emerald-500 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Satuan Produk</h3>
                 </div>
 
-                <!-- Section: Harga & Stok -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-4 md:p-6 border border-gray-200 dark:border-gray-700">
-                    <h3
-                        class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none" viewBox="0 0 24 24"
-                            stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Harga & Stok
-                    </h3>
+                <div id="units-container" class="space-y-4">
+                    @foreach ($product->units as $index => $productUnit)
+                    <div class="p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 relative group animate-fade-in-up">
+                        @if (!$productUnit->is_base_unit)
+                        <button type="button" class="remove-unit absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                        @endif
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                        <div>
-                            <x-input-label for="purchase_price" value="Harga Beli" />
-                            <div class="mt-1 relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
-                                </div>
-                                <x-text-input type="number" name="purchase_price" id="purchase_price"
-                                    min="0" step="1" value="{{ $product->purchase_price }}"
-                                    class="block w-full pl-10" required />
-                            </div>
-                            <x-input-error :messages="$errors->get('purchase_price')" class="mt-2" />
-                        </div>
+                        <input type="hidden" name="units[{{ $index }}][id]" value="{{ $productUnit->id }}">
 
-                        <div>
-                            <x-input-label for="selling_price" value="Harga Jual" />
-                            <div class="mt-1 relative rounded-md shadow-sm">
-                                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                    <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
-                                </div>
-                                <x-text-input type="number" name="selling_price" id="selling_price" min="0"
-                                    step="1" value="{{ $product->selling_price }}" class="block w-full pl-10"
-                                    required />
-                            </div>
-                            <x-input-error :messages="$errors->get('selling_price')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="stock" value="Stok" />
-                            <x-text-input type="number" name="stock" id="stock" min="0"
-                                step="1" value="{{ $product->stock }}" class="mt-1 block w-full" readonly />
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">Stok hanya dapat diubah melalui
-                                menu penyesuaian stok</p>
-                        </div>
-
-                        <div>
-                            <x-input-label for="min_stock" value="Minimal Stok" />
-                            <x-text-input type="number" name="min_stock" id="min_stock" min="0"
-                                step="1" value="{{ $product->min_stock }}" class="mt-1 block w-full"
-                                required />
-                            <x-input-error :messages="$errors->get('min_stock')" class="mt-2" />
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: FIFO/FEFO Configuration -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                    <h3
-                        class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        Konfigurasi Stok & Kedaluwarsa
-                    </h3>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div>
-                            <x-input-label for="stock_method" value="Metode Stok" />
-                            <select name="stock_method" id="stock_method"
-                                class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300">
-                                <option value="FIFO" {{ $product->stock_method === 'FIFO' ? 'selected' : '' }}>FIFO (First In, First Out)</option>
-                                <option value="FEFO" {{ $product->stock_method === 'FEFO' ? 'selected' : '' }}>FEFO (First Expired, First Out)</option>
-                            </select>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                FIFO: Stok lama keluar duluan | FEFO: Stok yang akan kedaluwarsa keluar duluan
-                            </p>
-                            <x-input-error :messages="$errors->get('stock_method')" class="mt-2" />
-                        </div>
-
-                        <div>
-                            <x-input-label for="expiry_warning_days" value="Peringatan Kedaluwarsa (Hari)" />
-                            <x-text-input type="number" name="expiry_warning_days" id="expiry_warning_days" 
-                                min="0" step="1" value="{{ $product->expiry_warning_days }}" class="mt-1 block w-full" />
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                                Berapa hari sebelum kedaluwarsa untuk menampilkan peringatan
-                            </p>
-                            <x-input-error :messages="$errors->get('expiry_warning_days')" class="mt-2" />
-                        </div>
-
-                        <div class="md:col-span-2">
-                            <div class="space-y-4">
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="requires_expiry_date" id="requires_expiry_date" 
-                                        value="1" {{ $product->requires_expiry_date ? 'checked' : '' }}
-                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700">
-                                    <label for="requires_expiry_date" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        Wajib memiliki tanggal kedaluwarsa
-                                    </label>
-                                </div>
-
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="is_perishable" id="is_perishable" 
-                                        value="1" {{ $product->is_perishable ? 'checked' : '' }}
-                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700">
-                                    <label for="is_perishable" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        Produk mudah rusak/kedaluwarsa
-                                    </label>
-                                </div>
-
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="strict_expiry_validation" id="strict_expiry_validation" 
-                                        value="1" {{ $product->strict_expiry_validation ? 'checked' : '' }}
-                                        class="rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500 dark:border-gray-600 dark:bg-gray-700">
-                                    <label for="strict_expiry_validation" class="ml-2 text-sm text-gray-700 dark:text-gray-300">
-                                        Validasi ketat tanggal kedaluwarsa
-                                    </label>
-                                </div>
-                            </div>
-                            <p class="text-xs text-gray-500 dark:text-gray-400 mt-2">
-                                Validasi ketat akan mencegah penjualan produk yang sudah kedaluwarsa atau mendekati kedaluwarsa
-                            </p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: Units of Measure -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-200 dark:border-gray-700">
-                    <h3
-                        class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                        </svg>
-                        Satuan Produk
-                    </h3>
-
-                    <div class="mb-4">
-                        <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">Kelola satuan untuk produk ini.</p>
-                    </div>
-
-                    <div id="units-container">
-                        @foreach ($product->productUnits as $index => $productUnit)
-                            <div
-                                class="unit-row grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
-                                <input type="hidden" name="units[{{ $index }}][id]"
-                                    value="{{ $productUnit->id }}">
-                                <div>
-                                    <x-input-label value="Satuan" />
-                                    <select name="units[{{ $index }}][unit_id]"
-                                        class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                                        required>
-                                        <option value="">-- Pilih Satuan --</option>
-                                        @foreach ($units as $unit)
-                                            <option value="{{ $unit->id }}"
-                                                {{ $productUnit->unit_id == $unit->id ? 'selected' : '' }}>
-                                                {{ $unit->name }} ({{ $unit->abbreviation }})
-                                            </option>
-                                        @endforeach
-                                    </select>
-                                </div>
-                                <div>
-                                    <x-input-label value="Konversi" />
-                                    @if ($productUnit->is_default)
-                                        <input type="hidden" name="units[{{ $index }}][conversion_factor]"
-                                            value="1">
-                                        <x-text-input type="number" value="1" min="1" step="1"
-                                            class="mt-1 block w-full" readonly />
-                                        <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">1 = Satuan Dasar</p>
-                                    @else
-                                        <x-text-input type="number"
-                                            name="units[{{ $index }}][conversion_factor]"
-                                            value="{{ $productUnit->conversion_factor }}" min="1"
-                                            step="1" class="mt-1 block w-full" required />
-                                    @endif
-                                </div>
-                                <div>
-                                    <x-input-label value="Harga Beli" />
-                                    <div class="mt-1 relative rounded-md shadow-sm">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
-                                        </div>
-                                        <x-text-input type="number"
-                                            name="units[{{ $index }}][purchase_price]"
-                                            value="{{ $productUnit->purchase_price }}" min="0" step="1"
-                                            class="block w-full pl-10" required />
-                                    </div>
-                                </div>
-                                <div>
-                                    <x-input-label value="Harga Jual" />
-                                    <div class="mt-1 relative rounded-md shadow-sm">
-                                        <div
-                                            class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                                            <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
-                                        </div>
-                                        <x-text-input type="number" name="units[{{ $index }}][selling_price]"
-                                            value="{{ $productUnit->selling_price }}" min="0" step="1"
-                                            class="block w-full pl-10" required />
-                                    </div>
-                                </div>
-                                <div>
-                                    <x-input-label value="Tanggal Expired" />
-                                    <x-text-input type="date" name="units[{{ $index }}][expire_date]"
-                                        value="{{ $productUnit->expire_date ? $productUnit->expire_date->format('Y-m-d') : '' }}"
-                                        class="mt-1 block w-full" />
-                                </div>
-                                <div class="flex items-end">
-                                    @if ($productUnit->is_default)
-                                        <input type="hidden" name="units[{{ $index }}][is_default]"
-                                            value="1">
-                                        <span
-                                            class="inline-flex items-center px-2.5 py-1.5 rounded-md text-sm font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
-                                            Satuan Dasar
-                                        </span>
-                                    @else
-                                        <div class="flex items-center">
-                                            <input type="checkbox" name="units[{{ $index }}][is_default]"
-                                                id="is_default_{{ $index }}"
-                                                class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                                value="1">
-                                            <label for="is_default_{{ $index }}"
-                                                class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                                Satuan Utama
-                                            </label>
-                                        </div>
-                                        <button type="button"
-                                            class="remove-unit ml-auto text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none"
-                                                viewBox="0 0 24 24" stroke="currentColor">
-                                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                            </svg>
-                                        </button>
-                                    @endif
-                                </div>
-                            </div>
-                        @endforeach
-                        <div class="mt-4">
-                            <button type="button" id="add-unit-btn"
-                                class="inline-flex items-center px-3 py-2 border border-gray-300 dark:border-gray-600 shadow-sm text-sm leading-4 font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 transition-colors">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-2" fill="none"
-                                    viewBox="0 0 24 24" stroke="currentColor">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M12 4v16m8-8H4" />
-                                </svg>
-                                Tambah Satuan Lain
-                            </button>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Section: Gambar Produk -->
-                <div
-                    class="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6 border border-gray-100 dark:border-gray-700 mt-6">
-                    <h3
-                        class="text-lg font-medium text-gray-900 dark:text-gray-100 mb-4 pb-2 border-b border-gray-200 dark:border-gray-700 flex items-center">
-                        <svg xmlns="http://www.w3.org/2000/svg"
-                            class="h-5 w-5 mr-2 text-indigo-600 dark:text-indigo-400" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                        Gambar Produk
-                    </h3>
-
-                    <div class="mt-1">
-                        <div class="flex space-x-4 mb-4">
-                            <label for="image" class="cursor-pointer flex-1">
-                                <div
-                                    class="px-4 py-2 text-center border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
-                                    <svg class="w-5 h-5 inline mr-2 text-gray-500 dark:text-gray-400" fill="none"
-                                        stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                    Upload Gambar
-                                </div>
-                            </label>
-                            <button type="button" id="camera-button"
-                                class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700">
-                                <svg class="w-5 h-5 inline mr-2 text-gray-500 dark:text-gray-400" fill="none"
-                                    stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4H19a2 2 0 002 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                        d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                </svg>
-                                Ambil Foto
-                            </button>
-                        </div>
-
-                        <input type="file" id="image" name="image" class="hidden" accept="image/*">
-
-                        <div id="dropzone-container"
-                            class="relative flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-all duration-200 bg-gray-50 dark:bg-gray-800 overflow-hidden">
-                            @if ($product->image_path)
-                                <div id="image-preview" class="absolute inset-0 flex items-center justify-center">
-                                    <img src="{{ Storage::url($product->image_path) }}" alt="{{ $product->name }}"
-                                        class="max-h-full max-w-full object-contain">
-                                </div>
-                                <div id="image-overlay"
-                                    class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity">
-                                    <button type="button" id="remove-image"
-                                        class="bg-red-600 text-white p-2 rounded-full">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none"
-                                            viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                                d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
-                                </div>
-                            @else
-                                <div id="placeholder-container"
-                                    class="flex flex-col items-center justify-center p-5 text-center">
-                                    <svg class="w-14 h-14 mb-3 text-gray-400" fill="none" stroke="currentColor"
-                                        viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                            d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                                    </svg>
-                                    <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                        <span class="font-semibold">Klik untuk upload</span> atau drag and drop
-                                    </p>
-                                    <p class="text-xs text-gray-500 dark:text-gray-400">
-                                        SVG, PNG, JPG or GIF (Maks. 2MB)
-                                    </p>
-                                </div>
-                            @endif
-
-                            <div id="new-image-preview"
-                                class="absolute inset-0 flex items-center justify-center hidden">
-                                <img src="" alt="Preview" class="max-h-full max-w-full object-contain">
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Form Actions -->
-                <div class="flex items-center justify-end space-x-3 mt-6">
-                    <a href="{{ route('products.index') }}"
-                        class="inline-flex items-center px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 dark:focus:ring-indigo-400">
-                        Batal
-                    </a>
-                    <button type="submit"
-                        class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1.5" fill="none"
-                            viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        Simpan Perubahan
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const unitsContainer = document.getElementById('units-container');
-                const addUnitBtn = document.getElementById('add-unit-btn');
-                let unitIndex = {{ count($product->productUnits) }};
-
-                // Fungsi untuk membuat baris satuan baru
-                function createUnitRow() {
-                    const template = `
-                        <div class="unit-row grid grid-cols-1 md:grid-cols-6 gap-4 mb-4 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
                             <div>
-                                <x-input-label value="Satuan" />
-                                <select name="units[${unitIndex}][unit_id]"
-                                    class="mt-1 block w-full rounded-md border-gray-300 dark:border-gray-600 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 dark:bg-gray-700 dark:text-gray-300"
-                                    required>
-                                    <option value="">-- Pilih Satuan --</option>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan</label>
+                                <select name="units[{{ $index }}][unit_id]" required
+                                    class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                                    <option value="">-- Pilih --</option>
                                     @foreach ($units as $unit)
-                                        <option value="{{ $unit->id }}">{{ $unit->name }} ({{ $unit->abbreviation }})</option>
+                                    <option value="{{ $unit->id }}" {{ $productUnit->unit_id == $unit->id ? 'selected' : '' }}>
+                                        {{ $unit->name }} ({{ $unit->abbreviation }})
+                                    </option>
                                     @endforeach
                                 </select>
                             </div>
                             <div>
-                                <x-input-label value="Konversi" />
-                                <x-text-input type="number" name="units[${unitIndex}][conversion_factor]"
-                                    value="1" min="1" step="1" class="mt-1 block w-full" required />
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Konversi</label>
+                                <input type="number" name="units[{{ $index }}][conversion_factor]" required min="1" value="{{ $productUnit->conversion_factor }}"
+                                    class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm"
+                                    {{ $productUnit->is_base_unit ? 'readonly' : '' }}>
+                                @if ($productUnit->is_base_unit)
+                                <p class="text-xs text-gray-400 mt-1">Satuan Dasar</p>
+                                @endif
                             </div>
                             <div>
-                                <x-input-label value="Harga Beli" />
-                                <div class="mt-1 relative rounded-md shadow-sm">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Beli</label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
                                     </div>
-                                    <x-text-input type="number" name="units[${unitIndex}][purchase_price]"
-                                        value="0" min="0" step="1" class="block w-full pl-10" required />
+                                    <input type="number" name="units[{{ $index }}][purchase_price]" required value="{{ $productUnit->purchase_price }}"
+                                        class="block w-full pl-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
                                 </div>
                             </div>
                             <div>
-                                <x-input-label value="Harga Jual" />
-                                <div class="mt-1 relative rounded-md shadow-sm">
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Jual</label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
                                     <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                                         <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
                                     </div>
-                                    <x-text-input type="number" name="units[${unitIndex}][selling_price]"
-                                        value="0" min="0" step="1" class="block w-full pl-10" required />
+                                    <input type="number" name="units[{{ $index }}][selling_price]" required value="{{ $productUnit->selling_price }}"
+                                        class="block w-full pl-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
                                 </div>
                             </div>
                             <div>
-                                <x-input-label value="Tanggal Expired" />
-                                <x-text-input type="date" name="units[${unitIndex}][expire_date]"
-                                    class="mt-1 block w-full" />
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Expired</label>
+                                <input type="date" name="units[{{ $index }}][expire_date]" value="{{ $productUnit->expire_date }}"
+                                    class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
                             </div>
-                            <div class="flex items-end">
-                                <div class="flex items-center">
-                                    <input type="checkbox" name="units[${unitIndex}][is_default]"
-                                        id="is_default_${unitIndex}"
-                                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded"
-                                        value="1">
-                                    <label for="is_default_${unitIndex}" class="ml-2 block text-sm text-gray-700 dark:text-gray-300">
-                                        Satuan Utama
-                                    </label>
-                                </div>
-                                <button type="button" class="remove-unit ml-auto text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
+                            <div class="flex items-end pb-2">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="units[{{ $index }}][is_default]" value="1" {{ $productUnit->is_base_unit ? 'checked onclick=return false;' : ($productUnit->is_default ? 'checked' : '') }}
+                                        class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700">
+                                    <span class="text-sm">Utama</span>
+                                </label>
                             </div>
                         </div>
-                    `;
-                    unitsContainer.insertAdjacentHTML('beforeend', template);
-                    unitIndex++;
-                }
+                    </div>
+                    @endforeach
+                </div>
 
-                // Event listener untuk tombol tambah satuan
-                addUnitBtn.addEventListener('click', createUnitRow);
+                <div class="mt-4">
+                    <button type="button" id="add-unit-btn" class="btn-secondary">
+                        <i class="ti ti-plus"></i>
+                        <span>Tambah Satuan Lain</span>
+                    </button>
+                </div>
+            </div>
 
-                // Event listener untuk tombol hapus satuan
-                unitsContainer.addEventListener('click', function(e) {
-                    if (e.target.closest('.remove-unit')) {
-                        const unitRow = e.target.closest('.unit-row');
-                        if (unitRow) {
-                            unitRow.remove();
-                        }
-                    }
-                });
+            <!-- Image -->
+            <div class="card p-6">
+                <div class="flex items-center gap-2 mb-6 pb-4 border-b border-gray-100 dark:border-gray-700/50">
+                    <i class="ti ti-photo text-emerald-500 text-lg"></i>
+                    <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-100">Gambar Produk</h3>
+                </div>
 
-                // Event listener untuk checkbox satuan utama
-                unitsContainer.addEventListener('change', function(e) {
-                    if (e.target.matches('input[type="checkbox"][name$="[is_default]"]')) {
-                        const checkboxes = unitsContainer.querySelectorAll(
-                            'input[type="checkbox"][name$="[is_default]"]');
-                        checkboxes.forEach(checkbox => {
-                            if (checkbox !== e.target) {
-                                checkbox.checked = false;
-                            }
-                        });
-                    }
-                });
-
-                // Handle image upload
-                const imageInput = document.getElementById('image');
-                const dropzoneContainer = document.getElementById('dropzone-container');
-                const placeholderContainer = document.getElementById('placeholder-container');
-                const newImagePreview = document.getElementById('new-image-preview');
-                const imagePreview = document.getElementById('image-preview');
-                const removeImageBtn = document.getElementById('remove-image');
-                const cameraButton = document.getElementById('camera-button');
-
-                imageInput.addEventListener('change', function(e) {
-                    if (this.files && this.files[0]) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            if (imagePreview) {
-                                imagePreview.classList.add('hidden');
-                            }
-                            if (placeholderContainer) {
-                                placeholderContainer.classList.add('hidden');
-                            }
-
-                            const img = newImagePreview.querySelector('img');
-                            img.src = e.target.result;
-                            newImagePreview.classList.remove('hidden');
-                        }
-                        reader.readAsDataURL(this.files[0]);
-                    }
-                });
-
-                // Handle drag and drop
-                ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                    dropzoneContainer.addEventListener(eventName, preventDefaults, false);
-                });
-
-                function preventDefaults(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                }
-
-                ['dragenter', 'dragover'].forEach(eventName => {
-                    dropzoneContainer.addEventListener(eventName, highlight, false);
-                });
-
-                ['dragleave', 'drop'].forEach(eventName => {
-                    dropzoneContainer.addEventListener(eventName, unhighlight, false);
-                });
-
-                function highlight() {
-                    dropzoneContainer.classList.add('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/20');
-                }
-
-                function unhighlight() {
-                    dropzoneContainer.classList.remove('border-indigo-500', 'bg-indigo-50', 'dark:bg-indigo-900/20');
-                }
-
-                dropzoneContainer.addEventListener('drop', handleDrop, false);
-
-                function handleDrop(e) {
-                    const dt = e.dataTransfer;
-                    const files = dt.files;
-                    imageInput.files = files;
-
-                    const event = new Event('change', {
-                        bubbles: true
-                    });
-                    imageInput.dispatchEvent(event);
-                }
-
-                // Remove image
-                if (removeImageBtn) {
-                    removeImageBtn.addEventListener('click', function() {
-                        const removeImageInput = document.createElement('input');
-                        removeImageInput.type = 'hidden';
-                        removeImageInput.name = 'remove_image';
-                        removeImageInput.value = '1';
-                        dropzoneContainer.appendChild(removeImageInput);
-
-                        if (imagePreview) {
-                            imagePreview.classList.add('hidden');
-                        }
-
-                        if (placeholderContainer) {
-                            placeholderContainer.classList.remove('hidden');
-                        } else {
-                            const placeholder = document.createElement('div');
-                            placeholder.id = 'placeholder-container';
-                            placeholder.className = 'flex flex-col items-center justify-center p-5 text-center';
-                            placeholder.innerHTML = `
-                            <svg class="w-14 h-14 mb-3 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                            </svg>
-                            <p class="mb-2 text-sm text-gray-500 dark:text-gray-400">
-                                <span class="font-semibold">Klik untuk upload</span> atau drag and drop
-                            </p>
-                            <p class="text-xs text-gray-500 dark:text-gray-400">
-                                SVG, PNG, JPG or GIF (Maks. 2MB)
-                            </p>
-                        `;
-                            dropzoneContainer.appendChild(placeholder);
-                        }
-
-                        document.getElementById('image-overlay').classList.add('hidden');
-                    });
-                }
-
-                // Camera functionality
-                if (cameraButton) {
-                    cameraButton.addEventListener('click', async function() {
-                        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                            alert('Kamera tidak didukung di browser ini');
-                            return;
-                        }
-
-                        try {
-                            const stream = await navigator.mediaDevices.getUserMedia({
-                                video: true
-                            });
-                            const videoElement = document.getElementById('camera-preview');
-                            videoElement.srcObject = stream;
-                            videoElement.play();
-
-                            const cameraContainer = document.createElement('div');
-                            cameraContainer.className =
-                                'fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50';
-                            cameraContainer.id = 'camera-container';
-
-                            cameraContainer.innerHTML = `
-                            <div class="bg-white dark:bg-gray-800 p-4 rounded-lg max-w-lg w-full mx-4">
-                                <div class="flex justify-between items-center mb-4">
-                                    <h3 class="text-lg font-medium text-gray-900 dark:text-gray-100">Ambil Foto</h3>
-                                    <button id="close-camera" class="text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200">
-                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                                        </svg>
-                                    </button>
+                <div class="mt-2 text-center">
+                    <div class="flex items-center justify-center w-full">
+                        <label for="image" class="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-xl cursor-pointer bg-gray-50 dark:hover:bg-gray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 relative overflow-hidden group transition-all">
+                            <div id="placeholder-area" class="flex flex-col items-center justify-center pt-5 pb-6 {{ $product->image ? 'hidden' : '' }}">
+                                <div class="w-16 h-16 rounded-full bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center mb-4 text-emerald-500 group-hover:scale-110 transition-transform">
+                                    <i class="ti ti-cloud-upload text-3xl"></i>
                                 </div>
-                                <video id="camera-preview" class="w-full h-64 bg-black rounded-lg mb-4"></video>
-                                <div class="flex justify-center">
-                                    <button id="capture-photo" class="bg-indigo-600 text-white px-4 py-2 rounded-full">
-                                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4H19a2 2 0 002 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
-                                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </button>
+                                <p class="mb-2 text-sm text-gray-500 dark:text-gray-400"><span class="font-semibold">Klik untuk upload</span> atau drag and drop</p>
+                                <p class="text-xs text-gray-500 dark:text-gray-400">SVG, PNG, JPG (MAX. 2MB)</p>
+                            </div>
+
+                            <div id="image-preview" class="absolute inset-0 {{ $product->image ? '' : 'hidden' }} bg-white dark:bg-gray-800">
+                                <img src="{{ $product->image ? Storage::url($product->image) : '' }}" alt="Preview" class="w-full h-full object-contain">
+                                <button type="button" id="remove-image" class="absolute top-2 right-2 p-1.5 rounded-full bg-red-100 text-red-600 hover:bg-red-200 transition-colors">
+                                    <i class="ti ti-x"></i>
+                                </button>
+                            </div>
+                            <input id="image" name="image" type="file" class="hidden" accept="image/*" />
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end gap-3">
+                <button type="button" onclick="window.history.back()" class="btn-secondary">Batal</button>
+                <button type="submit" class="btn-primary">Simpan Perubahan</button>
+            </div>
+        </form>
+    </div>
+
+    @push('scripts')
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add Unit Logic
+            const unitsContainer = document.getElementById('units-container');
+            const addUnitBtn = document.getElementById('add-unit-btn');
+            // Start index after existing units
+            let unitIndex = {
+                {
+                    $product - > units - > count()
+                }
+            };
+
+            if (addUnitBtn) {
+                addUnitBtn.addEventListener('click', () => {
+                    const newRow = document.createElement('div');
+                    newRow.className = 'p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 relative group animate-fade-in-up';
+                    newRow.innerHTML = `
+                        <button type="button" class="remove-unit absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4">
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Satuan</label>
+                                <select name="units[${unitIndex}][unit_id]" required
+                                    class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                                    <option value="">-- Pilih --</option>
+                                    @foreach ($units as $unit)
+                                    <option value="{{ $unit->id }}">{{ $unit->name }} ({{ $unit->abbreviation }})</option>
+                                    @endforeach
+                                </select>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Konversi</label>
+                                <input type="number" name="units[${unitIndex}][conversion_factor]" required min="1"
+                                    class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Beli</label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
+                                    </div>
+                                    <input type="number" name="units[${unitIndex}][purchase_price]" required
+                                        class="block w-full pl-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
                                 </div>
                             </div>
-                        `;
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Harga Jual</label>
+                                <div class="mt-1 relative rounded-xl shadow-sm">
+                                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                                        <span class="text-gray-500 dark:text-gray-400 sm:text-sm">Rp</span>
+                                    </div>
+                                    <input type="number" name="units[${unitIndex}][selling_price]" required
+                                        class="block w-full pl-10 rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                                </div>
+                            </div>
+                            <div>
+                                <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Expired</label>
+                                <input type="date" name="units[${unitIndex}][expire_date]"
+                                    class="mt-1 block w-full rounded-xl border-gray-200 dark:border-gray-600 dark:bg-gray-700 dark:text-gray-300 focus:border-emerald-500 focus:ring-emerald-500 sm:text-sm">
+                            </div>
+                            <div class="flex items-end pb-2">
+                                <label class="flex items-center space-x-2">
+                                    <input type="checkbox" name="units[${unitIndex}][is_default]" value="1" 
+                                        class="rounded border-gray-300 text-emerald-600 shadow-sm focus:ring-emerald-500 dark:border-gray-600 dark:bg-gray-700">
+                                    <span class="text-sm">Utama</span>
+                                </label>
+                            </div>
+                        </div>
+                     `;
+                    unitsContainer.appendChild(newRow);
+                    unitIndex++;
+                });
 
-                            document.body.appendChild(cameraContainer);
-
-                            document.getElementById('close-camera').addEventListener('click', function() {
-                                stream.getTracks().forEach(track => track.stop());
-                                cameraContainer.remove();
-                            });
-
-                            document.getElementById('capture-photo').addEventListener('click', function() {
-                                const canvas = document.createElement('canvas');
-                                canvas.width = videoElement.videoWidth;
-                                canvas.height = videoElement.videoHeight;
-                                canvas.getContext('2d').drawImage(videoElement, 0, 0);
-
-                                canvas.toBlob(function(blob) {
-                                    const file = new File([blob], "camera-photo.jpg", {
-                                        type: "image/jpeg"
-                                    });
-
-                                    const dataTransfer = new DataTransfer();
-                                    dataTransfer.items.add(file);
-                                    imageInput.files = dataTransfer.files;
-
-                                    const event = new Event('change', {
-                                        bubbles: true
-                                    });
-                                    imageInput.dispatchEvent(event);
-
-                                    stream.getTracks().forEach(track => track.stop());
-                                    cameraContainer.remove();
-                                }, 'image/jpeg');
-                            });
-                        } catch (err) {
-                            alert('Error accessing camera: ' + err.message);
-                        }
-                    });
-                }
-
-                // Expiry Date Validation for Perishable Products
-                const isPerishableCheckbox = document.getElementById('is_perishable');
-                const requiresExpiryCheckbox = document.getElementById('requires_expiry_date');
-                const expiryWarningDaysInput = document.getElementById('expiry_warning_days');
-                const expireDateInputs = document.querySelectorAll('input[name$="[expire_date]"]');
-
-                function toggleExpiryValidation() {
-                    const isPerishable = isPerishableCheckbox?.checked || false;
-                    const requiresExpiry = requiresExpiryCheckbox?.checked || false;
-                    const shouldRequireExpiry = isPerishable || requiresExpiry;
-
-                    // Toggle required attribute for expiry warning days
-                    if (expiryWarningDaysInput) {
-                        expiryWarningDaysInput.required = shouldRequireExpiry;
-                        if (shouldRequireExpiry && !expiryWarningDaysInput.value) {
-                            expiryWarningDaysInput.value = '30'; // Default value
-                        }
+                unitsContainer.addEventListener('click', (e) => {
+                    if (e.target.closest('.remove-unit')) {
+                        e.target.closest('.relative').remove();
                     }
+                });
+            }
 
-                    // Toggle required attribute for expire date inputs
-                    expireDateInputs.forEach(input => {
-                        input.required = shouldRequireExpiry;
-                        if (shouldRequireExpiry) {
-                            // Set minimum date to tomorrow
-                            const tomorrow = new Date();
-                            tomorrow.setDate(tomorrow.getDate() + 1);
-                            input.min = tomorrow.toISOString().split('T')[0];
-                        } else {
-                            input.removeAttribute('min');
+            // Image Upload & Camera
+            const imageInput = document.getElementById('image');
+            const imagePreview = document.getElementById('image-preview');
+            const placeholder = document.getElementById('placeholder-area');
+            const removeImgBtn = document.getElementById('remove-image');
+
+            if (imageInput) {
+                imageInput.addEventListener('change', function() {
+                    const file = this.files[0];
+                    if (file) {
+                        const reader = new FileReader();
+                        reader.onload = function(e) {
+                            imagePreview.querySelector('img').src = e.target.result;
+                            imagePreview.classList.remove('hidden');
+                            placeholder.classList.add('hidden');
                         }
-                    });
-
-                    // Show/hide validation messages
-                    const validationMessage = document.getElementById('expiry-validation-message');
-                    if (validationMessage) {
-                        validationMessage.style.display = shouldRequireExpiry ? 'block' : 'none';
+                        reader.readAsDataURL(file);
                     }
-                }
+                });
 
-                // Add event listeners
-                if (isPerishableCheckbox) {
-                    isPerishableCheckbox.addEventListener('change', toggleExpiryValidation);
-                }
-                if (requiresExpiryCheckbox) {
-                    requiresExpiryCheckbox.addEventListener('change', toggleExpiryValidation);
-                }
-
-                // Initial validation check
-                toggleExpiryValidation();
-
-                // Add validation message if it doesn't exist
-                if (!document.getElementById('expiry-validation-message')) {
-                    const validationDiv = document.createElement('div');
-                    validationDiv.id = 'expiry-validation-message';
-                    validationDiv.className = 'mt-2 text-sm text-blue-600 dark:text-blue-400';
-                    validationDiv.style.display = 'none';
-                    validationDiv.innerHTML = '<i class="fas fa-info-circle mr-1"></i>Tanggal kedaluwarsa dan hari peringatan wajib diisi untuk produk yang mudah rusak.';
-                    
-                    // Insert after the strict_expiry_validation checkbox
-                    const strictValidationDiv = document.querySelector('input[name="strict_expiry_validation"]')?.closest('.flex');
-                    if (strictValidationDiv) {
-                        strictValidationDiv.parentNode.insertBefore(validationDiv, strictValidationDiv.nextSibling);
-                    }
-                }
-            });
-        </script>
+                removeImgBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    imageInput.value = '';
+                    imagePreview.querySelector('img').src = '';
+                    imagePreview.classList.add('hidden');
+                    placeholder.classList.remove('hidden');
+                });
+            }
+        });
+    </script>
     @endpush
 </x-app-layout>

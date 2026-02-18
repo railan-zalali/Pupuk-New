@@ -84,7 +84,10 @@ class SaleController extends Controller
         }
 
         // Get all products, not just those with stock > 0, to ensure draft products are available
-        $products = Product::orderBy('name')->get();
+        // Eager load relationships for better performance in POS
+        $products = Product::with(['category', 'productUnits.unit'])
+            ->orderBy('name')
+            ->get();
 
         // Ambil data customer tanpa cache
         $customers = Customer::select('id', 'nama', 'kecamatan_nama', 'kabupaten_nama')
@@ -293,7 +296,7 @@ class SaleController extends Controller
                         // Kurangi stok untuk setiap produk dalam draft menggunakan FIFO
                         $draft->load(['saleDetails.product']);
                         $fifoService = new FifoService();
-                        
+
                         foreach ($draft->saleDetails as $detail) {
                             $fifoService->reduceStock(
                                 $detail->product_id,

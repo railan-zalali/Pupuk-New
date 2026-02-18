@@ -1,13 +1,25 @@
 {
   "resources/css/app.css": {
-    "file": "assets/app-CrjPpIJz.css",
+    "file": "assets/app-BrHKNONF.css",
     "src": "resources/css/app.css",
     "isEntry": true
   },
   "resources/js/app.js": {
-    "file": "assets/app-DjaR69cl.js",
+    "file": "assets/app-bk0wuLQ-.js",
     "name": "app",
     "src": "resources/js/app.js",
+    "isEntry": true
+  },
+  "resources/js/purchase-form.js": {
+    "file": "assets/purchase-form-DtMCVkC7.js",
+    "name": "purchase-form",
+    "src": "resources/js/purchase-form.js",
+    "isEntry": true
+  },
+  "resources/js/sales-pos.js": {
+    "file": "assets/sales-pos-k1BOz4cy.js",
+    "name": "sales-pos",
+    "src": "resources/js/sales-pos.js",
     "isEntry": true
   }
 }

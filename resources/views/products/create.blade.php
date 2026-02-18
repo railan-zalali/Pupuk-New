@@ -508,11 +508,11 @@
             const addUnitBtn = document.getElementById('add-unit-btn');
             let unitIndex = 1;
 
-            if (addUnitBtn) {
-                addUnitBtn.addEventListener('click', () => {
-                    const newRow = document.createElement('div');
-                    newRow.className = 'p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 relative group animate-fade-in-up';
-                    newRow.innerHTML = `
+                if (addUnitBtn) {
+                    addUnitBtn.addEventListener('click', () => {
+                        const newRow = document.createElement('div');
+                        newRow.className = 'p-4 bg-gray-50 dark:bg-gray-800/50 rounded-xl border border-gray-100 dark:border-gray-700 relative group animate-fade-in-up';
+                        newRow.innerHTML = `
                         <button type="button" class="remove-unit absolute top-2 right-2 text-gray-400 hover:text-red-500 transition-colors">
                             <i class="ti ti-trash"></i>
                         </button>
@@ -577,34 +577,36 @@
                 });
             }
 
-            // Image Upload & Camera (simplified)
-            const imageInput = document.getElementById('image');
-            const imagePreview = document.getElementById('image-preview');
-            const placeholder = document.getElementById('placeholder-area');
-            const removeImgBtn = document.getElementById('remove-image');
+                const imageInput = document.getElementById('image');
+                const imagePreview = document.getElementById('image-preview');
+                const placeholder = document.getElementById('placeholder-area');
+                const removeImgBtn = document.getElementById('remove-image');
 
-            if (imageInput) {
-                imageInput.addEventListener('change', function() {
-                    const file = this.files[0];
-                    if (file) {
-                        const reader = new FileReader();
-                        reader.onload = function(e) {
-                            imagePreview.querySelector('img').src = e.target.result;
-                            imagePreview.classList.remove('hidden');
-                            placeholder.classList.add('hidden');
+                if (imageInput && imagePreview && placeholder && removeImgBtn) {
+                    imageInput.addEventListener('change', function() {
+                        const file = this.files[0];
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function(e) {
+                                const img = imagePreview.querySelector('img');
+                                if (img) img.src = e.target.result;
+                                imagePreview.classList.remove('hidden');
+                                placeholder.classList.add('hidden');
+                            }
+                            reader.readAsDataURL(file);
                         }
-                        reader.readAsDataURL(file);
-                    }
-                });
+                    });
 
-                removeImgBtn.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation(); // Stop bubbling to label
-                    imageInput.value = '';
-                    imagePreview.classList.add('hidden');
-                    placeholder.classList.remove('hidden');
-                });
-            }
+                    removeImgBtn.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        imageInput.value = '';
+                        const img = imagePreview.querySelector('img');
+                        if (img) img.src = '';
+                        imagePreview.classList.add('hidden');
+                        placeholder.classList.remove('hidden');
+                    });
+                }
 
             // Batch Rows Logic
             const addRowBtn = document.getElementById('add-product-row');

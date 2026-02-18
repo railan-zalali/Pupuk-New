@@ -211,6 +211,17 @@
     </script>
 
     @stack('scripts')
+    <script type="module">
+        if (window.Alpine) {
+            window.Alpine.start();
+        } else {
+            document.addEventListener('DOMContentLoaded', () => {
+                if (window.Alpine) {
+                    window.Alpine.start();
+                }
+            });
+        }
+    </script>
 </body>
 
 </html>

@@ -42,8 +42,8 @@ class PurchaseController extends Controller
     {
         $suppliers = Supplier::orderBy('name')->get();
 
-        // Ambil semua produk seperti di SalesController - tanpa filter supplier
-        $products = Product::orderBy('name')->get();
+        // Ambil semua produk dengan relasi yang dibutuhkan
+        $products = Product::with(['category', 'units'])->orderBy('name')->get();
 
         // Generate invoice number
         $lastPurchase = Purchase::orderBy('id', 'desc')->first();
